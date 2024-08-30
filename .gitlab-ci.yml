@@ -1,0 +1,100 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  REGION: ${AWS_DEFAULT_REGION}
+  CF_ZONE_ID: ${LYNX_CF_ZONE_ID}
+  DOCKER_TLS_CERTDIR: "/certs" # Docker TLS certificates (if needed)
+
+before_script:
+  - apk add --no-cache curl jq python3 py3-pip  # Installs necessary packages
+  - python3 -m venv /opt/venv  # Create a virtual environment (optional)
+  - source /opt/venv/bin/activate  # Activate the virtual environment (optional)
+  - pip3 install --upgrade pip  # Upgrades pip to the latest version inside the virtual environment (optional)
+  - pip3 install --no-cache-dir awscli
+  - aws --version  # Verify AWS CLI version (optional, for debugging)
+  - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
+
+stages:
+  - build
+  - test
+  - deploy
+  - clear-cache
+
+build:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${DEV_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${DEV_AWS_SECRET_ACCESS_KEY}
+        REPOSITORY_URL: ${DEV_API_IMAGE_REGISTRY}
+    - if: '$CI_COMMIT_BRANCH == "qa"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${DEV_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${DEV_AWS_SECRET_ACCESS_KEY}
+        REPOSITORY_URL: ${QA_API_IMAGE_REGISTRY}
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${PROD_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${PROD_AWS_SECRET_ACCESS_KEY}
+        REPOSITORY_URL: ${PROD_IMAGE_REGISTRY}
+
+  script:
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+    - echo "Building image..."
+    - docker build -t $REPOSITORY_URL:latest .
+    - echo "Tagging image..."
+    - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
+    - echo "Pushing image..."
+    - docker push $REPOSITORY_URL:latest
+    - docker push $REPOSITORY_URL:$IMAGE_TAG
+
+deploy:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${DEV_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${DEV_AWS_SECRET_ACCESS_KEY}
+        CLUSTER_NAME: ${DEV_ECS_CLUSTER}
+        SERVICE_NAME: ${DEV_ECS_SERVICE_API}
+    - if: '$CI_COMMIT_BRANCH == "qa"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${DEV_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${DEV_AWS_SECRET_ACCESS_KEY}
+        CLUSTER_NAME: ${QA_ECS_CLUSTER}
+        SERVICE_NAME: ${QA_ECS_SERVICE_API}
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      variables:
+        AWS_ACCESS_KEY_ID: ${PROD_AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${PROD_AWS_SECRET_ACCESS_KEY}
+        CLUSTER_NAME: ${PROD_ECS_CLUSTER}
+        SERVICE_NAME: ${PROD_ECS_SERVICE_API}
+
+  script:
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+    - docker run fabfuel/ecs-deploy:latest ecs deploy ${CLUSTER_NAME} ${SERVICE_NAME} --no-deregister --timeout 1200 --region ${REGION} --access-key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+
+clear-cache:
+  stage: clear-cache
+  only:
+    - dev
+    - qa
+    - prod
+  needs: ['deploy']
+  before_script:
+    - apk add --update curl && rm -rf /var/cache/apk/*
+  script:
+    - |
+      curl --fail --output "/dev/null" --silent --show-error -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+      -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" \
+      --data '{"purge_everything":true}'
+
+# Include job templates for security scanning
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml

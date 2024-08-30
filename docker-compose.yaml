@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  redis-cluster-compose:
+    driver: bridge
+
+services:
+  lynx-api:
+    image: lynx-api:dev
+    container_name: lynx-api
+    build:
+      context: .
+    expose:
+      - 9090:9090
+    networks:
+      - redis-cluster-compose
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+  redis:
+    image: redis:latest
+    ports:
+      - 7000:7000
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-1
+    volumes:
+      - ./7000:/redis
+    command: redis-server /redis/redis.conf
