@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 
 export class AddFundingSourcesDto {
   @ApiPropertyOptional({
@@ -45,7 +45,7 @@ export class AddFundingSourcesDto {
   @ValidateIf((o) => Array.isArray(o.equityStages))
   @IsString({ each: true })
   @IsOptional()
-  @ConditionalDiscardValue('raiseEquity', (value) => value === true)
+  @ConditionalValue('raiseEquity', (value) => value === true)
   equityStages?: string[] | string;
 
   @ApiPropertyOptional({
@@ -62,7 +62,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('awardeeHasVentureCapital', (value) => value === true)
+  @ConditionalValue('awardeeHasVentureCapital', (value) => value === true)
   foreignAffiliation?: string;
 
   @ApiPropertyOptional({
@@ -91,7 +91,7 @@ export class AddFundingSourcesDto {
   @ValidateIf((o) => Array.isArray(o.foreignFundingDetails))
   @IsString({ each: true })
   @IsOptional()
-  @ConditionalDiscardValue('foreignFunding', (value) => value === true)
+  @ConditionalValue('foreignFunding', (value) => value === true)
   foreignFundingDetails?: string[] | string;
 
   @ApiPropertyOptional({
@@ -108,7 +108,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('governmentBackedFunding', (value) => value === true)
+  @ConditionalValue('governmentBackedFunding', (value) => value === true)
   governmentBackedFundingDetails?: string;
 
   @ApiPropertyOptional({
@@ -125,7 +125,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('fundingRestrictions', (value) => value === true)
+  @ConditionalValue('fundingRestrictions', (value) => value === true)
   fundingRestrictionsDetails?: string;
 
   @ApiPropertyOptional({
@@ -142,7 +142,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('additionalFundingStrategy', (value) => value === true)
+  @ConditionalValue('additionalFundingStrategy', (value) => value === true)
   additionalFundingStrategyDetails?: string;
 
   @ApiPropertyOptional({
@@ -159,7 +159,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('outstandingDebts', (value) => value === true)
+  @ConditionalValue('outstandingDebts', (value) => value === true)
   outstandingDebtsDetails?: string;
 
   @ApiPropertyOptional({
@@ -176,7 +176,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('fundingInstruments', (value) => value === true)
+  @ConditionalValue('fundingInstruments', (value) => value === true)
   fundingInstrumentsDetails?: string;
 
   @ApiPropertyOptional({
@@ -193,7 +193,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('hasFinancialAudits', (value) => value === true)
+  @ConditionalValue('hasFinancialAudits', (value) => value === true)
   auditDetails?: string;
 
   @ApiPropertyOptional({
@@ -210,7 +210,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('strategicPartnership', (value) => value === true)
+  @ConditionalValue('strategicPartnership', (value) => value === true)
   strategicPartnershipDetails?: string;
 
   @ApiPropertyOptional({
@@ -227,7 +227,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('foreignFinancialInterest', (value) => value === true)
+  @ConditionalValue('foreignFinancialInterest', (value) => value === true)
   foreignFinancialInterestDetails?: string;
 
   @ApiPropertyOptional({
@@ -244,7 +244,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('contingencyFinancingPlan', (value) => value === true)
+  @ConditionalValue('contingencyFinancingPlan', (value) => value === true)
   contingencyFinancingPlanDetails?: string;
 }
 

@@ -9,9 +9,8 @@ import { CognitoModule } from './modules/cognito/cognito.module';
 import { CompanyModule } from './modules/company';
 import { CompanyProfileLegalStructureModule } from './modules/company-profile-legal-structure';
 import { ContactUsModule } from './modules/contact-us';
-import { GloabalCacheModule } from './modules/global/providers';
 import { MailerModule } from './modules/mailer/mailer.module';
-import { createLoggerOptions } from './shared/factories/pino-logger.factory';
+import { createLoggerOptions } from './shared/factories';
 import { HttpExceptionFilter } from './shared/filters/exception-filter';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { LoggerMiddleware } from './shared/middlewares';
@@ -25,6 +24,7 @@ import { RevenueModule } from './modules/revenue';
 import { CybersecurityModule } from './modules/cybersecurity';
 import { FundingSourcesModule } from './modules/funding-sources';
 import { OwnershipStructureModule } from './modules/ownership-structure/ownership-structure.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -37,9 +37,9 @@ import { OwnershipStructureModule } from './modules/ownership-structure/ownershi
       useFactory: createLoggerOptions,
     }),
     TypeOrmModule.forRoot({ ...dataSourceOptions }),
+    EventEmitterModule.forRoot(),
     HealthModule,
     GlobalModule,
-    GloabalCacheModule,
     GlobalJwtModule,
     AuthModule,
     CognitoModule,

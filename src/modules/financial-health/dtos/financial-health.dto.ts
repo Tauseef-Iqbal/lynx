@@ -1,7 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 
 export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Financial Statements Available' })
@@ -14,8 +14,8 @@ export class CreateFinancialHealthSectionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ConditionalDiscardValue('financialStatements', (value) => value === true)
-  financialStatementsFiles?: any[];
+  @ConditionalValue('financialStatements', (value) => value === true)
+  financialStatementsFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Financial Elements Available' })
   @IsOptional()
@@ -26,7 +26,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Financial Elements Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('financialElements', (value) => value === true)
+  @ConditionalValue('financialElements', (value) => value === true)
   financialElementsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Financial Statements Available' })
@@ -39,7 +39,7 @@ export class CreateFinancialHealthSectionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ConditionalDiscardValue('businessPlans', (value) => value === true)
+  @ConditionalValue('businessPlans', (value) => value === true)
   businessPlansFiles?: any[];
 
   @ApiPropertyOptional({ description: 'Bankruptcy Filed' })
@@ -51,7 +51,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Bankruptcy Filed Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('bankruptcyFiled', (value) => value === true)
+  @ConditionalValue('bankruptcyFiled', (value) => value === true)
   bankruptcyFiledDetails?: string;
 
   @ApiPropertyOptional({ description: 'Financial Obligations' })
@@ -63,7 +63,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Financial Obligations Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('financialObligations', (value) => value === true)
+  @ConditionalValue('financialObligations', (value) => value === true)
   financialObligationsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Good Standing Certificates Available' })
@@ -76,7 +76,7 @@ export class CreateFinancialHealthSectionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ConditionalDiscardValue('goodStandingCertificates', (value) => value === true)
+  @ConditionalValue('goodStandingCertificates', (value) => value === true)
   goodStandingCertificatesFiles?: any[];
 
   @ApiPropertyOptional({ description: 'Pending Lawsuit as Defendant' })
@@ -88,7 +88,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Pending Lawsuit Defendant Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('pendingLawsuitDefendant', (value) => value === true)
+  @ConditionalValue('pendingLawsuitDefendant', (value) => value === true)
   pendingLawsuitDefendantDetails?: string;
 
   @ApiPropertyOptional({ description: 'Foreign Person Obligations' })
@@ -100,7 +100,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Foreign Person Obligations Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('foreignPersonObligations', (value) => value === true)
+  @ConditionalValue('foreignPersonObligations', (value) => value === true)
   foreignPersonObligationsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Financial Disclosure Statements Available' })
@@ -113,7 +113,7 @@ export class CreateFinancialHealthSectionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ConditionalDiscardValue('financialDisclosureStatements', (value) => value === true)
+  @ConditionalValue('financialDisclosureStatements', (value) => value === true)
   financialDisclosureStatementsFiles?: any[];
 
   @ApiPropertyOptional({ description: 'Financial Changes' })
@@ -125,7 +125,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Financial Changes Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('financialChanges', (value) => value === true)
+  @ConditionalValue('financialChanges', (value) => value === true)
   financialChangesDetails?: string;
 
   @ApiPropertyOptional({ description: 'Contingency Financing Plans Available' })
@@ -137,7 +137,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Contingency Financing Plans Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('contingencyFinancingPlans', (value) => value === true)
+  @ConditionalValue('contingencyFinancingPlans', (value) => value === true)
   contingencyFinancingPlansDetails?: string;
 
   @ApiPropertyOptional({ description: 'Financial Covenants' })
@@ -149,7 +149,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Financial Covenants Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('financialConvenants', (value) => value === true)
+  @ConditionalValue('financialConvenants', (value) => value === true)
   financialConvenantsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Reserve Fundings' })
@@ -161,7 +161,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Reserve Fundings Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('reserveFundings', (value) => value === true)
+  @ConditionalValue('reserveFundings', (value) => value === true)
   reserveFundingsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Financial Audits Available' })
@@ -174,7 +174,7 @@ export class CreateFinancialHealthSectionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ConditionalDiscardValue('financialAudits', (value) => value === true)
+  @ConditionalValue('financialAudits', (value) => value === true)
   financialAuditsFiles?: any[];
 
   @ApiPropertyOptional({ description: 'Ownership/Management Financial Changes' })
@@ -186,7 +186,7 @@ export class CreateFinancialHealthSectionDto {
   @ApiPropertyOptional({ description: 'Ownership/Management Financial Changes Details' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('ownershipManagementFinancialChanges', (value) => value === true)
+  @ConditionalValue('ownershipManagementFinancialChanges', (value) => value === true)
   ownershipManagementFinancialChangesDetails?: string;
 }
 

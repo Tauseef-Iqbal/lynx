@@ -1,7 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 import { AddOwnershipStructureKeyManagementDto, AddOwnerShipStructureDetailsDto } from '../dtos';
 
 export class OwnershipAgreementsDetailsDto {
@@ -57,7 +57,7 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalDiscardValue('percentForeignInterest', (value) => value === true)
+  @ConditionalValue('percentForeignInterest', (value) => value === true)
   ownershipDetails?: OwnershipAgreementsDetailsDto;
 
   @ApiPropertyOptional({ description: 'Agreements with Foreign Persons', example: true })
@@ -68,7 +68,7 @@ export class AddOwnershipStructureDto {
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('ownershipAgreementsDetails', (value) => value === true)
+  @ConditionalValue('ownershipAgreementsDetails', (value) => value === true)
   revenueSharingAgreementsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Percent Foreign Interest', example: true })
@@ -81,7 +81,7 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalDiscardValue('percentForeignInterest', (value) => value === true)
+  @ConditionalValue('percentForeignInterest', (value) => value === true)
   foreignInterestDetails?: ForeignInterestDetailsDto;
 
   @ApiPropertyOptional({ description: 'Foreign Owned Business', example: true })
@@ -94,7 +94,7 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalDiscardValue('foreignOwnedBusiness', (value) => value === true)
+  @ConditionalValue('foreignOwnedBusiness', (value) => value === true)
   foreignOwnedBusinessDetails?: ForeignInterestDetailsDto;
 
   @ApiPropertyOptional({ description: 'Beneficial Owner', example: true })
@@ -105,7 +105,7 @@ export class AddOwnershipStructureDto {
   @ApiPropertyOptional({ description: 'Beneficial Owner Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('beneficialOwner', (value) => value === true)
+  @ConditionalValue('beneficialOwner', (value) => value === true)
   beneficialOwnerDetails?: string;
 }
 

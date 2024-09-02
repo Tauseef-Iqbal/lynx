@@ -1,27 +1,28 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, ValidateIf, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { CompanyClassification } from '../enums';
+import { IsSocialMediaUrl } from '../validators';
 
-class SocialMediaDto {
+export class SocialMediaDto {
   @ApiPropertyOptional({ description: 'LinkedIn profile URL' })
-  @IsUrl({}, { message: 'Invalid LinkedIn URL' })
   @IsOptional()
+  @IsSocialMediaUrl('linkedin', { message: 'Invalid LinkedIn URL' })
   linkedin?: string;
 
   @ApiPropertyOptional({ description: 'Facebook profile URL' })
   @IsOptional()
-  @IsUrl({}, { message: 'Invalid Facebook URL' })
+  @IsSocialMediaUrl('facebook', { message: 'Invalid Facebook URL' })
   facebook?: string;
 
   @ApiPropertyOptional({ description: 'YouTube profile URL' })
   @IsOptional()
-  @IsUrl({}, { message: 'Invalid YouTube URL' })
+  @IsSocialMediaUrl('youtube', { message: 'Invalid YouTube URL' })
   youtube?: string;
 
   @ApiPropertyOptional({ description: 'Instagram profile URL' })
   @IsOptional()
-  @IsUrl({}, { message: 'Invalid Instagram URL' })
+  @IsSocialMediaUrl('instagram', { message: 'Invalid Instagram URL' })
   instagram?: string;
 }
 
@@ -34,6 +35,7 @@ export class CreateCompanyProfileDto {
   @ApiPropertyOptional({ description: 'Company website' })
   @IsOptional()
   @IsString()
+  @IsUrl()
   website?: string;
 
   @ApiProperty({ description: 'SAM ID' })
@@ -61,9 +63,10 @@ export class CreateCompanyProfileDto {
   @IsString()
   founderName: string;
 
-  @ApiProperty({ description: 'Year the company was founded' })
+  @ApiProperty({ description: 'Year the company was founded', example: 2024 })
   @IsNotEmpty()
   @IsInt()
+  @Transform(({ value }) => parseInt(value, 10))
   foundedYear: number;
 
   @ApiProperty({ description: 'State of Registration' })
@@ -91,9 +94,10 @@ export class CreateCompanyProfileDto {
   @IsString()
   city: string;
 
-  @ApiProperty({ description: 'ZIP Code' })
+  @ApiProperty({ description: 'ZIP Code', example: 924892 })
   @IsNotEmpty()
   @IsInt()
+  @Transform(({ value }) => parseInt(value, 10))
   zipCode: number;
 
   @ApiPropertyOptional({ description: 'Classification', enum: CompanyClassification })
@@ -102,9 +106,10 @@ export class CreateCompanyProfileDto {
   classification?: CompanyClassification;
 
   @ApiPropertyOptional({ description: 'Classification Types' })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @ValidateIf((obj) => obj.classification === CompanyClassification.SMALL_BUSINESS)
+  @IsArray({ message: 'classificationTypes must be an array.' })
+  @IsString({ each: true, message: 'Each classificationType must be a string.' })
+  @IsNotEmpty({ each: true, message: 'classificationTypes cannot be an empty array.' })
   classificationTypes?: string[];
 
   @ApiPropertyOptional({ description: 'Industry Associations' })
@@ -112,11 +117,12 @@ export class CreateCompanyProfileDto {
   @IsString({ each: true })
   industryAssociations?: string[] | string;
 
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @ApiPropertyOptional({ description: 'Company Assets' })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  assets?: any[];
+  @Matches(/^(https?:\/\/[^\s]+)|(data:[a-zA-Z]+\/[a-zA-Z]+;base64,[a-zA-Z0-9+/]+={0,2})$/, { each: true, message: 'Each asset must be a valid S3 URL or a base64-encoded string' })
+  assets?: string[];
 
   @ApiPropertyOptional({ description: 'Social Media profiles' })
   @IsOptional()

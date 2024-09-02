@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 
 export class AddToolsAndApplicationsDto {
   @ApiPropertyOptional({
@@ -43,7 +43,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('emailServiceProvider', (value) => value === true)
+  @ConditionalValue('emailServiceProvider', (value) => value === true)
   emailServiceProviderDetails?: string;
 
   @ApiPropertyOptional({
@@ -60,7 +60,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('cloudServices', (value) => value === true)
+  @ConditionalValue('cloudServices', (value) => value === true)
   cloudServicesDetails?: string;
 
   @ApiPropertyOptional({
@@ -77,7 +77,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('onPremiseSoftwareHardwareSystems', (value) => value === true)
+  @ConditionalValue('onPremiseSoftwareHardwareSystems', (value) => value === true)
   onPremiseSoftwareHardwareSystemsDetails?: string;
 
   @ApiPropertyOptional({
@@ -94,7 +94,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('nonCompanyOwnedMobileDevices', (value) => value === true)
+  @ConditionalValue('nonCompanyOwnedMobileDevices', (value) => value === true)
   mdmSolution?: string;
 
   @ApiPropertyOptional({
@@ -111,7 +111,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('technologyAssets', (value) => value === true)
+  @ConditionalValue('technologyAssets', (value) => value === true)
   technologyAssetsDetails?: string;
 
   @ApiPropertyOptional({
@@ -128,7 +128,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('financialCovenants', (value) => value === true)
+  @ConditionalValue('financialCovenants', (value) => value === true)
   financialCovenantsDetails?: string;
 
   @ApiPropertyOptional({
@@ -137,7 +137,7 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('financialCovenants', (value) => value === true)
+  @ConditionalValue('financialCovenants', (value) => value === true)
   securityMeasures?: string;
 }
 

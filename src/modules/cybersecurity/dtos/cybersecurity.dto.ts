@@ -2,7 +2,7 @@ import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { IBaseCyberSecurityDetails, ICybersecurityStandardsCompliantDetails, IEncryptDataDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 
 class BaseCyberSecurityDetailsDto implements IBaseCyberSecurityDetails {
   @ApiPropertyOptional({ description: 'The frequency of the cybersecurity activity (e.g., monthly, quarterly).' })
@@ -100,7 +100,7 @@ export class AddCybersecurityDto {
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity team.' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('cybersecurityTeam', (value) => value === true)
+  @ConditionalValue('cybersecurityTeam', (value) => value === true)
   cybersecurityTeamDetails?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization has a cybersecurity policy.' })
@@ -111,7 +111,7 @@ export class AddCybersecurityDto {
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity policy.' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('cybersecurityPolicy', (value) => value === true)
+  @ConditionalValue('cybersecurityPolicy', (value) => value === true)
   cybersecurityPolicyDetails?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts penetration testing.' })
@@ -123,7 +123,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => PenetrationTestingDetailsDto)
-  @ConditionalDiscardValue('penetrationTesting', (value) => value === true)
+  @ConditionalValue('penetrationTesting', (value) => value === true)
   penetrationTestingDetails?: PenetrationTestingDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization complies with cybersecurity standards.' })
@@ -135,7 +135,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityStandardsCompliantDetailsDto)
-  @ConditionalDiscardValue('cybersecurityStandardsCompliant', (value) => value === true)
+  @ConditionalValue('cybersecurityStandardsCompliant', (value) => value === true)
   cybersecurityStandardsCompliantDetails?: CybersecurityStandardsCompliantDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization has an incident response plan.' })
@@ -147,7 +147,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @IsDate()
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @ConditionalDiscardValue('incidentResponsePlan', (value) => value === true)
+  @ConditionalValue('incidentResponsePlan', (value) => value === true)
   lastIncident?: Date;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts cybersecurity training.' })
@@ -159,7 +159,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityTrainingDetailsDto)
-  @ConditionalDiscardValue('cybersecurityTraining', (value) => value === true)
+  @ConditionalValue('cybersecurityTraining', (value) => value === true)
   cybersecurityTrainingDetails?: CybersecurityTrainingDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization encrypts its data.' })
@@ -171,7 +171,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => EncryptDataDetailsDto)
-  @ConditionalDiscardValue('encryptData', (value) => value === true)
+  @ConditionalValue('encryptData', (value) => value === true)
   encryptDataDetails?: EncryptDataDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts cybersecurity audits.' })
@@ -183,7 +183,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityAuditsDetailsDto)
-  @ConditionalDiscardValue('cybersecurityAudits', (value) => value === true)
+  @ConditionalValue('cybersecurityAudits', (value) => value === true)
   cybersecurityAuditsDetails?: CybersecurityAuditsDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether a foreign entity is involved in cybersecurity activities.' })
@@ -195,7 +195,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => ForeignEntityInvolvedDetailsDto)
-  @ConditionalDiscardValue('foreignEntityInvolved', (value) => value === true)
+  @ConditionalValue('foreignEntityInvolved', (value) => value === true)
   foreignEntityInvolvedDetails?: ForeignEntityInvolvedDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization manages access control for its systems.' })
@@ -207,7 +207,7 @@ export class AddCybersecurityDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => ManageAccessControlDetailsDto)
-  @ConditionalDiscardValue('manageAccessControl', (value) => value === true)
+  @ConditionalValue('manageAccessControl', (value) => value === true)
   manageAccessControlDetails?: ManageAccessControlDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations have been reported.' })
@@ -218,19 +218,19 @@ export class AddCybersecurityDto {
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations were reported within 24 hours.' })
   @IsOptional()
   @IsBoolean()
-  @ConditionalDiscardValue('cyberViolationsReported', (value) => value === true)
+  @ConditionalValue('cyberViolationsReported', (value) => value === true)
   cyberViolationsReported24Hrs?: boolean;
 
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations have been resolved.' })
   @IsOptional()
   @IsBoolean()
-  @ConditionalDiscardValue('cyberViolationsReported', (value) => value === true)
+  @ConditionalValue('cyberViolationsReported', (value) => value === true)
   cyberViolationsResolved?: boolean;
 
   @ApiPropertyOptional({ description: 'Summary of any cyber violations that have occurred.' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('cyberViolationsReported', (value) => value === true)
+  @ConditionalValue('cyberViolationsReported', (value) => value === true)
   cyberViolationsSummary?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization is interested in a cybersecurity assessment.' })
@@ -241,14 +241,14 @@ export class AddCybersecurityDto {
   @ApiPropertyOptional({ description: 'The preferred type of cybersecurity assessment.' })
   @IsOptional()
   @IsString()
-  @ConditionalDiscardValue('interestedInCybersecurityAssessement', (value) => value === true)
+  @ConditionalValue('interestedInCybersecurityAssessement', (value) => value === true)
   preferredAssessementType?: string;
 
   @ApiPropertyOptional({ description: 'Primary follow-up contact for cybersecurity-related matters.', type: PrimaryFollowUpContactDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => PrimaryFollowUpContactDto)
-  @ConditionalDiscardValue('interestedInCybersecurityAssessement', (value) => value === true)
+  @ConditionalValue('interestedInCybersecurityAssessement', (value) => value === true)
   primaryFollowUpContact?: PrimaryFollowUpContactDto;
 }
 

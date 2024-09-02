@@ -8,10 +8,11 @@ import { User } from 'src/shared/decorators';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { FinancialHealthFiles } from './interfaces';
 import { CPToolsAndApplicationsEntity, UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Financial Health')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('financial-health')
 export class FinancialHealthController {
   constructor(private readonly financialHealthService: FinancialHealthService) {}
@@ -19,17 +20,26 @@ export class FinancialHealthController {
   @ApiOperation({ summary: 'Create Financial Health' })
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'financialStatementsFiles', maxCount: 10 },
-      { name: 'businessPlansFiles', maxCount: 10 },
-      { name: 'goodStandingCertificatesFiles', maxCount: 10 },
-      { name: 'financialDisclosureStatementsFiles', maxCount: 10 },
-      { name: 'financialAuditsFiles', maxCount: 10 },
-    ]),
+    FileFieldsInterceptor(
+      [
+        { name: 'financialStatementsFiles', maxCount: 10 },
+        { name: 'businessPlansFiles', maxCount: 10 },
+        { name: 'goodStandingCertificatesFiles', maxCount: 10 },
+        { name: 'financialDisclosureStatementsFiles', maxCount: 10 },
+        { name: 'financialAuditsFiles', maxCount: 10 },
+      ],
+      {
+        limits: {
+          fileSize: 500 * 1024 * 1024,
+        },
+      },
+    ),
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateFinancialHealthSectionDto })
   async createFinancialHealthSection(@User() user: any, @Body() createFinancialHealthSectionDto: CreateFinancialHealthSectionDto, @UploadedFiles() files: FinancialHealthFiles) {
+    console.log('createFinancialHealthSectionDto>>>>>>>.', createFinancialHealthSectionDto);
+
     const response = await this.financialHealthService.createFinancialHealthSection(user, createFinancialHealthSectionDto, files);
     return new ResponseDto(HttpStatus.CREATED, 'Financial Health Section created successfully!', response);
   }
@@ -37,13 +47,20 @@ export class FinancialHealthController {
   @ApiOperation({ summary: 'Update Financial Health' })
   @Put('/:id')
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'financialStatementsFiles', maxCount: 10 },
-      { name: 'businessPlansFiles', maxCount: 10 },
-      { name: 'goodStandingCertificatesFiles', maxCount: 10 },
-      { name: 'financialDisclosureStatementsFiles', maxCount: 10 },
-      { name: 'financialAuditsFiles', maxCount: 10 },
-    ]),
+    FileFieldsInterceptor(
+      [
+        { name: 'financialStatementsFiles', maxCount: 10 },
+        { name: 'businessPlansFiles', maxCount: 10 },
+        { name: 'goodStandingCertificatesFiles', maxCount: 10 },
+        { name: 'financialDisclosureStatementsFiles', maxCount: 10 },
+        { name: 'financialAuditsFiles', maxCount: 10 },
+      ],
+      {
+        limits: {
+          fileSize: 500 * 1024 * 1024,
+        },
+      },
+    ),
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateFinancialHealthSectionDto })

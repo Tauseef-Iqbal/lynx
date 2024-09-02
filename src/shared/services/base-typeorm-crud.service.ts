@@ -32,6 +32,12 @@ export class BaseTypeOrmCrudService<T> {
     return data;
   }
 
+  async findByFilter(filter: any = {}, options: any = {}): Promise<T> {
+    const data = await this.repository.findOne({ where: { ...filter, isDeleted: false } as any, relations: options?.relations });
+    if (!data) throw new Error(`${this.repository.metadata.name} not found`);
+    return data;
+  }
+
   async update(id: number, params: T): Promise<T> {
     const existingUser = await this.findById(id);
     const userData = this.repository.merge(existingUser, params);

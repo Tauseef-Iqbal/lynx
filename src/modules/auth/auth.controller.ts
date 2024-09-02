@@ -16,6 +16,8 @@ export class AuthController {
   @UsePipes(SanitizeInputPipe)
   @Post('signup')
   async signUp(@Body() signupDto: SignupDto) {
+    console.log(signupDto);
+
     const resp = await this.authService.signup(signupDto);
     return new ResponseDto(HttpStatus.CREATED, 'Account created successfully!', resp).toJSON();
   }

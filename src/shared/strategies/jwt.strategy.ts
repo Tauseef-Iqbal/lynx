@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const cachedUser: string | undefined = await this.cacheManager.get(`user-${payload.sub}`);
+    const cachedUser: string | undefined = await this.cacheManager.get(`user-${payload.id}`);
     if (!cachedUser) throw new UnauthorizedException('Please authenticate');
 
     const user = JSON.parse(cachedUser);

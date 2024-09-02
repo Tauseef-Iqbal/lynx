@@ -13,7 +13,7 @@ export const dataSourceOptions: DataSourceOptions = {
   synchronize: false,
   bigNumberStrings: true,
   multipleStatements: true,
-  logging: process.env.DB_LOGGING === 'true',
+  logging: true,
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
   migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
   subscribers: [join(__dirname, 'typeorm', '*.subscriber{.ts,.js}')],

@@ -1,1 +1,1 @@
-export * from './bullmq.factory';
+export * from './pino-logger.factory';

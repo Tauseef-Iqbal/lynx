@@ -3,7 +3,7 @@ import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, ValidateNes
 import { GeneratedRevenueRange, CompanyRevenueStream } from 'src/modules/revenue/enums';
 import { Type } from 'class-transformer';
 import { AddRevenueProjectsAwardedDto } from './revenue-projects-awarded.dto';
-import { ConditionalDiscardValue } from 'src/shared/decorators';
+import { ConditionalValue } from 'src/shared/validators';
 
 class CustomerDetailsDto {
   @ApiPropertyOptional({ description: 'Customer Name', example: 'John Doe' })
@@ -53,7 +53,7 @@ export class AddRevenueDto {
   @ApiPropertyOptional({ description: 'Five Percent Foreign Revenue Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('fivePercentForeignRevenue', (value) => value === true)
+  @ConditionalValue('fivePercentForeignRevenue', (value) => value === true)
   fivePercentForeignRevenueDetails?: string;
 
   @ApiPropertyOptional({ description: 'Company Revenue Stream', enum: CompanyRevenueStream })
@@ -81,7 +81,7 @@ export class AddRevenueDto {
   @ApiPropertyOptional({ description: 'Financial Backing Investments Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('financialBackingInvestments', (value) => value === true)
+  @ConditionalValue('financialBackingInvestments', (value) => value === true)
   financialBackingInvestmentsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements', example: true })
@@ -92,7 +92,7 @@ export class AddRevenueDto {
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('revenueSharingAgreements', (value) => value === true)
+  @ConditionalValue('revenueSharingAgreements', (value) => value === true)
   revenueSharingAgreementsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Restrictions', example: true })
@@ -103,7 +103,7 @@ export class AddRevenueDto {
   @ApiPropertyOptional({ description: 'Revenue Restrictions Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('revenueRestrictions', (value) => value === true)
+  @ConditionalValue('revenueRestrictions', (value) => value === true)
   revenueRestrictionsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Growth Plan', example: true })
@@ -114,7 +114,7 @@ export class AddRevenueDto {
   @ApiPropertyOptional({ description: 'Revenue Growth Plan Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalDiscardValue('revenueGrowthPlan', (value) => value === true)
+  @ConditionalValue('revenueGrowthPlan', (value) => value === true)
   revenueGrowthPlanDetails?: string;
 }
 

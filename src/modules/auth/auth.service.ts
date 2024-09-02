@@ -20,9 +20,9 @@ export class AuthService implements IAuthService {
   ) {}
 
   async getAuthToken(user: UserEntity, sub: string, AccessToken?: string): Promise<string> {
-    const token = this.jwtService.sign({ sub });
+    const token = this.jwtService.sign({ id: user.id, sub });
     await this.cacheManager.set(
-      `user-${sub}`,
+      `user-${user.id}`,
       JSON.stringify({
         sub,
         AccessToken,
@@ -118,8 +118,8 @@ export class AuthService implements IAuthService {
   }
 
   async signout(user: any) {
-    const { AccessToken, sub } = user;
-    if (sub) await this.cacheManager.del(`user-${sub}`);
+    const { AccessToken, sub, id } = user;
+    if (sub) await this.cacheManager.del(`user-${id}`);
     if (AccessToken) await this.cognitoService.signout(AccessToken);
     return true;
   }

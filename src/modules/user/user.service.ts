@@ -93,6 +93,7 @@ export class UserService {
       where: { id, isDeleted: false },
       relations: {
         company: { socialMedia: true, resources: true, info: true },
+        companyProfile: true,
         representation: true,
       },
     });

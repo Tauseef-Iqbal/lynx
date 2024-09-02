@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(token);
-      const cachedUser: string | undefined = await this.cacheManager.get(`user-${payload.sub}`);
+      const cachedUser: string | undefined = await this.cacheManager.get(`user-${payload.id}`);
 
       if (!cachedUser) throw new UnauthorizedException('Please authenticate');
 

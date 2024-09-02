@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nes
 import { User } from 'src/shared/decorators';
 import { ResponseDto } from 'src/shared/dtos';
 import { JwtAuthGuard } from 'src/shared/guards';
-import { CompanyProfileEntity } from 'src/typeorm/models';
+import { CompanyProfileEntity, UserEntity } from 'src/typeorm/models';
 import { CompanyProfileService } from './company-profile.service';
 import { CreateCompanyProfileDto, UpdateCompanyProfileDto } from './dtos/company-profile.dto';
 import { Assets } from './interfaces';
@@ -18,31 +18,57 @@ export class CompanyProfileController {
 
   @ApiOperation({ summary: 'Create Company Profile' })
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'assets' }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'assets', maxCount: 10 }], {
+      limits: {
+        fileSize: 500 * 1024 * 1024,
+      },
+    }),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCompanyProfileDto })
-  async createCompanyProfile(@User() user: any, @Body() createCompanyProfileDto: CreateCompanyProfileDto, @UploadedFiles() files: Assets) {
+  async createCompanyProfile(@User() user: UserEntity, @Body() createCompanyProfileDto: CreateCompanyProfileDto, @UploadedFiles() files: Assets) {
     const response = await this.companyProfileService.createCompanyProfile(user, createCompanyProfileDto, files);
     return new ResponseDto(HttpStatus.CREATED, 'Company profile created successfully!', response);
   }
 
   @ApiOperation({ summary: 'Update Company Profile' })
   @Put('/:id')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'assets' }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'assets', maxCount: 10 }], {
+      limits: {
+        fileSize: 500 * 1024 * 1024,
+      },
+    }),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateCompanyProfileDto })
-  async updateCompanyProfile(@Param('id') id: number, @Body() updateCompanyProfileDto: UpdateCompanyProfileDto, @UploadedFiles() files: Assets) {
-    const response = await this.companyProfileService.updateCompanyProfile(id, updateCompanyProfileDto, files);
+  async updateCompanyProfile(@Param('id') id: number, @User() user: UserEntity, @Body() updateCompanyProfileDto: UpdateCompanyProfileDto, @UploadedFiles() files: Assets) {
+    const response = await this.companyProfileService.updateCompanyProfile(id, user, updateCompanyProfileDto, files);
     return new ResponseDto(HttpStatus.OK, 'Company Profile updated successfully!', response);
   }
 
+  @ApiOperation({ summary: 'Get Company Profile By Id' })
   @Get('/:id')
   async getFinancialHealthById(@Param('id') id: number) {
     return await this.companyProfileService.findById(id);
   }
 
+  @ApiOperation({ summary: 'Get My Company Profile' })
+  @Get('profile/me')
+  async getMyCompanyProfile(@User() user: UserEntity) {
+    return this.companyProfileService.getMyCompanyProfile(user);
+  }
+
+  @ApiOperation({ summary: 'Delete Company Profile By Id' })
   @Delete('/:id')
   async deleteFinancialHealth(@Param('id') id: number) {
     return this.companyProfileService.update(id, { isDeleted: true } as unknown as CompanyProfileEntity);
+  }
+
+  @ApiOperation({ summary: 'Delete My Company Profile' })
+  @Delete('profile/me')
+  async deleteMyFinancialHealth(@User() user: UserEntity) {
+    return this.companyProfileService.update(user.companyProfile.id, { isDeleted: true } as unknown as CompanyProfileEntity);
   }
 }

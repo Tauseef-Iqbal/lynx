@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -22,20 +22,60 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
 
   async createFinancialHealthSection(user: any, createFinancialHealthSectionDto: CreateFinancialHealthSectionDto, files: FinancialHealthFiles): Promise<CPFinancialHealthEntity> {
     if (files.financialStatementsFiles) {
-      createFinancialHealthSectionDto.financialStatementsFiles = await processFilesToAdd(user, files.financialStatementsFiles, FinancialHealthSectionFilesCategory.FinancialStatements, this.s3Service);
+      if (!createFinancialHealthSectionDto.financialStatements) throw new BadRequestException('financialStatementsFiles should not be provided when financialStatements does not meet the required condition.');
+      createFinancialHealthSectionDto.financialStatementsFiles = await processFilesToAdd({
+        incomingFiles: files.financialStatementsFiles,
+        incomingS3AndBase64: createFinancialHealthSectionDto.financialStatementsFiles,
+        keyPrefix: `${user.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialStatements}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
     }
+
     if (files.businessPlansFiles) {
-      createFinancialHealthSectionDto.businessPlansFiles = await processFilesToAdd(user, files.businessPlansFiles, FinancialHealthSectionFilesCategory.BusinessPlans, this.s3Service);
+      if (!createFinancialHealthSectionDto.businessPlans) throw new BadRequestException('businessPlansFiles should not be provided when businessPlans does not meet the required condition.');
+      createFinancialHealthSectionDto.businessPlansFiles = await processFilesToAdd({
+        incomingFiles: files.businessPlansFiles,
+        incomingS3AndBase64: createFinancialHealthSectionDto.businessPlansFiles,
+        keyPrefix: `${user.companyProfile.name}/${FinancialHealthSectionFilesCategory.BusinessPlans}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
     }
+
     if (files.goodStandingCertificatesFiles) {
-      createFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToAdd(user, files.goodStandingCertificatesFiles, FinancialHealthSectionFilesCategory.GoodStandingCertificates, this.s3Service);
+      if (!createFinancialHealthSectionDto.goodStandingCertificates) throw new BadRequestException('goodStandingCertificatesFiles should not be provided when goodStandingCertificates does not meet the required condition.');
+      createFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToAdd({
+        incomingFiles: files.goodStandingCertificatesFiles,
+        incomingS3AndBase64: createFinancialHealthSectionDto.goodStandingCertificatesFiles,
+        keyPrefix: `${user.companyProfile.name}/${FinancialHealthSectionFilesCategory.GoodStandingCertificates}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
     }
+
     if (files.financialDisclosureStatementsFiles) {
-      createFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToAdd(user, files.financialDisclosureStatementsFiles, FinancialHealthSectionFilesCategory.FinancialDisclosureStatements, this.s3Service);
+      if (!createFinancialHealthSectionDto.financialDisclosureStatements) throw new BadRequestException('financialDisclosureStatementsFiles should not be provided when financialDisclosureStatements does not meet the required condition.');
+      createFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToAdd({
+        incomingFiles: files.financialDisclosureStatementsFiles,
+        incomingS3AndBase64: createFinancialHealthSectionDto.financialDisclosureStatementsFiles,
+        keyPrefix: `${user.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialDisclosureStatements}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
     }
+
     if (files.financialAuditsFiles) {
-      createFinancialHealthSectionDto.financialAuditsFiles = await processFilesToAdd(user, files.financialAuditsFiles, FinancialHealthSectionFilesCategory.FinancialAudits, this.s3Service);
+      if (!createFinancialHealthSectionDto.financialAudits) throw new BadRequestException('financialAuditsFiles should not be provided when financialAudits does not meet the required condition.');
+      createFinancialHealthSectionDto.financialAuditsFiles = await processFilesToAdd({
+        incomingFiles: files.financialAuditsFiles,
+        incomingS3AndBase64: createFinancialHealthSectionDto.financialAuditsFiles,
+        keyPrefix: `${user.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialAudits}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
     }
+
     return this.create({ ...createFinancialHealthSectionDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPFinancialHealthEntity);
   }
 
@@ -50,47 +90,58 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
     }
 
     if (files.financialStatementsFiles) {
-      updateFinancialHealthSectionDto.financialStatementsFiles = await processFilesToUpdate(
-        financialHealthSection.companyProfile,
-        financialHealthSection.financialStatementsFiles || [],
-        files.financialStatementsFiles,
-        FinancialHealthSectionFilesCategory.FinancialStatements,
-        this.s3Service,
-        this.configService,
-      );
+      updateFinancialHealthSectionDto.financialStatementsFiles = await processFilesToUpdate({
+        existingFiles: financialHealthSection.financialStatementsFiles,
+        incomingFiles: files.financialStatementsFiles,
+        incomingS3AndBase64: updateFinancialHealthSectionDto.financialStatementsFiles,
+        keyPrefix: `${financialHealthSection.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialStatements}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
     }
+
     if (files.businessPlansFiles) {
-      updateFinancialHealthSectionDto.businessPlansFiles = await processFilesToUpdate(financialHealthSection.companyProfile, updateFinancialHealthSectionDto.businessPlansFiles || [], files.businessPlansFiles, FinancialHealthSectionFilesCategory.BusinessPlans, this.s3Service, this.configService);
+      updateFinancialHealthSectionDto.businessPlansFiles = await processFilesToUpdate({
+        existingFiles: financialHealthSection.businessPlansFiles,
+        incomingFiles: files.businessPlansFiles,
+        incomingS3AndBase64: updateFinancialHealthSectionDto.businessPlansFiles,
+        keyPrefix: `${financialHealthSection.companyProfile.name}/${FinancialHealthSectionFilesCategory.BusinessPlans}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
     }
+
     if (files.goodStandingCertificatesFiles) {
-      updateFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToUpdate(
-        financialHealthSection.companyProfile,
-        updateFinancialHealthSectionDto.goodStandingCertificatesFiles || [],
-        files.goodStandingCertificatesFiles,
-        FinancialHealthSectionFilesCategory.GoodStandingCertificates,
-        this.s3Service,
-        this.configService,
-      );
+      updateFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToUpdate({
+        existingFiles: financialHealthSection.goodStandingCertificatesFiles,
+        incomingFiles: files.goodStandingCertificatesFiles,
+        incomingS3AndBase64: updateFinancialHealthSectionDto.goodStandingCertificatesFiles,
+        keyPrefix: `${financialHealthSection.companyProfile.name}/${FinancialHealthSectionFilesCategory.GoodStandingCertificates}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
     }
+
     if (files.financialDisclosureStatementsFiles) {
-      updateFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToUpdate(
-        financialHealthSection.companyProfile,
-        updateFinancialHealthSectionDto.financialDisclosureStatementsFiles || [],
-        files.financialDisclosureStatementsFiles,
-        FinancialHealthSectionFilesCategory.FinancialDisclosureStatements,
-        this.s3Service,
-        this.configService,
-      );
+      updateFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToUpdate({
+        existingFiles: financialHealthSection.financialDisclosureStatementsFiles,
+        incomingFiles: files.financialDisclosureStatementsFiles,
+        incomingS3AndBase64: updateFinancialHealthSectionDto.financialDisclosureStatementsFiles,
+        keyPrefix: `${financialHealthSection.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialDisclosureStatements}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
     }
+
     if (files.financialAuditsFiles) {
-      updateFinancialHealthSectionDto.financialAuditsFiles = await processFilesToUpdate(
-        financialHealthSection.companyProfile,
-        updateFinancialHealthSectionDto.financialAuditsFiles || [],
-        files.financialAuditsFiles,
-        FinancialHealthSectionFilesCategory.FinancialAudits,
-        this.s3Service,
-        this.configService,
-      );
+      updateFinancialHealthSectionDto.financialAuditsFiles = await processFilesToUpdate({
+        existingFiles: financialHealthSection.financialAuditsFiles,
+        incomingFiles: files.financialAuditsFiles,
+        incomingS3AndBase64: updateFinancialHealthSectionDto.financialAuditsFiles,
+        keyPrefix: `${financialHealthSection.companyProfile.name}/${FinancialHealthSectionFilesCategory.FinancialAudits}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
     }
 
     return this.update(id, updateFinancialHealthSectionDto as unknown as CPFinancialHealthEntity);
