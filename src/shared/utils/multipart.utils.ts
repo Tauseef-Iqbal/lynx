@@ -2,26 +2,35 @@ import { S3Service } from 'src/modules/global/providers';
 import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '../constants';
 import { ParamsToHandleAddFiles, ParamsToHandleUpdateFiles } from '../types';
 import { isS3Url } from './basic.utils';
+import { PreconditionFailedException } from '@nestjs/common';
 
-export const processFilesToAdd = async ({ incomingFiles = [], incomingS3AndBase64 = [], keyPrefix, configService, s3Service }: ParamsToHandleAddFiles): Promise<string[]> => {
+export const processFilesToAdd = async ({ incomingFiles = [], incomingS3AndBase64 = [], keyPrefix, configService, s3Service, assetsMetadata = [] }: ParamsToHandleAddFiles): Promise<any> => {
   const uploadTasks: (() => Promise<void>)[] = [];
-  const uploadedFiles: string[] = [];
+  const uploadedFiles = [];
 
   // 1. Process assets provided as files
-  incomingFiles.forEach((file) => {
-    const newKey = `${keyPrefix}/${file.originalname}`;
-    const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`;
-    uploadedFiles.push(fileUrl);
+  incomingFiles.forEach((file, index) => {
+    const metadata = assetsMetadata[index];
+    let newKey: string;
+
+    if (metadata) {
+      if (incomingFiles.length !== assetsMetadata.length) throw new PreconditionFailedException('Assets to be uploaded must have the same length as AssetsMetada');
+      newKey = `${keyPrefix}/${metadata.type}/${file.originalname}`;
+      uploadedFiles.push({ url: `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`, type: metadata.type });
+    } else {
+      newKey = `${keyPrefix}/${file.originalname}`;
+      uploadedFiles.push(`${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`);
+    }
     uploadTasks.push(() => s3Service.uploadBuffer(file.buffer, newKey));
   });
 
   // 2. Process assets provided as Base64 strings
-  incomingS3AndBase64.forEach((base64Asset) => {
-    const { buffer, mimeType } = convertBase64ToBuffer(base64Asset);
+  incomingS3AndBase64.forEach((asset: any) => {
+    const { buffer, mimeType } = convertBase64ToBuffer(typeof asset === 'string' ? asset : asset.url);
     const extension = getFileExtension(mimeType);
-    const newKey = `${keyPrefix}/${Date.now()}.${extension}`;
+    const newKey = `${keyPrefix}/${asset.type ? `${asset.type}` : ''}/${Date.now()}.${extension}`;
     const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`;
-    uploadedFiles.push(fileUrl);
+    typeof asset === 'object' && asset !== null ? uploadedFiles.push({ url: fileUrl, type: asset.type }) : uploadedFiles.push(fileUrl);
     uploadTasks.push(() => s3Service.uploadBuffer(buffer, newKey));
   });
 
@@ -46,21 +55,45 @@ export const processCpLegalStructureFilesToAdd = async (user: any, files: Expres
   );
 };
 
-export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles = [], incomingS3AndBase64, keyPrefix, configService, s3Service }: ParamsToHandleUpdateFiles): Promise<string[]> => {
-  const existingAssets = new Set<string>(existingFiles);
-  const incomingAssets = new Set<string>();
+export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles = [], incomingS3AndBase64 = [], keyPrefix, configService, s3Service, assetsMetadata = [] }: ParamsToHandleUpdateFiles): Promise<any> => {
+  const existingAssets = new Set<any>(existingFiles);
+  const incomingAssets = new Set<any>();
   const deleteTasks: (() => Promise<void>)[] = [];
   const uploadTasks: (() => Promise<void>)[] = [];
 
   // 1. Process assets provided as files
-  incomingFiles.forEach((file) => {
-    const newKey = `${keyPrefix}/${file.originalname}`;
-    const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`;
-    incomingAssets.add(fileUrl);
+  incomingFiles.forEach((file, index) => {
+    const metadata = assetsMetadata[index];
+    let newKey: string;
+    let newAsset: string | { url: string; type: string };
 
-    const existingAsset = Array.from(existingAssets).find((asset) => asset.endsWith(`/${file.originalname}`));
+    if (metadata) {
+      if (incomingFiles.length !== assetsMetadata.length) throw new PreconditionFailedException('Assets to be uploaded must have the same length as AssetsMetada');
+      newKey = `${keyPrefix}/${metadata.type}/${file.originalname}`;
+      newAsset = {
+        url: `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`,
+        type: metadata.type,
+      };
+    } else {
+      newKey = `${keyPrefix}/${file.originalname}`;
+      newAsset = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`;
+    }
+
+    incomingAssets.add(newAsset);
+
+    const existingAsset = Array.from(existingAssets).find((asset) => {
+      if (typeof asset === 'string') {
+        return typeof newAsset === 'string' && asset === newAsset;
+      } else {
+        return typeof newAsset === 'object' && asset.type === newAsset.type && asset.url === newAsset.url;
+      }
+    });
+
     if (existingAsset) {
-      deleteTasks.push(() => s3Service.deleteFile(newKey));
+      const keyToDelete = typeof existingAsset === 'string' ? existingAsset.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop() : existingAsset.url.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
+      if (keyToDelete) {
+        deleteTasks.push(() => s3Service.deleteFile(keyToDelete));
+      }
       existingAssets.delete(existingAsset);
     }
 
@@ -69,17 +102,32 @@ export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles =
 
   // 2. Process assets provided as S3 URLs or Base64 strings
   incomingS3AndBase64.forEach((asset) => {
-    if (isS3Url(asset)) {
-      if (!existingAssets.has(asset)) {
-        throw new Error(`Asset URL not found in existing assets: ${asset}`);
-      }
-      incomingAssets.add(asset);
+    let assetUrl: string, assetType: string;
+
+    if (typeof asset === 'string') {
+      assetUrl = asset;
+    } else if (typeof asset === 'object' && asset.url) {
+      assetUrl = asset.url;
+      assetType = asset.type;
     } else {
-      const { buffer, mimeType } = convertBase64ToBuffer(asset);
+      throw new Error('Invalid asset format. Must be a string or an object with "url" property.');
+    }
+
+    if (isS3Url(assetUrl)) {
+      const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl && (!assetType || existing.type === assetType)));
+      if (!existingAsset) {
+        throw new Error(`Asset URL not found in existing assets: ${assetUrl}`);
+      }
+
+      incomingAssets.add(assetType ? { type: assetType, url: assetUrl } : assetUrl);
+      existingAssets.delete(existingAsset);
+    } else {
+      const { buffer, mimeType } = convertBase64ToBuffer(assetUrl);
       const extension = getFileExtension(mimeType);
-      const newKey = `${keyPrefix}/${Date.now()}.${extension}`;
+      const newKey = `${keyPrefix}/${assetType ? `${assetType}` : ''}/${Date.now()}.${extension}`;
       const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${newKey}`;
-      incomingAssets.add(fileUrl);
+
+      incomingAssets.add(assetType ? { type: assetType, url: fileUrl } : fileUrl);
       uploadTasks.push(() => s3Service.uploadBuffer(buffer, newKey));
     }
   });
@@ -87,14 +135,14 @@ export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles =
   const assetsToDelete = Array.from(existingAssets).filter(
     (existingAsset) =>
       !Array.from(incomingAssets).some((incomingAsset) => {
-        const existingKey = existingAsset.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
-        const incomingKey = incomingAsset.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
+        const existingKey = typeof existingAsset === 'string' ? existingAsset.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop() : existingAsset.url.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
+        const incomingKey = typeof incomingAsset === 'string' ? incomingAsset.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop() : incomingAsset.url.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
         return existingKey === incomingKey;
       }),
   );
 
   assetsToDelete.forEach((assetToDelete) => {
-    const keyToDelete = assetToDelete.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
+    const keyToDelete = typeof assetToDelete === 'string' ? assetToDelete.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop() : assetToDelete.url.split(configService.get<string>('AWS_S3_PUBLIC_LINK')).pop();
     if (keyToDelete) {
       deleteTasks.push(() => s3Service.deleteFile(keyToDelete));
     }

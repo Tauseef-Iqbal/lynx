@@ -118,8 +118,8 @@ export class AuthService implements IAuthService {
   }
 
   async signout(user: any) {
-    const { AccessToken, sub, id } = user;
-    if (sub) await this.cacheManager.del(`user-${id}`);
+    const { AccessToken, id } = user;
+    if (id) await this.cacheManager.del(`user-${id}`);
     if (AccessToken) await this.cognitoService.signout(AccessToken);
     return true;
   }

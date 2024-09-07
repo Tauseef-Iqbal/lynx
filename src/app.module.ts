@@ -15,6 +15,7 @@ import { HttpExceptionFilter } from './shared/filters/exception-filter';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { LoggerMiddleware } from './shared/middlewares';
 import { dataSourceOptions } from './typeorm/orm.config';
+import { CpProductsAndServicesModule } from './modules/cp-products-and-services/cp-products-and-services.module';
 import { GlobalModule } from './modules/global/global.module';
 import { CompanyProfileModule } from './modules/company-profile';
 import { FinancialHealthModule } from './modules/financial-health';
@@ -25,6 +26,10 @@ import { CybersecurityModule } from './modules/cybersecurity';
 import { FundingSourcesModule } from './modules/funding-sources';
 import { OwnershipStructureModule } from './modules/ownership-structure/ownership-structure.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PastPerformanceModule } from './modules/past-performance/past-performance.module';
+import { CertificationsModule } from './modules/certifications/certifications.module';
+import { AwardsModule } from './modules/awards/awards.module';
+import { BusinessGoalsModule } from './modules/business-goals';
 
 @Module({
   imports: [
@@ -36,7 +41,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       inject: [ConfigService],
       useFactory: createLoggerOptions,
     }),
-    TypeOrmModule.forRoot({ ...dataSourceOptions }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     EventEmitterModule.forRoot(),
     HealthModule,
     GlobalModule,
@@ -53,7 +58,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     RevenueModule,
     CybersecurityModule,
     FundingSourcesModule,
+    CpProductsAndServicesModule,
     OwnershipStructureModule,
+    PastPerformanceModule,
+    CertificationsModule,
+    AwardsModule,
+    BusinessGoalsModule,
   ],
   providers: [
     {

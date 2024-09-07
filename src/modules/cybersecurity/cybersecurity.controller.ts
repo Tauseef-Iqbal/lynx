@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { CybersecurityService } from './cybersecurity.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddCybersecurityDto, UpdateCybersecurityDto } from './dtos';
-import { CPCybersecurityEntity } from 'src/typeorm/models';
+import { CPCybersecurityEntity, UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Cybersecurity')
 @ApiBearerAuth()
@@ -16,26 +16,43 @@ export class CybersecurityController {
 
   @ApiOperation({ summary: 'Add Cybersecurity' })
   @Post()
-  async addCybersecurity(@User() user: any, @Body() addCybersecurityDto: AddCybersecurityDto) {
-    const inputParams = { ...addCybersecurityDto, companyProfile: { id: user?.companyProfile.id } };
-    const toolsAndApplications = await this.cybersecurityService.create(inputParams as unknown as CPCybersecurityEntity);
-    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', toolsAndApplications).toJSON();
+  async addCybersecurity(@User() user: UserEntity, @Body() addCybersecurityDto: AddCybersecurityDto) {
+    const cyberSecurity = await this.cybersecurityService.addCybersecurity(user, addCybersecurityDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cyberSecurity).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Cybersecurity' })
   @Put('/:id')
-  async updateCybersecurity(@Param('id') id: number, @Body() updateCybersecurityDto: UpdateCybersecurityDto) {
-    const toolsAndApplications = await this.cybersecurityService.update(id, updateCybersecurityDto as unknown as CPCybersecurityEntity);
-    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', toolsAndApplications).toJSON();
+  async updateCybersecurity(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateCybersecurityDto: UpdateCybersecurityDto) {
+    const cyberSecurity = await this.cybersecurityService.updateCybersecurity(id, user, updateCybersecurityDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cyberSecurity).toJSON();
   }
 
+  @ApiOperation({ summary: 'Get My Cybersecurity' })
+  @Get('section/me')
+  async getMyCybersecurity(@User() user: UserEntity) {
+    const response = await this.cybersecurityService.getMyCybersecurity(user?.companyProfile?.id);
+    return new ResponseDto(HttpStatus.OK, 'My Cybersecurity Section fetched successfully!', response).toJSON();
+  }
+
+  @ApiOperation({ summary: 'Get Cybersecurity By ID' })
   @Get('/:id')
-  async getFinancialHealthById(@Param('id') id: number) {
-    return await this.cybersecurityService.findById(id);
+  async getCybersecurityById(@Param('id', ParseIntPipe) id: number) {
+    const response = await this.cybersecurityService.findById(id);
+    return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section fetched successfully!', response).toJSON();
   }
 
+  @ApiOperation({ summary: 'Delete Cybersecurity By ID' })
   @Delete('/:id')
-  async deleteFinancialHealth(@Param('id') id: number) {
-    return this.cybersecurityService.update(id, { isDeleted: true } as unknown as CPCybersecurityEntity);
+  async deleteCybersecurity(@Param('id', ParseIntPipe) id: number) {
+    const response = await this.cybersecurityService.update(id, { isDeleted: true } as unknown as CPCybersecurityEntity);
+    return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
+  }
+
+  @ApiOperation({ summary: 'Delete My Cybersecurity' })
+  @Delete('section/me')
+  async deleteMyCybersecurity(@User() user: UserEntity) {
+    const response = await this.cybersecurityService.deleteMyCybersecurity(user.companyProfile.id);
+    return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
   }
 }

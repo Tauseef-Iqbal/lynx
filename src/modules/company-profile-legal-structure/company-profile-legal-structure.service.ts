@@ -7,8 +7,9 @@ import { S3Service } from '../global/providers';
 import { ConfigService } from '@nestjs/config';
 import { CreateCompanyProfileLegalStructureDto, UpdateCompanyProfileLegalStructureDto } from './dtos';
 import { CpLegalStrucutreFiles } from './interfaces';
-import { processCpLegalStructureFilesToAdd } from 'src/shared/utils';
+import { filesToUpdate, uploadFilesToS3 } from 'src/shared/utils';
 import { CompanyProfileLegalStructureOrgFacilityService } from './company-profile-legal-structure-org-facility.service';
+import { MAX_DBA_FILE_SIZE_BYTES, MAX_DBA_FILE_SIZE_MB } from 'src/shared/constants';
 
 @Injectable()
 export class CompanyProfileLegalStructureService extends BaseTypeOrmCrudService<CompanyProfileLegalStructureEntity> {
@@ -31,11 +32,11 @@ export class CompanyProfileLegalStructureService extends BaseTypeOrmCrudService<
    */
   async createCompanyProfileLegalStructure(user: any, createCpLegalStructureDto: CreateCompanyProfileLegalStructureDto, files: CpLegalStrucutreFiles): Promise<CompanyProfileLegalStructureEntity> {
     if (files.completedProjectsFiles) {
-      createCpLegalStructureDto.completedProjectsFiles = await processCpLegalStructureFilesToAdd(user, files.completedProjectsFiles, createCpLegalStructureDto.legalStructure, this.s3Service);
+      createCpLegalStructureDto.completedProjectsFiles = await uploadFilesToS3(user, files.completedProjectsFiles, createCpLegalStructureDto.legalStructure, this.s3Service);
     }
 
     if (files.dbaFiles) {
-      createCpLegalStructureDto.dbaFiles = await processCpLegalStructureFilesToAdd(user, files.dbaFiles, createCpLegalStructureDto.legalStructure, this.s3Service);
+      createCpLegalStructureDto.dbaFiles = await uploadFilesToS3(user, files.dbaFiles, createCpLegalStructureDto.legalStructure, this.s3Service, MAX_DBA_FILE_SIZE_BYTES, MAX_DBA_FILE_SIZE_MB);
     }
 
     // create the company profile legal structure with company profile relation
@@ -61,11 +62,11 @@ export class CompanyProfileLegalStructureService extends BaseTypeOrmCrudService<
     }
 
     if (files.completedProjectsFiles) {
-      updateCpLegalStructureDto.completedProjectsFiles = await processCpLegalStructureFilesToAdd(user, files.completedProjectsFiles, updateCpLegalStructureDto.legalStructure, this.s3Service);
+      updateCpLegalStructureDto.completedProjectsFiles = await filesToUpdate(user, files.completedProjectsFiles, cpLegalStructure.completedProjectsFiles, updateCpLegalStructureDto.legalStructure, this.s3Service, this.configService);
     }
 
     if (files.dbaFiles) {
-      updateCpLegalStructureDto.dbaFiles = await processCpLegalStructureFilesToAdd(user, files.dbaFiles, updateCpLegalStructureDto.legalStructure, this.s3Service);
+      updateCpLegalStructureDto.dbaFiles = await filesToUpdate(user, files.dbaFiles, cpLegalStructure.dbaFiles, updateCpLegalStructureDto.legalStructure, this.s3Service, this.configService);
     }
 
     if (updateCpLegalStructureDto.orgFacilities && updateCpLegalStructureDto.orgFacilities.length > 0) {

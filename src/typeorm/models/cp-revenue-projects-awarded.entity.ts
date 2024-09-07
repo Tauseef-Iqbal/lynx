@@ -22,7 +22,6 @@ export class CPRevenueProjectsAwardedEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CPRevenueEntity, (cp_revenue) => cp_revenue.projectsAwarded, {
     nullable: false,
-    cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

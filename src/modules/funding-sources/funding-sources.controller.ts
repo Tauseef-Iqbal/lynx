@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { FundingSourcesService } from './funding-sources.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddFundingSourcesDto, UpdateFundingSourcesDto } from './dtos';
 import { CPFundingSourcesEntity } from 'src/typeorm/models/cp-funding-sources.entity';
+import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Funding Sources')
 @ApiBearerAuth()
@@ -17,27 +18,42 @@ export class FundingSourcesController {
   @ApiOperation({ summary: 'Add Funding Sources' })
   @Post()
   async addFundingSources(@User() user: any, @Body() addFundingSourcesDto: AddFundingSourcesDto) {
-    const inputParams = { ...addFundingSourcesDto, companyProfile: { id: user?.companyProfile.id } };
-    const fundingSources = await this.fundingSourcesService.create(inputParams as unknown as CPFundingSourcesEntity);
+    const fundingSources = await this.fundingSourcesService.addFundingSources(user, addFundingSourcesDto);
     return new ResponseDto(HttpStatus.CREATED, 'Funding Sources added successfully!', fundingSources).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Funding Sources' })
   @Put('/:id')
-  async updateFundingSources(@Param('id') id: number, @Body() updateFundingSourcesDto: UpdateFundingSourcesDto) {
-    const fundingSources = await this.fundingSourcesService.update(id, updateFundingSourcesDto as unknown as CPFundingSourcesEntity);
+  async updateFundingSources(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateFundingSourcesDto: UpdateFundingSourcesDto) {
+    const fundingSources = await this.fundingSourcesService.updateFundingSources(id, user, updateFundingSourcesDto);
     return new ResponseDto(HttpStatus.CREATED, 'Funding Sources updated successfully!', fundingSources).toJSON();
   }
 
-  @ApiOperation({ summary: 'Get Funding Sources' })
-  @Get('/:id')
-  async getFinancialHealthById(@Param('id') id: number) {
-    return await this.fundingSourcesService.findById(id);
+  @ApiOperation({ summary: 'Get My Funding Sources' })
+  @Get('section/me')
+  async getMyFundingSources(@User() user: UserEntity) {
+    const response = await this.fundingSourcesService.getMyFundingSources(user?.companyProfile?.id);
+    return new ResponseDto(HttpStatus.OK, 'My Funding Sources Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Funding Sources' })
+  @ApiOperation({ summary: 'Get Funding Sources By ID' })
+  @Get('/:id')
+  async getFundingSourcesById(@Param('id', ParseIntPipe) id: number) {
+    const response = await this.fundingSourcesService.findById(id);
+    return new ResponseDto(HttpStatus.OK, 'Funding Sources Section fetched successfully!', response).toJSON();
+  }
+
+  @ApiOperation({ summary: 'Delete Funding Sources By ID' })
   @Delete('/:id')
-  async deleteFinancialHealth(@Param('id') id: number) {
-    return this.fundingSourcesService.update(id, { isDeleted: true } as unknown as CPFundingSourcesEntity);
+  async deleteFundingSources(@Param('id', ParseIntPipe) id: number) {
+    const response = await this.fundingSourcesService.update(id, { isDeleted: true } as unknown as CPFundingSourcesEntity);
+    return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
+  }
+
+  @ApiOperation({ summary: 'Delete My Funding Sources' })
+  @Delete('section/me')
+  async deleteMyFundingSources(@User() user: UserEntity) {
+    const response = await this.fundingSourcesService.deleteMyFundingSources(user.companyProfile.id);
+    return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
   }
 }

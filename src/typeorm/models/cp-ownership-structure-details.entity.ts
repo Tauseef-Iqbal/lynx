@@ -28,10 +28,9 @@ export class CPOwnershipStructureDetailsEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CPOwnershipStructureEntity, (ownershipStructure) => ownershipStructure.ownershipStructureDetails, {
     nullable: false,
-    cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn({ name: 'ownership_structure_id' })
-  ownershipStructure: Promise<CPOwnershipStructureEntity>;
+  ownershipStructure: CPOwnershipStructureEntity;
 }

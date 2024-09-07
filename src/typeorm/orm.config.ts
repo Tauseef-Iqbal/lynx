@@ -13,11 +13,11 @@ export const dataSourceOptions: DataSourceOptions = {
   synchronize: false,
   bigNumberStrings: true,
   multipleStatements: true,
-  logging: true,
+  logging: false,
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
   migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
   subscribers: [join(__dirname, 'typeorm', '*.subscriber{.ts,.js}')],
-  migrationsRun: true,
+  migrationsRun: false,
   migrationsTableName: 'migrations',
 };
 export const dataSource = new DataSource(dataSourceOptions);

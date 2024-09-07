@@ -1,6 +1,8 @@
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { CustomBaseEntity } from './custom-base.entity';
 import { CompanyProfileEntity } from './company-profile.entity';
+import { CPFundingSourcesForeignAffiliationEntity } from './cp-funding-sources-foreign-affiliation.entity';
+import { IInvestorDetails } from 'src/modules/funding-sources/interfaces';
 
 @Entity({ name: 'cp_funding_sources' })
 export class CPFundingSourcesEntity extends CustomBaseEntity {
@@ -8,7 +10,7 @@ export class CPFundingSourcesEntity extends CustomBaseEntity {
   fundingType?: string;
 
   @Column({ name: 'funding_details', type: 'jsonb', nullable: true })
-  fundingDetails?: string[] | string;
+  fundingDetails?: string[];
 
   @Column({ name: 'underwriters', type: 'text', nullable: true })
   underWriters?: string;
@@ -17,28 +19,25 @@ export class CPFundingSourcesEntity extends CustomBaseEntity {
   raiseEquity?: boolean;
 
   @Column({ name: 'equity_stages', type: 'jsonb', nullable: true })
-  equityStages?: string[] | string;
+  equityStages?: string[];
 
   @Column({ name: 'awardee_has_venture_capital', type: 'boolean', nullable: true })
   awardeeHasVentureCapital?: boolean;
 
-  @Column({ name: 'foreign_affiliation', type: 'text', nullable: true })
+  @Column({ name: 'foreign_affiliation', type: 'varchar', length: 255, nullable: true })
   foreignAffiliation?: string;
 
   @Column({ name: 'investor_details', type: 'jsonb', nullable: true })
-  investorDetails?: string[] | string;
+  investorDetails?: IInvestorDetails;
 
   @Column({ name: 'foreign_funding', type: 'boolean', nullable: true })
   foreignFunding?: boolean;
 
-  @Column({ name: 'foreign_funding_details', type: 'jsonb', nullable: true })
-  foreignFundingDetails?: string[] | string;
-
   @Column({ name: 'government_backed_funding', type: 'boolean', nullable: true })
-  GovernmentBackedFunding?: boolean;
+  governmentBackedFunding?: boolean;
 
   @Column({ name: 'government_backed_funding_details', type: 'text', nullable: true })
-  GovernmentBackedFundingDetails?: string;
+  governmentBackedFundingDetails?: string;
 
   @Column({ name: 'funding_restrictions', type: 'boolean', nullable: true })
   fundingRestrictions?: boolean;
@@ -65,7 +64,7 @@ export class CPFundingSourcesEntity extends CustomBaseEntity {
   fundingInstrumentsDetails?: string;
 
   @Column({ name: 'has_financial_audits', type: 'boolean', nullable: true })
-  hasFinancialAudits?: boolean;
+  financialAudits?: boolean;
 
   @Column({ name: 'audit_details', type: 'text', nullable: true })
   auditDetails?: string;
@@ -97,4 +96,9 @@ export class CPFundingSourcesEntity extends CustomBaseEntity {
   })
   @JoinColumn({ name: 'cp_id' })
   companyProfile: CompanyProfileEntity;
+
+  @OneToMany(() => CPFundingSourcesForeignAffiliationEntity, (fundingSourcesForeignAffiliation) => fundingSourcesForeignAffiliation.fundingSources, {
+    cascade: ['insert', 'update'],
+  })
+  fundingSourcesForeignAffiliation: CPFundingSourcesForeignAffiliationEntity[];
 }

@@ -1,5 +1,7 @@
 import _ from 'lodash';
+import { S3Service } from 'src/modules/global/providers';
 import { ISocialMedia } from 'src/modules/company-profile/interfaces';
+import { ConfigService } from '@nestjs/config';
 
 export const convertKeysToCamelCase = (obj) => _.mapKeys(obj, (value, key) => _.camelCase(key));
 
@@ -51,12 +53,85 @@ export function isValidSocialMediaUrl(url: string, platform: keyof ISocialMedia)
   };
 
   const platformPattern = patterns[platform];
-  if (!platformPattern) {
-    throw new Error(`Unsupported platform: ${platform}`);
-  }
+  if (!platformPattern) throw new Error(`Unsupported platform: ${platform}`);
 
   return platformPattern.test(url);
 }
+
+export const uploadFilesToS3 = async (user: any, files: Express.Multer.File[], folderName: string, s3Service: S3Service, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string[]> => {
+  files.forEach((file) => {
+    if (file.size > maxFileSizeBytes) {
+      throw new Error(`File ${file.originalname} exceeds the maximum size of ${maxFileSizeMb} MB.`);
+    }
+  });
+
+  return Promise.all(
+    files.map(async (file) => {
+      const sanitizedFilename = file.originalname.replace(/\s+/g, '_');
+      const key = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
+      await s3Service.uploadBuffer(file.buffer, key);
+      return `${process.env.AWS_S3_PUBLIC_LINK}${key}`;
+    }),
+  );
+};
+
+export const filesToUpdate = async (user: any, files: Express.Multer.File[], existingFiles: string[] | null | undefined, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string[]> => {
+  const incomingFiles: string[] = [];
+
+  // Initialize existingFiles if it's null or undefined
+  existingFiles = existingFiles || [];
+
+  for (const file of files) {
+    const sanitizedFilename = file.originalname.replace(/\s+/g, '_');
+    const blobPath = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
+    const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${blobPath}`;
+    incomingFiles.push(fileUrl);
+
+    const existingFileIndex = existingFiles.findIndex((asset) => {
+      if (!asset) {
+        return false;
+      }
+      const existingBlobName = asset.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop();
+      return existingBlobName === sanitizedFilename;
+    });
+
+    if (existingFileIndex !== -1) {
+      await s3Service.deleteFile(blobPath);
+      existingFiles[existingFileIndex] = fileUrl;
+    } else {
+      existingFiles.push(fileUrl);
+    }
+
+    if (file.size > maxFileSizeBytes) {
+      throw new Error(`File ${file.originalname} exceeds the maximum size of ${maxFileSizeMb} MB.`);
+    }
+
+    await s3Service.uploadBuffer(file.buffer, blobPath);
+  }
+
+  // Determine files to delete
+  const filesToDelete = existingFiles.filter((existingFile) => {
+    const existingBlobName = existingFile.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop();
+    return !incomingFiles.some((incomingAsset) => {
+      const incomingBlobName = incomingAsset.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop();
+      return existingBlobName === incomingBlobName;
+    });
+  });
+
+  // Delete outdated files
+  for (const file of filesToDelete) {
+    await s3Service.deleteFile(file.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop());
+    existingFiles.splice(existingFiles.indexOf(file), 1);
+  }
+
+  return existingFiles;
+};
+
+export const filesToDelete = async (user: any, urls: string[], s3Service: S3Service, folderName: string) => {
+  for (const [url] of urls) {
+    await s3Service.deleteFile(url.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop());
+  }
+};
 
 export function isS3Url(str: string): boolean {
   const s3UrlPattern = /^https:\/\/[a-zA-Z0-9.-]+\.s3\.amazonaws\.com\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%\s-]*$/;

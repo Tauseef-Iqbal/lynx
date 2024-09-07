@@ -69,6 +69,7 @@ export class UserService {
     await this.companySocialMediaRepository.insert({
       company: { id: company.id },
     });
+
     // await this.companyResourcesRepository.insert({ company: { id: company.id } });
 
     return this.findById(newUser.id);

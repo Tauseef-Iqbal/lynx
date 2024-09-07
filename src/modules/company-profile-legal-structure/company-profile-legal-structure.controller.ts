@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
@@ -35,7 +35,7 @@ export class CompanyProfileLegalStructureController extends BaseController<Compa
 
   @ApiOperation({ summary: 'Get Company Profile Legal Structure' })
   @Get(':id')
-  async getCompanyProfileLegalStructureById(@Param('id') id: number): Promise<any> {
+  async getCompanyProfileLegalStructureById(@Param('id', ParseIntPipe) id: number): Promise<any> {
     const response = await this.findById(id);
     return new ResponseDto(HttpStatus.OK, 'Legal Structure Section fetched successfully!', response);
   }
@@ -45,7 +45,7 @@ export class CompanyProfileLegalStructureController extends BaseController<Compa
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCompanyProfileLegalStructureApiBodyDto })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'dbaFiles', maxCount: FILE_LIMITS.DBA_FILE_LIMIT }, { name: 'completedProjectsFiles' }]))
-  async updateCompanyProfileLegalStructureById(@User() user: any, @Param('id') id: number, @Body('data') data: string, @UploadedFiles() files: CpLegalStrucutreFiles): Promise<any> {
+  async updateCompanyProfileLegalStructureById(@User() user: any, @Param('id', ParseIntPipe) id: number, @Body('data') data: string, @UploadedFiles() files: CpLegalStrucutreFiles): Promise<any> {
     const updateCpLegalStructureDto = plainToInstance(UpdateCompanyProfileLegalStructureDto, JSON.parse(data));
     await validateOrReject(updateCpLegalStructureDto);
     const response = await this.companyProfileLegalStructureService.updateCompanyProfileLegalStructure(id, user, updateCpLegalStructureDto, files);
@@ -54,7 +54,7 @@ export class CompanyProfileLegalStructureController extends BaseController<Compa
 
   @ApiOperation({ summary: 'Delete Company Profile Legal Structure' })
   @Delete(':id')
-  async deleteCompanyProfileLegalStructureById(@Param('id') id: number): Promise<void> {
+  async deleteCompanyProfileLegalStructureById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.delete(id);
   }
 }

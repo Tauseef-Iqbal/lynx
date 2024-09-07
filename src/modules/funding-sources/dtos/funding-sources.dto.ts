@@ -1,6 +1,9 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { IsArray, IsBoolean, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { ConditionalValue } from 'src/shared/validators';
+import { IInvestorDetails } from '../interfaces';
+import { AddForeignFundingForeignAffiliationDto } from './foreign-funding-foreign-affiliation.dto';
+import { Type } from 'class-transformer';
 
 export class AddFundingSourcesDto {
   @ApiPropertyOptional({
@@ -16,10 +19,10 @@ export class AddFundingSourcesDto {
     type: [String],
     example: ['Venture Capital', 'Angel Investors'],
   })
-  @ValidateIf((o) => Array.isArray(o.fundingDetails))
+  @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  fundingDetails?: string[] | string;
+  fundingDetails?: string[];
 
   @ApiPropertyOptional({
     description: 'Underwriters for the funding',
@@ -42,11 +45,11 @@ export class AddFundingSourcesDto {
     type: [String],
     example: ['Seed', 'Series A', 'Series B'],
   })
-  @ValidateIf((o) => Array.isArray(o.equityStages))
   @IsString({ each: true })
+  @IsArray()
   @IsOptional()
   @ConditionalValue('raiseEquity', (value) => value === true)
-  equityStages?: string[] | string;
+  equityStages?: string[];
 
   @ApiPropertyOptional({
     description: 'Indicates if the awardee has venture capital backing',
@@ -70,10 +73,9 @@ export class AddFundingSourcesDto {
     type: [String],
     example: ['Investor A', 'Investor B'],
   })
-  @ValidateIf((o) => Array.isArray(o.investorDetails))
-  @IsString({ each: true })
+  @IsObject()
   @IsOptional()
-  investorDetails?: string[] | string;
+  investorDetails?: IInvestorDetails;
 
   @ApiPropertyOptional({
     description: 'Indicates if the company has foreign funding',
@@ -83,16 +85,12 @@ export class AddFundingSourcesDto {
   @IsOptional()
   foreignFunding?: boolean;
 
-  @ApiPropertyOptional({
-    description: 'Details about the foreign funding',
-    type: [String],
-    example: ['Foreign Investor A', 'Foreign Investor B'],
-  })
-  @ValidateIf((o) => Array.isArray(o.foreignFundingDetails))
-  @IsString({ each: true })
+  @ApiPropertyOptional({ description: 'Foreign Funding Foreign Affiliation', type: [AddForeignFundingForeignAffiliationDto] })
   @IsOptional()
-  @ConditionalValue('foreignFunding', (value) => value === true)
-  foreignFundingDetails?: string[] | string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AddForeignFundingForeignAffiliationDto)
+  fundingSourcesForeignAffiliation?: AddForeignFundingForeignAffiliationDto[];
 
   @ApiPropertyOptional({
     description: 'Indicates if the company has government-backed funding',

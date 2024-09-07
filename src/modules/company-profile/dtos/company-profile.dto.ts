@@ -1,28 +1,53 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, ValidateIf, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsObject, IsOptional, IsString, IsUrl, Matches, ValidateIf, ValidateNested } from 'class-validator';
+import { ConditionalValue } from 'src/shared/validators';
 import { CompanyClassification } from '../enums';
+import { IAssets } from '../interfaces';
 import { IsSocialMediaUrl } from '../validators';
+
+export class AssetsDto implements IAssets {
+  @ApiPropertyOptional({ description: 'Type of the asset' })
+  @IsString()
+  type: string;
+
+  @ApiPropertyOptional({ description: 'URL of the asset' })
+  @IsString()
+  @Matches(/^(https?:\/\/[^\s]+)|(data:[a-zA-Z]+\/[a-zA-Z]+;base64,[a-zA-Z0-9+/]+={0,2})$/, {
+    message: 'URL must be a valid S3 URL or a base64-encoded string',
+  })
+  url: string;
+}
+
+export class AssetsMetadataDto {
+  @ApiProperty({ description: 'Type of the asset (e.g., image, document)' })
+  @IsString()
+  type: string;
+}
 
 export class SocialMediaDto {
   @ApiPropertyOptional({ description: 'LinkedIn profile URL' })
   @IsOptional()
   @IsSocialMediaUrl('linkedin', { message: 'Invalid LinkedIn URL' })
+  @IsString()
   linkedin?: string;
 
   @ApiPropertyOptional({ description: 'Facebook profile URL' })
   @IsOptional()
   @IsSocialMediaUrl('facebook', { message: 'Invalid Facebook URL' })
+  @IsString()
   facebook?: string;
 
   @ApiPropertyOptional({ description: 'YouTube profile URL' })
   @IsOptional()
   @IsSocialMediaUrl('youtube', { message: 'Invalid YouTube URL' })
+  @IsString()
   youtube?: string;
 
   @ApiPropertyOptional({ description: 'Instagram profile URL' })
   @IsOptional()
   @IsSocialMediaUrl('instagram', { message: 'Invalid Instagram URL' })
+  @IsString()
   instagram?: string;
 }
 
@@ -36,45 +61,46 @@ export class CreateCompanyProfileDto {
   @IsOptional()
   @IsString()
   @IsUrl()
+  @ValidateIf((o, val) => ![undefined, null, ''].includes(val))
   website?: string;
 
-  @ApiProperty({ description: 'SAM ID' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'SAM ID' })
+  @IsOptional()
   @IsString()
-  samId: string;
+  samId?: string;
 
-  @ApiProperty({ description: 'CAGE Code' })
+  @ApiPropertyOptional({ description: 'CAGE Code' })
   @IsNotEmpty()
   @IsString()
   cageCode: string;
 
-  @ApiProperty({ description: 'DUNS Number' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'DUNS Number' })
+  @IsOptional()
   @IsString()
-  duns: string;
+  duns?: string;
 
   @ApiProperty({ description: 'EIN Number' })
   @IsNotEmpty()
   @IsString()
   ein: string;
 
-  @ApiProperty({ description: 'Founder Name' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'Founder Name' })
+  @IsOptional()
   @IsString()
-  founderName: string;
+  founderName?: string;
 
-  @ApiProperty({ description: 'Year the company was founded', example: 2024 })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'Year the company was founded', example: 2024 })
   @IsInt()
-  @Transform(({ value }) => parseInt(value, 10))
-  foundedYear: number;
+  @IsOptional()
+  @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+  foundedYear?: number;
 
-  @ApiProperty({ description: 'State of Registration' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'State of Registration' })
+  @IsOptional()
   @IsString()
-  stateOfRegistration: string;
+  stateOfRegistration?: string;
 
-  @ApiProperty({ description: 'Registration Code' })
+  @ApiPropertyOptional({ description: 'Registration Code' })
   @IsNotEmpty()
   @IsString()
   registrationCode: string;
@@ -106,27 +132,39 @@ export class CreateCompanyProfileDto {
   classification?: CompanyClassification;
 
   @ApiPropertyOptional({ description: 'Classification Types' })
+  @IsOptional()
   @ValidateIf((obj) => obj.classification === CompanyClassification.SMALL_BUSINESS)
   @IsArray({ message: 'classificationTypes must be an array.' })
   @IsString({ each: true, message: 'Each classificationType must be a string.' })
   @IsNotEmpty({ each: true, message: 'classificationTypes cannot be an empty array.' })
+  @ConditionalValue('classification', (value) => value === CompanyClassification.SMALL_BUSINESS)
   classificationTypes?: string[];
 
   @ApiPropertyOptional({ description: 'Industry Associations' })
   @IsOptional()
   @IsString({ each: true })
+  @IsArray()
   industryAssociations?: string[] | string;
 
   @ApiPropertyOptional({ description: 'Company Assets' })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @Matches(/^(https?:\/\/[^\s]+)|(data:[a-zA-Z]+\/[a-zA-Z]+;base64,[a-zA-Z0-9+/]+={0,2})$/, { each: true, message: 'Each asset must be a valid S3 URL or a base64-encoded string' })
-  assets?: string[];
+  @ValidateNested({ each: true })
+  @IsObject({ each: true })
+  assets?: AssetsDto[];
 
-  @ApiPropertyOptional({ description: 'Social Media profiles' })
+  @ApiPropertyOptional({ description: 'Names of the assets' })
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @IsObject({ each: true })
+  @Type(() => AssetsMetadataDto)
+  @IsArray()
+  assetsMetadata: AssetsMetadataDto[];
+
+  @ApiPropertyOptional({ description: 'Social Media profiles', type: () => SocialMediaDto })
   @IsOptional()
   @ValidateNested()
+  @IsObject()
   @Type(() => SocialMediaDto)
   socialMedia?: SocialMediaDto;
 }

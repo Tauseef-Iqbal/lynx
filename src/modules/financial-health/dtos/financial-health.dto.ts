@@ -15,6 +15,12 @@ export class CreateFinancialHealthSectionDto {
   @IsArray()
   @IsString({ each: true })
   @ConditionalValue('financialStatements', (value) => value === true)
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
   financialStatementsFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Financial Elements Available' })
@@ -40,7 +46,13 @@ export class CreateFinancialHealthSectionDto {
   @IsArray()
   @IsString({ each: true })
   @ConditionalValue('businessPlans', (value) => value === true)
-  businessPlansFiles?: any[];
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  businessPlansFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Bankruptcy Filed' })
   @IsOptional()
@@ -77,7 +89,13 @@ export class CreateFinancialHealthSectionDto {
   @IsArray()
   @IsString({ each: true })
   @ConditionalValue('goodStandingCertificates', (value) => value === true)
-  goodStandingCertificatesFiles?: any[];
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  goodStandingCertificatesFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Pending Lawsuit as Defendant' })
   @IsOptional()
@@ -114,7 +132,13 @@ export class CreateFinancialHealthSectionDto {
   @IsArray()
   @IsString({ each: true })
   @ConditionalValue('financialDisclosureStatements', (value) => value === true)
-  financialDisclosureStatementsFiles?: any[];
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  financialDisclosureStatementsFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Financial Changes' })
   @IsOptional()
@@ -175,7 +199,13 @@ export class CreateFinancialHealthSectionDto {
   @IsArray()
   @IsString({ each: true })
   @ConditionalValue('financialAudits', (value) => value === true)
-  financialAuditsFiles?: any[];
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  financialAuditsFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Ownership/Management Financial Changes' })
   @IsOptional()

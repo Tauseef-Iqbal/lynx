@@ -44,15 +44,15 @@ export class CPOwnershipStructureEntity extends CustomBaseEntity {
     onUpdate: 'NO ACTION',
   })
   @JoinColumn({ name: 'cp_id' })
-  companyProfile: Promise<CompanyProfileEntity>;
+  companyProfile: CompanyProfileEntity;
 
   @OneToOne(() => CPOwnershipStructureDetailsEntity, (ownershipStructureDetails) => ownershipStructureDetails.ownershipStructure, {
     cascade: ['insert', 'update'],
   })
-  ownershipStructureDetails: Promise<CPOwnershipStructureDetailsEntity>;
+  ownershipStructureDetails: CPOwnershipStructureDetailsEntity;
 
   @OneToMany(() => CPOwnershipStructureKeyManagementEntity, (ownershipStructureKeyManagement) => ownershipStructureKeyManagement.ownershipStructure, {
     cascade: ['insert', 'update'],
   })
-  ownershipStructureKeyManagement: Promise<CPOwnershipStructureKeyManagementEntity[]>;
+  ownershipStructureKeyManagement: CPOwnershipStructureKeyManagementEntity[];
 }

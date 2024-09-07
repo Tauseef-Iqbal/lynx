@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { OwnershipStructureService } from './ownership-structure.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddOwnershipStructureDto, UpdateOwnershipStructureDto } from './dtos';
 import { CPOwnershipStructureEntity } from 'src/typeorm/models/cp-ownership-structure.entity';
+import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Ownership-structure')
 @ApiBearerAuth()
@@ -14,31 +15,43 @@ import { CPOwnershipStructureEntity } from 'src/typeorm/models/cp-ownership-stru
 export class OwnershipStructureController {
   constructor(private readonly ownershipStructureService: OwnershipStructureService) {}
 
-  @ApiOperation({ summary: 'Add ownership structure' })
+  @ApiOperation({ summary: 'Add Ownership Structure' })
   @Post()
-  async addOwnerShipStructure(@User() user: any, @Body() addownershipStructureDto: AddOwnershipStructureDto) {
-    const inputParams = { ...addownershipStructureDto, companyProfile: { id: user?.companyProfile.id } };
-    const ownershipStructure = await this.ownershipStructureService.create(inputParams as unknown as CPOwnershipStructureEntity);
-    return new ResponseDto(HttpStatus.CREATED, 'ownership added successfully!', ownershipStructure).toJSON();
+  async addOwnershipStructure(@User() user: UserEntity, @Body() addOwnershipStructureDto: AddOwnershipStructureDto) {
+    const ownershipStructure = await this.ownershipStructureService.addOwnershipStructure(user, addOwnershipStructureDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Ownership Strcuture added successfully!', ownershipStructure).toJSON();
   }
 
-  @ApiOperation({ summary: 'Update ownership structure' })
+  @ApiOperation({ summary: 'Update Ownership Structure' })
   @Put('/:id')
-  async updateOwnerShipStructure(@Param('id') id: number, @Body() updateownershipStructureDto: UpdateOwnershipStructureDto) {
-    const ownershipStructure = await this.ownershipStructureService.updateOwnershipStructure(id, updateownershipStructureDto);
-    console.log(ownershipStructure, 'ownershipStructure');
-    return new ResponseDto(HttpStatus.CREATED, 'ownership updated successfully!').toJSON();
+  async updateOwnershipStructure(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateOwnershipStructureDto: UpdateOwnershipStructureDto) {
+    const ownershipStructure = await this.ownershipStructureService.updateOwnershipStructure(id, user, updateOwnershipStructureDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Ownership Strcuture updated successfully!', ownershipStructure).toJSON();
   }
 
-  @ApiOperation({ summary: 'Get ownership structure' })
+  @ApiOperation({ summary: 'Get My Ownership Structure' })
+  @Get('section/me')
+  async getMyCybersecurity(@User() user: UserEntity) {
+    const response = await this.ownershipStructureService.getMyOwnershipStructure(user?.companyProfile?.id);
+    return new ResponseDto(HttpStatus.OK, 'My Ownership Structure fetched successfully!', response).toJSON();
+  }
+
+  @ApiOperation({ summary: 'Get Ownership Structure' })
   @Get('/:id')
-  async getOwnerShipStructureById(@Param('id') id: number) {
-    return await this.ownershipStructureService.findById(id);
+  async getMyOwnershipStructureByID(@Param('id', ParseIntPipe) id: number) {
+    return await this.ownershipStructureService.getMyOwnershipStructure(id);
   }
 
-  @ApiOperation({ summary: 'Delete ownership structure' })
+  @ApiOperation({ summary: 'Delete Ownership Structure' })
   @Delete('/:id')
-  async deleteOwnerShipStructure(@Param('id') id: number) {
+  async deleteMyOwnershipStructureByID(@Param('id', ParseIntPipe) id: number) {
     return this.ownershipStructureService.update(id, { isDeleted: true } as unknown as CPOwnershipStructureEntity);
+  }
+
+  @ApiOperation({ summary: 'Delete My Ownership Structure' })
+  @Delete('section/me')
+  async deleteMyOwnershipStructure(@User() user: UserEntity) {
+    const response = await this.ownershipStructureService.deleteMyOwnershipStructure(user.companyProfile.id);
+    return new ResponseDto(HttpStatus.OK, 'My Ownership Structure deleted successfully!', response).toJSON();
   }
 }

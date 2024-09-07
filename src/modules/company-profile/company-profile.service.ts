@@ -22,7 +22,7 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
     super(companyRepository);
   }
 
-  async createCompanyProfile(user: UserEntity, createCompanyProfileDto: CreateCompanyProfileDto, files: Assets): Promise<CompanyProfileEntity> {
+  async createCompanyProfile(user: UserEntity, createCompanyProfileDto: CreateCompanyProfileDto, files: Assets): Promise<any> {
     if (user?.companyProfile.id) {
       return this.updateCompanyProfile(user.companyProfile.id, user, createCompanyProfileDto, files);
     } else {
@@ -33,6 +33,7 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
           keyPrefix: `${createCompanyProfileDto.name}/Profile`,
           configService: this.configService,
           s3Service: this.s3Service,
+          assetsMetadata: createCompanyProfileDto.assetsMetadata,
         });
       }
 
@@ -42,14 +43,12 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
     }
   }
 
-  async updateCompanyProfile(id: number, user: UserEntity, updateCompanyProfileDto: UpdateCompanyProfileDto, files: Assets): Promise<CompanyProfileEntity> {
+  async updateCompanyProfile(id: number, user: UserEntity, updateCompanyProfileDto: UpdateCompanyProfileDto, files: Assets): Promise<any> {
     const companyProfile = await this.findByFilter({ id, userProfile: { id: user.id } });
 
-    if (!companyProfile) {
-      throw new Error('Company not found');
-    }
+    if (!companyProfile) throw new Error('Company not found');
 
-    if (companyProfile.assets.length || updateCompanyProfileDto.assets.length) {
+    if (companyProfile?.assets?.length || files?.assets?.length) {
       updateCompanyProfileDto.assets = await processFilesToUpdate({
         existingFiles: companyProfile.assets,
         incomingFiles: files.assets,
@@ -57,6 +56,7 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
         keyPrefix: `${companyProfile.name}/Profile`,
         configService: this.configService,
         s3Service: this.s3Service,
+        assetsMetadata: updateCompanyProfileDto.assetsMetadata,
       });
     }
 
@@ -66,8 +66,12 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
   }
 
   async getMyCompanyProfile(user: UserEntity): Promise<CompanyProfileEntity> {
-    if (!user.companyProfile) throw new Error(`You're not registered. Please create your company profile.`);
-    return this.findById(user.companyProfile.id);
+    // if (!user.companyProfile.id) throw new Error(`You're not registered. Please create your company profile.`);
+    if (!user.companyProfile.id) return null;
+
+    const companyProfile = await this.findByFilter({ userProfile: { id: user.id } });
+
+    return companyProfile;
   }
 
   async deleteCompany(id: number): Promise<void> {

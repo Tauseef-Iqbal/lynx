@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { CustomBaseEntity } from './custom-base.entity';
 import { CPFinancialHealthEntity } from './cp-financial-health.entity';
 import { UserEntity } from './user.entity';
@@ -7,10 +7,15 @@ import { CPToolsAndApplicationsEntity } from './cp-tools-applications.entity';
 import { CPRevenueEntity } from './cp-revenue.entity';
 import { CPCybersecurityEntity } from './cp-cybersecurity.entity';
 import { CPFundingSourcesEntity } from './cp-funding-sources.entity';
-import { ISocialMedia } from 'src/modules/company-profile/interfaces';
+import { IAssets, ISocialMedia } from 'src/modules/company-profile/interfaces';
 import { CompanyClassification } from 'src/modules/company-profile/enums';
+import { CpProductsAndServicesEntity } from './cp-products-and-services.entity';
 import { CPOwnershipStructureEntity } from './cp-ownership-structure.entity';
 import { validateAndTransformSocialMedia } from 'src/shared/utils';
+import { CpPastPerformanceEntity } from './cp-past-performance.entity';
+import { CpCertificationsEntity } from './cp-certifications.entity';
+import { CpAwardEntity } from './cp-awards.entity';
+import { CPBusinessGoalsEntity } from './cp-business-goals.entity';
 
 @Entity({ name: 'company_profile' })
 export class CompanyProfileEntity extends CustomBaseEntity {
@@ -69,7 +74,7 @@ export class CompanyProfileEntity extends CustomBaseEntity {
   industryAssociations?: string[] | string;
 
   @Column({ name: 'assets', type: 'jsonb', nullable: true })
-  assets: string[];
+  assets: IAssets[];
 
   @Column({ name: 'social_media', type: 'jsonb', nullable: true })
   socialMedia?: ISocialMedia;
@@ -101,8 +106,23 @@ export class CompanyProfileEntity extends CustomBaseEntity {
   @OneToOne(() => CPFundingSourcesEntity, (fundingSources) => fundingSources.companyProfile)
   fundingSources: CPFundingSourcesEntity;
 
+  @OneToMany(() => CpProductsAndServicesEntity, (cpRequiredSystem) => cpRequiredSystem.companyProfile)
+  cpRequiredSystem: CpProductsAndServicesEntity[];
+
   @OneToOne(() => CPOwnershipStructureEntity, (ownershipStructure) => ownershipStructure.companyProfile)
   ownershipStructure: CPOwnershipStructureEntity;
+
+  @OneToMany(() => CpPastPerformanceEntity, (cpPastPerformance) => cpPastPerformance.companyProfile)
+  pastPerformance: CpPastPerformanceEntity[];
+
+  @OneToMany(() => CpCertificationsEntity, (cpCertifications) => cpCertifications.companyProfile)
+  cpCertifications: CpCertificationsEntity[];
+
+  @OneToMany(() => CpAwardEntity, (cpAwards) => cpAwards.companyProfile)
+  cpAwards: CpAwardEntity[];
+
+  @OneToOne(() => CPBusinessGoalsEntity, (businessGoals) => businessGoals.companyProfile)
+  businessGoals: CPBusinessGoalsEntity;
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -13,11 +13,12 @@ export class BaseTypeOrmCrudService<T> {
     return await this.repository.save(data);
   }
 
-  async findAll(inputParams: IGetAll): Promise<{ data: T[]; count: number; totalCount: number; totalPages: number }> {
+  async findAll(inputParams: IGetAll, options?: any): Promise<{ data: T[]; count: number; totalCount: number; totalPages: number }> {
     const { page, limit } = inputParams;
     const [data, count] = await this.repository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
+      relations: options?.relations,
     });
 
     const totalCount = await this.repository.count();
@@ -33,18 +34,20 @@ export class BaseTypeOrmCrudService<T> {
   }
 
   async findByFilter(filter: any = {}, options: any = {}): Promise<T> {
-    const data = await this.repository.findOne({ where: { ...filter, isDeleted: false } as any, relations: options?.relations });
-    if (!data) throw new Error(`${this.repository.metadata.name} not found`);
-    return data;
+    return this.repository.findOne({ where: { ...filter, isDeleted: false } as any, relations: options?.relations });
   }
 
   async update(id: number, params: T): Promise<T> {
-    const existingUser = await this.findById(id);
-    const userData = this.repository.merge(existingUser, params);
-    return await this.repository.save(userData);
+    const existingData = await this.findById(id);
+    const newData = this.repository.merge(existingData, params);
+    return this.repository.save(newData);
   }
 
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async softDelete(id: number): Promise<void> {
+    await this.repository.softDelete(id);
   }
 }

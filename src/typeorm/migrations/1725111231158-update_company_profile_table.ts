@@ -13,7 +13,7 @@ export class UpdateCompanyProfileTable1725111231158 implements MigrationInterfac
     await queryRunner.query(`ALTER TABLE "company_profile" ALTER COLUMN "state_of_registration" DROP NOT NULL`);
     await queryRunner.query(`ALTER TABLE "company_profile" ALTER COLUMN "registration_code" DROP NOT NULL`);
     await queryRunner.query(`ALTER TABLE "company_profile" DROP COLUMN "zip_code"`);
-    await queryRunner.query(`ALTER TABLE "company_profile" ADD "zip_code" integer NOT NULL`);
+    await queryRunner.query(`ALTER TABLE "company_profile" ADD "zip_code" integer`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

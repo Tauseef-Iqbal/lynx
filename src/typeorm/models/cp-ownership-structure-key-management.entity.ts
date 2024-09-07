@@ -5,21 +5,19 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'cp_ownership_structure_key_management' })
 export class CPOwnershipStructureKeyManagementEntity extends CustomBaseEntity {
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   name?: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   role?: string;
 
   @Index()
   @ManyToOne(() => CPOwnershipStructureEntity, (ownershipStructure) => ownershipStructure.ownershipStructureKeyManagement, {
     nullable: false,
-    cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
-    lazy: true,
   })
   @ApiProperty({ type: () => CPOwnershipStructureEntity })
   @JoinColumn({ name: 'ownership_structure_id' })
-  ownershipStructure: Promise<CPOwnershipStructureEntity>;
+  ownershipStructure: CPOwnershipStructureEntity;
 }
