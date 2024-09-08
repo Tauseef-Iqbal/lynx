@@ -17,15 +17,15 @@ export class CybersecurityController {
   @ApiOperation({ summary: 'Add Cybersecurity' })
   @Post()
   async addCybersecurity(@User() user: UserEntity, @Body() addCybersecurityDto: AddCybersecurityDto) {
-    const cyberSecurity = await this.cybersecurityService.addCybersecurity(user, addCybersecurityDto);
-    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cyberSecurity).toJSON();
+    const cybersecurity = await this.cybersecurityService.addCybersecurity(user, addCybersecurityDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cybersecurity).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Cybersecurity' })
   @Put('/:id')
   async updateCybersecurity(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateCybersecurityDto: UpdateCybersecurityDto) {
-    const cyberSecurity = await this.cybersecurityService.updateCybersecurity(id, user, updateCybersecurityDto);
-    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cyberSecurity).toJSON();
+    const cybersecurity = await this.cybersecurityService.updateCybersecurity(id, user, updateCybersecurityDto);
+    return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cybersecurity).toJSON();
   }
 
   @ApiOperation({ summary: 'Get My Cybersecurity' })

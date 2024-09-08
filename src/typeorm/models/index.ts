@@ -24,3 +24,7 @@ export * from './cp-past-performance.entity';
 export * from './cp-past-performance-testimonials.entity';
 export * from './cp-certifications.entity';
 export * from './cp-business-goals.entity';
+export * from './cp-supply-chain.entity';
+export * from './cp-supply-chain-supplier.entity';
+export * from './cp-personnel.entity';
+export * from './cp-points-of-contact.entity';

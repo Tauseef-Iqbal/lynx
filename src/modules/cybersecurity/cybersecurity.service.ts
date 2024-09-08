@@ -24,8 +24,8 @@ export class CybersecurityService extends BaseTypeOrmCrudService<CPCybersecurity
   }
 
   async updateCybersecurity(id: number, user: UserEntity, updateCybersecurityDto: UpdateCybersecurityDto): Promise<CPCybersecurityEntity> {
-    const cyberSecurity = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!cyberSecurity) {
+    const cybercecurity = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
+    if (!cybercecurity) {
       throw new Error('Cybersecurity not associated with this company profile');
     }
 

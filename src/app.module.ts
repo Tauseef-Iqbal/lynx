@@ -30,6 +30,9 @@ import { PastPerformanceModule } from './modules/past-performance/past-performan
 import { CertificationsModule } from './modules/certifications/certifications.module';
 import { AwardsModule } from './modules/awards/awards.module';
 import { BusinessGoalsModule } from './modules/business-goals';
+import { SupplyChainModule } from './modules/supply-chain';
+import { PersonnelModule } from './modules/personnel';
+import { PointsOfContactModule } from './modules/points-of-contact';
 
 @Module({
   imports: [
@@ -64,6 +67,9 @@ import { BusinessGoalsModule } from './modules/business-goals';
     CertificationsModule,
     AwardsModule,
     BusinessGoalsModule,
+    SupplyChainModule,
+    PersonnelModule,
+    PointsOfContactModule,
   ],
   providers: [
     {

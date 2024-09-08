@@ -17,15 +17,15 @@ export class BusinessGoalsController {
   @ApiOperation({ summary: 'Add Business Goals' })
   @Post()
   async addBusinessGoals(@User() user: UserEntity, @Body() addBusinessGoalsDto: AddBusinessGoalsDto) {
-    const cyberSecurity = await this.businessGoalsService.addBusinessGoals(user, addBusinessGoalsDto);
-    return new ResponseDto(HttpStatus.CREATED, 'BusinessGoals added successfully!', cyberSecurity).toJSON();
+    const businessGoals = await this.businessGoalsService.addBusinessGoals(user, addBusinessGoalsDto);
+    return new ResponseDto(HttpStatus.CREATED, 'BusinessGoals added successfully!', businessGoals).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Business Goals' })
   @Put('/:id')
   async updateBusinessGoals(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateBusinessGoalsDto: UpdateBusinessGoalsDto) {
-    const cyberSecurity = await this.businessGoalsService.updateBusinessGoals(id, user, updateBusinessGoalsDto);
-    return new ResponseDto(HttpStatus.CREATED, 'BusinessGoals added successfully!', cyberSecurity).toJSON();
+    const businessGoals = await this.businessGoalsService.updateBusinessGoals(id, user, updateBusinessGoalsDto);
+    return new ResponseDto(HttpStatus.CREATED, 'BusinessGoals added successfully!', businessGoals).toJSON();
   }
 
   @ApiOperation({ summary: 'Get My Business Goals' })

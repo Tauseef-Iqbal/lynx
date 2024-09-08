@@ -16,6 +16,8 @@ import { CpPastPerformanceEntity } from './cp-past-performance.entity';
 import { CpCertificationsEntity } from './cp-certifications.entity';
 import { CpAwardEntity } from './cp-awards.entity';
 import { CPBusinessGoalsEntity } from './cp-business-goals.entity';
+import { CPPersonnelEntity } from './cp-personnel.entity';
+import { CPPointsOfContactEntity } from './cp-points-of-contact.entity';
 
 @Entity({ name: 'company_profile' })
 export class CompanyProfileEntity extends CustomBaseEntity {
@@ -123,6 +125,12 @@ export class CompanyProfileEntity extends CustomBaseEntity {
 
   @OneToOne(() => CPBusinessGoalsEntity, (businessGoals) => businessGoals.companyProfile)
   businessGoals: CPBusinessGoalsEntity;
+
+  @OneToOne(() => CPPersonnelEntity, (personnel) => personnel.companyProfile)
+  personnel: CPPersonnelEntity;
+
+  @OneToMany(() => CPPointsOfContactEntity, (pointsOfContact) => pointsOfContact.companyProfile)
+  pointsOfContact: CPPointsOfContactEntity[];
 
   @BeforeInsert()
   @BeforeUpdate()
