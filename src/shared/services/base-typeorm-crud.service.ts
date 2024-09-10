@@ -34,7 +34,7 @@ export class BaseTypeOrmCrudService<T> {
   }
 
   async findByFilter(filter: any = {}, options: any = {}): Promise<T> {
-    return this.repository.findOne({ where: { ...filter, isDeleted: false } as any, relations: options?.relations });
+    return this.repository.findOne({ where: { ...filter } as any, relations: options?.relations });
   }
 
   async update(id: number, params: T): Promise<T> {

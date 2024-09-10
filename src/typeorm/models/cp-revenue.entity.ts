@@ -1,9 +1,9 @@
-import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
-import { CompanyProfileEntity } from './company-profile.entity';
 import { CompanyRevenueStream, GeneratedRevenueRange } from 'src/modules/revenue/enums';
-import { CPRevenueProjectsAwardedEntity } from './cp-revenue-projects-awarded.entity';
 import { ICustomerDetails } from 'src/modules/revenue/interfaces';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { CompanyProfileEntity } from './company-profile.entity';
+import { CPRevenueProjectsAwardedEntity } from './cp-revenue-projects-awarded.entity';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_revenue' })
 export class CPRevenueEntity extends CustomBaseEntity {

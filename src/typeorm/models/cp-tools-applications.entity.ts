@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
 import { CompanyProfileEntity } from './company-profile.entity';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_tools_applications' })
 export class CPToolsAndApplicationsEntity extends CustomBaseEntity {

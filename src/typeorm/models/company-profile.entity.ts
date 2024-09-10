@@ -1,23 +1,29 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, OneToOne, OneToMany } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
-import { CPFinancialHealthEntity } from './cp-financial-health.entity';
-import { UserEntity } from './user.entity';
-import { CompanyProfileLegalStructureEntity } from './company-profile-legal-structure.entity';
-import { CPToolsAndApplicationsEntity } from './cp-tools-applications.entity';
-import { CPRevenueEntity } from './cp-revenue.entity';
-import { CPCybersecurityEntity } from './cp-cybersecurity.entity';
-import { CPFundingSourcesEntity } from './cp-funding-sources.entity';
-import { IAssets, ISocialMedia } from 'src/modules/company-profile/interfaces';
 import { CompanyClassification } from 'src/modules/company-profile/enums';
-import { CpProductsAndServicesEntity } from './cp-products-and-services.entity';
-import { CPOwnershipStructureEntity } from './cp-ownership-structure.entity';
+import { IAssets, ISocialMedia } from 'src/modules/company-profile/interfaces';
 import { validateAndTransformSocialMedia } from 'src/shared/utils';
-import { CpPastPerformanceEntity } from './cp-past-performance.entity';
-import { CpCertificationsEntity } from './cp-certifications.entity';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { CompanyProfileLegalStructureEntity } from './company-profile-legal-structure.entity';
+import { CPAdvancedBusinessInformationEntity } from './cp-advanced-business-information.entity';
 import { CpAwardEntity } from './cp-awards.entity';
 import { CPBusinessGoalsEntity } from './cp-business-goals.entity';
+import { CpCertificationsEntity } from './cp-certifications.entity';
+import { CPCybersecurityEntity } from './cp-cybersecurity.entity';
+import { CPFinancialHealthEntity } from './cp-financial-health.entity';
+import { CPFundingSourcesEntity } from './cp-funding-sources.entity';
+import { CPOwnershipStructureEntity } from './cp-ownership-structure.entity';
+import { CpPastPerformanceEntity } from './cp-past-performance.entity';
+import { CpProductsAndServicesEntity } from './cp-products-and-services.entity';
+import { CPRevenueEntity } from './cp-revenue.entity';
+import { CPToolsAndApplicationsEntity } from './cp-tools-applications.entity';
+import { CustomBaseEntity } from './custom-base.entity';
+import { UserEntity } from './user.entity';
+import { RequiredSystemEntity } from './required-system.entity';
 import { CPPersonnelEntity } from './cp-personnel.entity';
 import { CPPointsOfContactEntity } from './cp-points-of-contact.entity';
+import { DataComplianceDocumentationEntity } from './cp-data-compliance-documentation.entity';
+import { ControlsAndProtocolEntity } from './cp-controls-and-protocols.entity';
+import { CPDataManagementAndStorageEntity } from './cp-data-management-and-storage.entity';
+import { CPFCIAndCUIEntity } from './cp-fci-and-cui.entity';
 
 @Entity({ name: 'company_profile' })
 export class CompanyProfileEntity extends CustomBaseEntity {
@@ -126,11 +132,28 @@ export class CompanyProfileEntity extends CustomBaseEntity {
   @OneToOne(() => CPBusinessGoalsEntity, (businessGoals) => businessGoals.companyProfile)
   businessGoals: CPBusinessGoalsEntity;
 
+  @OneToOne(() => CPAdvancedBusinessInformationEntity, (cpBusinessInfo) => cpBusinessInfo.companyProfile)
+  cpBusinessInfo: CPAdvancedBusinessInformationEntity;
+  @OneToMany(() => RequiredSystemEntity, (cpRequiredSystem) => cpRequiredSystem.companyProfile)
+  cpRequiredSystems: RequiredSystemEntity[];
+
   @OneToOne(() => CPPersonnelEntity, (personnel) => personnel.companyProfile)
   personnel: CPPersonnelEntity;
 
-  @OneToMany(() => CPPointsOfContactEntity, (pointsOfContact) => pointsOfContact.companyProfile)
+  @OneToOne(() => CPPointsOfContactEntity, (pointsOfContact) => pointsOfContact.companyProfile)
   pointsOfContact: CPPointsOfContactEntity[];
+
+  @OneToOne(() => DataComplianceDocumentationEntity, (dataComplianceDocumentationEntity) => dataComplianceDocumentationEntity.companyProfile)
+  dataComplianceDocumentationEntity: DataComplianceDocumentationEntity;
+
+  @OneToOne(() => ControlsAndProtocolEntity, (controlsAndProtocolEntity) => controlsAndProtocolEntity.companyProfile)
+  controlsAndProtocol: ControlsAndProtocolEntity;
+
+  @OneToOne(() => CPDataManagementAndStorageEntity, (dataManagementAndStorage) => dataManagementAndStorage.companyProfile)
+  dataManagementAndStorage: CPDataManagementAndStorageEntity;
+
+  @OneToOne(() => CPFCIAndCUIEntity, (FCIAndCUI) => FCIAndCUI.companyProfile)
+  FCIAndCUI: CPFCIAndCUIEntity;
 
   @BeforeInsert()
   @BeforeUpdate()

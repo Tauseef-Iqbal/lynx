@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
-import { CPSupplyChainEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 import { SupplyChainService } from './supply-chain.service';
 import { AddSupplyChainDto, UpdateSupplyChainDto } from './dtos';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -74,17 +74,17 @@ export class SupplyChainController {
     return new ResponseDto(HttpStatus.OK, 'Supply Chain Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Supply Chain By ID' })
-  @Delete('/:id')
-  async deleteSupplyChain(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.supplyChainService.update(id, { isDeleted: true } as unknown as CPSupplyChainEntity);
-    return new ResponseDto(HttpStatus.OK, 'Supply Chain Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Supply Chain By ID' })
+  // @Delete('/:id')
+  // async deleteSupplyChain(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.supplyChainService.update(id, { isDeleted: true } as unknown as CPSupplyChainEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Supply Chain Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Supply Chain' })
-  @Delete('section/me')
-  async deleteMySupplyChain(@User() user: UserEntity) {
-    const response = await this.supplyChainService.deleteMySupplyChain(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Supply Chain Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Supply Chain' })
+  // @Delete('section/me')
+  // async deleteMySupplyChain(@User() user: UserEntity) {
+  //   const response = await this.supplyChainService.deleteMySupplyChain(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Supply Chain Section deleted successfully!', response).toJSON();
+  // }
 }

@@ -25,7 +25,7 @@ export class PastPerformanceService extends BaseTypeOrmCrudService<CpPastPerform
 
   async createPastPerformance(user: any, createPastPerformanceDto: CreatePastPerformanceDto, files: CpPastPerformanceFiles): Promise<CpPastPerformanceEntity> {
     if (files.supportingDocs) {
-      createPastPerformanceDto.supportingDocs = await uploadFilesToS3(user, files.supportingDocs, createPastPerformanceDto.contractName, this.s3Service, MAX_PAST_PROFORMANCE_FILE_SIZE_BYTES, MAX_PAST_PROFORMANCE_FILE_SIZE_MB);
+      createPastPerformanceDto.supportingDocs = await uploadFilesToS3(user, files.supportingDocs, createPastPerformanceDto.contractName, this.s3Service, this.configService, MAX_PAST_PROFORMANCE_FILE_SIZE_BYTES, MAX_PAST_PROFORMANCE_FILE_SIZE_MB);
     }
 
     const pp = await this.create({ ...createPastPerformanceDto, companyProfile: { id: user.companyProfile.id } } as unknown as CpPastPerformanceEntity);

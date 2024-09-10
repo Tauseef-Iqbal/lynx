@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3Service } from 'src/modules/global/providers';
@@ -21,6 +21,9 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
   }
 
   async createFinancialHealthSection(user: UserEntity, createFinancialHealthSectionDto: CreateFinancialHealthSectionDto, files: FinancialHealthFiles): Promise<CPFinancialHealthEntity> {
+    console.log('createFinancialHealthSectionDto', createFinancialHealthSectionDto);
+    console.log('files', files);
+
     const existedFinancialHealth = await this.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
     if (existedFinancialHealth) {
       return this.updateFinancialHealthSection(existedFinancialHealth.id, user, createFinancialHealthSectionDto, files);
@@ -85,17 +88,22 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
 
   async getMyFinancialHealth(companyProfileId: number): Promise<CPFinancialHealthEntity> {
     const myFinancialhealth = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myFinancialhealth) {
-      throw new NotFoundException('Financial Health section not found against your company profile');
-    }
+    // if (!myFinancialhealth) {
+    //   throw new NotFoundException('Financial Health section not found against your company profile');
+    // }
+
+    if (!myFinancialhealth) return null;
+
     return myFinancialhealth;
   }
 
   async updateFinancialHealthSection(id: number, user: UserEntity, updateFinancialHealthSectionDto: UpdateFinancialHealthSectionDto, files: FinancialHealthFiles): Promise<CPFinancialHealthEntity> {
     const financialHealthSection = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!financialHealthSection) {
-      throw new Error('Financial Health Section not associated with this company profile');
-    }
+    // if (!financialHealthSection) {
+    //   throw new Error('Financial Health Section not associated with this company profile');
+    // }
+
+    if (!financialHealthSection) return null;
 
     if (files.financialStatementsFiles || updateFinancialHealthSectionDto.financialStatementsFiles) {
       if (files.financialStatementsFiles && !updateFinancialHealthSectionDto.financialStatements) throw new BadRequestException('financialStatementsFiles should not be provided when financialStatements does not meet the required condition.');

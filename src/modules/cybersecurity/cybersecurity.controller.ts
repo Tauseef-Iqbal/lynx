@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { CybersecurityService } from './cybersecurity.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddCybersecurityDto, UpdateCybersecurityDto } from './dtos';
-import { CPCybersecurityEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Cybersecurity')
 @ApiBearerAuth()
@@ -42,17 +42,17 @@ export class CybersecurityController {
     return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Cybersecurity By ID' })
-  @Delete('/:id')
-  async deleteCybersecurity(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.cybersecurityService.update(id, { isDeleted: true } as unknown as CPCybersecurityEntity);
-    return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Cybersecurity By ID' })
+  // @Delete('/:id')
+  // async deleteCybersecurity(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.cybersecurityService.update(id, { isDeleted: true } as unknown as CPCybersecurityEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Cybersecurity' })
-  @Delete('section/me')
-  async deleteMyCybersecurity(@User() user: UserEntity) {
-    const response = await this.cybersecurityService.deleteMyCybersecurity(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Cybersecurity' })
+  // @Delete('section/me')
+  // async deleteMyCybersecurity(@User() user: UserEntity) {
+  //   const response = await this.cybersecurityService.deleteMyCybersecurity(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Cybersecurity Section deleted successfully!', response).toJSON();
+  // }
 }

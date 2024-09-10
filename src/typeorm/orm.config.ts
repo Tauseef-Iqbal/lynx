@@ -17,7 +17,7 @@ export const dataSourceOptions: DataSourceOptions = {
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
   migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
   subscribers: [join(__dirname, 'typeorm', '*.subscriber{.ts,.js}')],
-  migrationsRun: true,
+  migrationsRun: false,
   migrationsTableName: 'migrations',
 };
 export const dataSource = new DataSource(dataSourceOptions);

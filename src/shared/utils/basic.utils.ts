@@ -58,7 +58,7 @@ export function isValidSocialMediaUrl(url: string, platform: keyof ISocialMedia)
   return platformPattern.test(url);
 }
 
-export const uploadFilesToS3 = async (user: any, files: Express.Multer.File[], folderName: string, s3Service: S3Service, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string[]> => {
+export const uploadFilesToS3 = async (user: any, files: Express.Multer.File[], folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string[]> => {
   files.forEach((file) => {
     if (file.size > maxFileSizeBytes) {
       throw new Error(`File ${file.originalname} exceeds the maximum size of ${maxFileSizeMb} MB.`);
@@ -70,7 +70,7 @@ export const uploadFilesToS3 = async (user: any, files: Express.Multer.File[], f
       const sanitizedFilename = file.originalname.replace(/\s+/g, '_');
       const key = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
       await s3Service.uploadBuffer(file.buffer, key);
-      return `${process.env.AWS_S3_PUBLIC_LINK}${key}`;
+      return `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${key}`;
     }),
   );
 };

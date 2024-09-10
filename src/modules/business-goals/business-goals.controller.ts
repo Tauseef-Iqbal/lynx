@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { BusinessGoalsService } from './business-goals.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddBusinessGoalsDto, UpdateBusinessGoalsDto } from './dtos';
-import { CPBusinessGoalsEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('BusinessGoals')
 @ApiBearerAuth()
@@ -42,17 +42,17 @@ export class BusinessGoalsController {
     return new ResponseDto(HttpStatus.OK, 'BusinessGoals Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete BusinessGoals By ID' })
-  @Delete('/:id')
-  async deleteBusinessGoals(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.businessGoalsService.update(id, { isDeleted: true } as unknown as CPBusinessGoalsEntity);
-    return new ResponseDto(HttpStatus.OK, 'BusinessGoals Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete BusinessGoals By ID' })
+  // @Delete('/:id')
+  // async deleteBusinessGoals(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.businessGoalsService.update(id, { isDeleted: true } as unknown as CPBusinessGoalsEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'BusinessGoals Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Business Goals' })
-  @Delete('section/me')
-  async deleteMyBusinessGoals(@User() user: UserEntity) {
-    const response = await this.businessGoalsService.deleteMyBusinessGoals(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'BusinessGoals Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Business Goals' })
+  // @Delete('section/me')
+  // async deleteMyBusinessGoals(@User() user: UserEntity) {
+  //   const response = await this.businessGoalsService.deleteMyBusinessGoals(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'BusinessGoals Section deleted successfully!', response).toJSON();
+  // }
 }

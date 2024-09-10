@@ -56,9 +56,11 @@ export class SupplyChainService extends BaseTypeOrmCrudService<CPSupplyChainEnti
 
   async updateSupplyChain(id: number, user: UserEntity, updateSupplyChainDto: UpdateSupplyChainDto, files: SupplyChainFiles): Promise<CPSupplyChainEntity> {
     const existedSupplyChain = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true, supplyChainSupplier: true } });
-    if (!existedSupplyChain) {
-      throw new Error('Supply Chain not associated with this company profile');
-    }
+    // if (!existedSupplyChain) {
+    //   throw new Error('Supply Chain not associated with this company profile');
+    // }
+
+    if (!existedSupplyChain) return null;
 
     if (files.suppliersBannedListFiles || updateSupplyChainDto.suppliersBannedListFiles) {
       if (files.suppliersBannedListFiles && !updateSupplyChainDto.suppliersBannedList) throw new BadRequestException('suppliersBannedListFiles should not be provided when suppliersBannedList does not meet the required condition.');
@@ -105,10 +107,13 @@ export class SupplyChainService extends BaseTypeOrmCrudService<CPSupplyChainEnti
   }
 
   async getMySupplyChain(companyProfileId: number): Promise<CPSupplyChainEntity> {
-    const mySupplyChain = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!mySupplyChain) {
-      throw new NotFoundException('Supply Chain not found against your company profile');
-    }
+    const mySupplyChain = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false }, { relations: { supplyChainSupplier: true } });
+    // if (!mySupplyChain) {
+    //   throw new NotFoundException('Supply Chain not found against your company profile');
+    // }
+
+    if (!mySupplyChain) return null;
+
     return mySupplyChain;
   }
 

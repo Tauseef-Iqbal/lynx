@@ -1,8 +1,8 @@
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CPOwnershipStructureDetailsEntity } from './cp-ownership-structure-details.entity';
 import { CPOwnershipStructureKeyManagementEntity } from './cp-ownership-structure-key-management.entity';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_ownership_structure' })
 export class CPOwnershipStructureEntity extends CustomBaseEntity {

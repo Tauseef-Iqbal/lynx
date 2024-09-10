@@ -19,6 +19,6 @@ export class CPFundingSourcesForeignAffiliationEntity extends CustomBaseEntity {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'foreign_funding_id' })
+  @JoinColumn({ name: 'funding_sources_id' })
   fundingSources: CPFundingSourcesEntity;
 }

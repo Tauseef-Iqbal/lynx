@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -25,18 +25,23 @@ export class CybersecurityService extends BaseTypeOrmCrudService<CPCybersecurity
 
   async updateCybersecurity(id: number, user: UserEntity, updateCybersecurityDto: UpdateCybersecurityDto): Promise<CPCybersecurityEntity> {
     const cybercecurity = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!cybercecurity) {
-      throw new Error('Cybersecurity not associated with this company profile');
-    }
+    // if (!cybercecurity) {
+    //   throw new Error('Cybersecurity not associated with this company profile');
+    // }
+
+    if (!cybercecurity) return null;
 
     return this.update(id, updateCybersecurityDto as unknown as CPCybersecurityEntity);
   }
 
   async getMyCybersecurity(companyProfileId: number): Promise<CPCybersecurityEntity> {
     const myCybersecurity = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myCybersecurity) {
-      throw new NotFoundException('Cybersecurity not found against your company profile');
-    }
+    // if (!myCybersecurity) {
+    //   throw new NotFoundException('Cybersecurity not found against your company profile');
+    // }
+
+    if (!myCybersecurity) return null;
+
     return myCybersecurity;
   }
 

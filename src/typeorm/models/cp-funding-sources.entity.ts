@@ -1,8 +1,8 @@
-import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
+import { IInvestorDetails } from 'src/modules/funding-sources/interfaces';
+import { Column, Entity, Index, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CPFundingSourcesForeignAffiliationEntity } from './cp-funding-sources-foreign-affiliation.entity';
-import { IInvestorDetails } from 'src/modules/funding-sources/interfaces';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_funding_sources' })
 export class CPFundingSourcesEntity extends CustomBaseEntity {

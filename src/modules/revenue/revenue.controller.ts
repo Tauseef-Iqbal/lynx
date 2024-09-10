@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { RevenueService } from './revenue.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddRevenueDto, UpdateRevenueDto } from './dtos';
-import { CPRevenueEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Revenue')
@@ -43,17 +43,17 @@ export class RevenueController {
     return new ResponseDto(HttpStatus.OK, 'Revenue fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Revenue' })
-  @Delete('/:id')
-  async deleteMyRevenueByID(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.revenueService.update(id, { isDeleted: true } as unknown as CPRevenueEntity);
-    return new ResponseDto(HttpStatus.OK, 'Revenue deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Revenue' })
+  // @Delete('/:id')
+  // async deleteMyRevenueByID(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.revenueService.update(id, { isDeleted: true } as unknown as CPRevenueEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Revenue deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Revenue' })
-  @Delete('section/me')
-  async deleteMyRevenue(@User() user: UserEntity) {
-    const response = await this.revenueService.deleteMyRevenue(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'My Revenue deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Revenue' })
+  // @Delete('section/me')
+  // async deleteMyRevenue(@User() user: UserEntity) {
+  //   const response = await this.revenueService.deleteMyRevenue(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'My Revenue deleted successfully!', response).toJSON();
+  // }
 }

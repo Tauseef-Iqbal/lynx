@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
 import { CompanyProfileEntity } from '.';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity('cp_business_goals')
 export class CPBusinessGoalsEntity extends CustomBaseEntity {

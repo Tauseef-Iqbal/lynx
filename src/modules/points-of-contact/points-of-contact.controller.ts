@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { PointsOfContactService } from './points-of-contact.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddPointsOfContactDto, UpdatePointsOfContactDto } from './dtos';
-import { CPPointsOfContactEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Points Of Contact')
 @ApiBearerAuth()
@@ -42,17 +42,17 @@ export class PointsOfContactController {
     return new ResponseDto(HttpStatus.OK, 'Points Of Contact Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete PointsOfContact By ID' })
-  @Delete('/:id')
-  async deletePointsOfContact(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.pointsOfContactService.update(id, { isDeleted: true } as unknown as CPPointsOfContactEntity);
-    return new ResponseDto(HttpStatus.OK, 'Points Of Contact Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete PointsOfContact By ID' })
+  // @Delete('/:id')
+  // async deletePointsOfContact(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.pointsOfContactService.update(id, { isDeleted: true } as unknown as CPPointsOfContactEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Points Of Contact Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My PointsOfContact' })
-  @Delete('section/me')
-  async deleteMyPointsOfContact(@User() user: UserEntity) {
-    const response = await this.pointsOfContactService.deleteMyPointsOfContact(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Points Of Contact Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My PointsOfContact' })
+  // @Delete('section/me')
+  // async deleteMyPointsOfContact(@User() user: UserEntity) {
+  //   const response = await this.pointsOfContactService.deleteMyPointsOfContact(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Points Of Contact Section deleted successfully!', response).toJSON();
+  // }
 }

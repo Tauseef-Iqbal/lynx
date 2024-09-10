@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -41,9 +41,11 @@ export class PersonnelService extends BaseTypeOrmCrudService<CPPersonnelEntity> 
 
   async updatePersonnel(id: number, user: UserEntity, updatePersonnelDto: UpdatePersonnelDto, files: IFOCIDesignationFiles): Promise<CPPersonnelEntity> {
     const personnel = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!personnel) {
-      throw new Error('Personnel not associated with this company profile');
-    }
+    // if (!personnel) {
+    //   throw new Error('Personnel not associated with this company profile');
+    // }
+
+    if (!personnel) return null;
 
     if (files.FOCIDesignationFiles || updatePersonnelDto.FOCIDesignationFiles) {
       if (files.FOCIDesignationFiles && !updatePersonnelDto.FOCIDesignation) throw new BadRequestException('FOCIDesignationFiles should not be provided when FOCIDesignation does not meet the required condition.');
@@ -62,9 +64,12 @@ export class PersonnelService extends BaseTypeOrmCrudService<CPPersonnelEntity> 
 
   async getMyPersonnel(companyProfileId: number): Promise<CPPersonnelEntity> {
     const myPersonnel = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myPersonnel) {
-      throw new NotFoundException('Personnel not found against your company profile');
-    }
+    // if (!myPersonnel) {
+    //   throw new NotFoundException('Personnel not found against your company profile');
+    // }
+
+    if (!myPersonnel) return null;
+
     return myPersonnel;
   }
 

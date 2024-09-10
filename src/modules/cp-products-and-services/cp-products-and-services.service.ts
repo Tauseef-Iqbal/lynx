@@ -25,7 +25,7 @@ export class CpProductsAndServicesService extends BaseTypeOrmCrudService<CpProdu
 
   async createCpProductsAndServices(user: any, createCpProductsAndServicesDto: CreateCpProductsAndServicesDto, files: CpProductsAndServicesFiles): Promise<CpProductsAndServicesEntity> {
     if (files.uploadedMaterials) {
-      createCpProductsAndServicesDto.uploadedMaterials = await uploadFilesToS3(user, files.uploadedMaterials, createCpProductsAndServicesDto.name, this.s3Service, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
+      createCpProductsAndServicesDto.uploadedMaterials = await uploadFilesToS3(user, files.uploadedMaterials, createCpProductsAndServicesDto.name, this.s3Service, this.configService, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
     }
 
     const cpProductsAndServices = await this.create({ ...createCpProductsAndServicesDto, companyProfile: { id: user.companyProfile.id } } as unknown as CpProductsAndServicesEntity);

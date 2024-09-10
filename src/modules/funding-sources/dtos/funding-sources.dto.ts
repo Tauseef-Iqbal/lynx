@@ -183,7 +183,7 @@ export class AddFundingSourcesDto {
   })
   @IsBoolean()
   @IsOptional()
-  hasFinancialAudits?: boolean;
+  financialAudits?: boolean;
 
   @ApiPropertyOptional({
     description: 'Details about the financial audits',
@@ -191,7 +191,7 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('hasFinancialAudits', (value) => value === true)
+  @ConditionalValue('financialAudits', (value) => value === true)
   auditDetails?: string;
 
   @ApiPropertyOptional({

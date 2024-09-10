@@ -9,28 +9,28 @@ export class AddBusinessGoalsDto {
   @IsEnum(GrowthAndExpansionEnum, { each: true })
   growthAndExpansion?: GrowthAndExpansionEnum[];
 
-  @ApiPropertyOptional({ enum: CollaborationEnum, description: 'Collaboration Goals' })
+  @ApiPropertyOptional({ enum: CollaborationEnum, isArray: true, description: 'Collaboration Goals' })
   @IsOptional()
   @IsArray()
-  @IsEnum(CollaborationEnum)
+  @IsEnum(CollaborationEnum, { each: true })
   collaboration?: CollaborationEnum[];
 
-  @ApiPropertyOptional({ enum: ProcurementEnum, description: 'Procurement Goals' })
+  @ApiPropertyOptional({ enum: ProcurementEnum, isArray: true, description: 'Procurement Goals' })
   @IsOptional()
   @IsArray()
-  @IsEnum(ProcurementEnum)
+  @IsEnum(ProcurementEnum, { each: true })
   procurement?: ProcurementEnum[];
 
-  @ApiPropertyOptional({ enum: OperationsEnum, description: 'Operations Goals' })
+  @ApiPropertyOptional({ enum: OperationsEnum, isArray: true, description: 'Operations Goals' })
   @IsOptional()
   @IsArray()
-  @IsEnum(OperationsEnum)
+  @IsEnum(OperationsEnum, { each: true })
   operations?: OperationsEnum[];
 
-  @ApiPropertyOptional({ enum: BrandingAndMarketingEnum, description: 'Branding and Marketing Goals' })
+  @ApiPropertyOptional({ enum: BrandingAndMarketingEnum, isArray: true, description: 'Branding and Marketing Goals' })
   @IsOptional()
   @IsArray()
-  @IsEnum(BrandingAndMarketingEnum)
+  @IsEnum(BrandingAndMarketingEnum, { each: true })
   brandingAndMarketing?: BrandingAndMarketingEnum[];
 }
 

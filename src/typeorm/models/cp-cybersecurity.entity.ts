@@ -1,7 +1,7 @@
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
-import { CompanyProfileEntity } from './company-profile.entity';
 import { ICybersecurityAuditsDetails, ICybersecurityStandardsCompliantDetails, ICybersecurityTrainingDetails, IEncryptDataDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPenetrationTestingDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
+import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { CompanyProfileEntity } from './company-profile.entity';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_cybersecurity' })
 export class CPCybersecurityEntity extends CustomBaseEntity {

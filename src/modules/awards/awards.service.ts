@@ -23,7 +23,7 @@ export class AwardsService extends BaseTypeOrmCrudService<CpAwardEntity> {
 
   async createAward(user: any, createCpAwardDto: CreateCpAwardDto, files: AwardFiles): Promise<CpAwardEntity> {
     if (files.documentation) {
-      createCpAwardDto.documentation = await uploadFilesToS3(user, files.documentation, createCpAwardDto.nameOfAward, this.s3Service, MAX_CP_AWARDS_SIZE_BYTES, MAX_CP_AWARDS_FILE_SIZE_MB);
+      createCpAwardDto.documentation = await uploadFilesToS3(user, files.documentation, createCpAwardDto.nameOfAward, this.s3Service, this.configService, MAX_CP_AWARDS_SIZE_BYTES, MAX_CP_AWARDS_FILE_SIZE_MB);
     }
 
     return this.create({

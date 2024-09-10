@@ -1,8 +1,8 @@
 import { Column, Entity, Index, OneToOne } from 'typeorm';
+import { CompanyProfileEntity } from './company-profile.entity';
 import { CompanyEntity } from './company.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 import { UserRepresentationEntity } from './user-representation.entity';
-import { CompanyProfileEntity } from './company-profile.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends CustomBaseEntity {

@@ -3,6 +3,7 @@ import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '../constants';
 import { ParamsToHandleAddFiles, ParamsToHandleUpdateFiles } from '../types';
 import { isS3Url } from './basic.utils';
 import { PreconditionFailedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 export const processFilesToAdd = async ({ incomingFiles = [], incomingS3AndBase64 = [], keyPrefix, configService, s3Service, assetsMetadata = [] }: ParamsToHandleAddFiles): Promise<any> => {
   const uploadTasks: (() => Promise<void>)[] = [];
@@ -39,7 +40,7 @@ export const processFilesToAdd = async ({ incomingFiles = [], incomingS3AndBase6
   return uploadedFiles;
 };
 
-export const processCpLegalStructureFilesToAdd = async (user: any, files: Express.Multer.File[], legalStructure: string, s3Service: S3Service): Promise<string[]> => {
+export const processCpLegalStructureFilesToAdd = async (user: any, files: Express.Multer.File[], legalStructure: string, s3Service: S3Service, configService: ConfigService): Promise<string[]> => {
   files.forEach((file) => {
     if (file.size > MAX_FILE_SIZE_BYTES) {
       throw new Error(`File ${file.originalname} exceeds the maximum size of ${MAX_FILE_SIZE_MB} MB.`);
@@ -50,7 +51,7 @@ export const processCpLegalStructureFilesToAdd = async (user: any, files: Expres
     files.map(async (file) => {
       const key = `${user.companyProfile.name}/${legalStructure}/${file.originalname}`;
       await s3Service.uploadBuffer(file.buffer, key);
-      return `${process.env.AWS_S3_PUBLIC_LINK}${key}`;
+      return `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${key}`;
     }),
   );
 };
@@ -114,10 +115,12 @@ export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles =
     }
 
     if (isS3Url(assetUrl)) {
-      const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl && (!assetType || existing.type === assetType)));
-      if (!existingAsset) {
-        throw new Error(`Asset URL not found in existing assets: ${assetUrl}`);
-      }
+      console.log({ assetUrl, existingAssets });
+      // const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl && (!assetType || existing.type === assetType)));
+      const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl));
+      // if (!existingAsset) {
+      //   throw new Error(`Asset URL not found in existing assets: ${assetUrl}`);
+      // }
 
       incomingAssets.add(assetType ? { type: assetType, url: assetUrl } : assetUrl);
       existingAssets.delete(existingAsset);

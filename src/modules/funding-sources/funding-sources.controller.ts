@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { FundingSourcesService } from './funding-sources.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddFundingSourcesDto, UpdateFundingSourcesDto } from './dtos';
-import { CPFundingSourcesEntity } from 'src/typeorm/models/cp-funding-sources.entity';
 import { UserEntity } from 'src/typeorm/models';
 
 @ApiTags('Funding Sources')
@@ -43,17 +42,17 @@ export class FundingSourcesController {
     return new ResponseDto(HttpStatus.OK, 'Funding Sources Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Funding Sources By ID' })
-  @Delete('/:id')
-  async deleteFundingSources(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.fundingSourcesService.update(id, { isDeleted: true } as unknown as CPFundingSourcesEntity);
-    return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Funding Sources By ID' })
+  // @Delete('/:id')
+  // async deleteFundingSources(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.fundingSourcesService.update(id, { isDeleted: true } as unknown as CPFundingSourcesEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Funding Sources' })
-  @Delete('section/me')
-  async deleteMyFundingSources(@User() user: UserEntity) {
-    const response = await this.fundingSourcesService.deleteMyFundingSources(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Funding Sources' })
+  // @Delete('section/me')
+  // async deleteMyFundingSources(@User() user: UserEntity) {
+  //   const response = await this.fundingSourcesService.deleteMyFundingSources(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Funding Sources Section deleted successfully!', response).toJSON();
+  // }
 }

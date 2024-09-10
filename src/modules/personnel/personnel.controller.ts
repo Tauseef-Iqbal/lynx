@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PersonnelService } from './personnel.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddPersonnelDto, UpdatePersonnelDto } from './dtos';
-import { CPPersonnelEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { IFOCIDesignationFiles } from './interfaces';
 
@@ -62,17 +62,17 @@ export class PersonnelController {
     return new ResponseDto(HttpStatus.OK, 'Personnel Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Personnel By ID' })
-  @Delete('/:id')
-  async deletePersonnel(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.personnelService.update(id, { isDeleted: true } as unknown as CPPersonnelEntity);
-    return new ResponseDto(HttpStatus.OK, 'Personnel Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Personnel By ID' })
+  // @Delete('/:id')
+  // async deletePersonnel(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.personnelService.update(id, { isDeleted: true } as unknown as CPPersonnelEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Personnel Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Personnel' })
-  @Delete('section/me')
-  async deleteMyPersonnel(@User() user: UserEntity) {
-    const response = await this.personnelService.deleteMyPersonnel(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Personnel Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Personnel' })
+  // @Delete('section/me')
+  // async deleteMyPersonnel(@User() user: UserEntity) {
+  //   const response = await this.personnelService.deleteMyPersonnel(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Personnel Section deleted successfully!', response).toJSON();
+  // }
 }

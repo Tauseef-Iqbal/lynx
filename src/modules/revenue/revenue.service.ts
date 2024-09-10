@@ -28,9 +28,11 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
 
   async updateRevenue(id: number, user: UserEntity, updateRevenueDto: UpdateRevenueDto): Promise<CPRevenueEntity> {
     const existingRevenue = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true, projectsAwarded: true } });
-    if (!existingRevenue) {
-      throw new Error('Revenue not associated with this company profile');
-    }
+    // if (!existingRevenue) {
+    //   throw new Error('Revenue not associated with this company profile');
+    // }
+
+    if (!existingRevenue) return null;
 
     if (updateRevenueDto.projectsAwarded) {
       const existingProjectsIds: number[] = existingRevenue.projectsAwarded.map((project) => Number(project.id));
@@ -62,9 +64,12 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
 
   async getMyRevenue(companyProfileId: number): Promise<CPRevenueEntity> {
     const myRevenue = await this.findByFilter({ companyProfile: { id: companyProfileId } }, { relations: { projectsAwarded: true } });
-    if (!myRevenue) {
-      throw new NotFoundException('Revenue not found against your company profile');
-    }
+    // if (!myRevenue) {
+    //   throw new NotFoundException('Revenue not found against your company profile');
+    // }
+
+    if (!myRevenue) return null;
+
     return myRevenue;
   }
 

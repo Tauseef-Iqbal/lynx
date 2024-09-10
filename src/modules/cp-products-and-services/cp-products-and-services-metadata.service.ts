@@ -47,7 +47,7 @@ export class CpProductsAndServicesMetaDataService extends BaseTypeOrmCrudService
       let supportingMaterialsUrls;
 
       if (supportingMaterials) {
-        supportingMaterialsUrls = await uploadFilesToS3(user, supportingMaterials, this.S3FolderName, this.s3Service, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
+        supportingMaterialsUrls = await uploadFilesToS3(user, supportingMaterials, this.S3FolderName, this.s3Service, this.configService, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
       }
 
       const additionalInfoPromises = cpProductsAndServicesMetaDtos.map((cpProductsAndServicesMetaDto) => {

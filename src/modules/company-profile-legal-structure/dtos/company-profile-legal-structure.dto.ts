@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { FILE_LIMITS } from 'src/shared/constants';
 
 export class CompanyProfileLegalStructureOrgFacilityDto {
@@ -37,9 +37,10 @@ export class CompanyProfileLegalStructureOrgFacilityDto {
 
 export class CreateCompanyProfileLegalStructureDto {
   @ApiProperty({ description: 'Company legal structure' })
-  @IsString()
-  @IsNotEmpty()
-  legalStructure: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  legalStructure: string[];
 
   @ApiPropertyOptional({ description: 'Doing Business As name' })
   @IsString()

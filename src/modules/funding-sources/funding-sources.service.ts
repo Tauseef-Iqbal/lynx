@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -22,15 +22,16 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
     if (existedFundingSources) {
       return this.updateFundingSources(existedFundingSources.id, user, addFundingSourcesDto);
     }
-
     return this.create({ ...addFundingSourcesDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPFundingSourcesEntity);
   }
 
   async updateFundingSources(id: number, user: UserEntity, updateFundingSourcesDto: UpdateFundingSourcesDto): Promise<CPFundingSourcesEntity> {
-    const existedFundingSources = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true, fundingSourcesForeignAffiliation: true } });
-    if (!existedFundingSources) {
-      throw new Error('Funding Sources not associated with this company profile');
-    }
+    const existedFundingSources = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { fundingSourcesForeignAffiliation: true } });
+    // if (!existedFundingSources) {
+    //   throw new Error('Funding Sources not associated with this company profile');
+    // }
+
+    if (!existedFundingSources) return null;
 
     if (updateFundingSourcesDto.fundingSourcesForeignAffiliation) {
       const existingForeignAffiliationsIds: number[] = existedFundingSources.fundingSourcesForeignAffiliation.map((project) => Number(project.id));
@@ -59,10 +60,13 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
   }
 
   async getMyFundingSources(companyProfileId: number): Promise<CPFundingSourcesEntity> {
-    const myFundingSources = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myFundingSources) {
-      throw new NotFoundException('Funding Sources not found against your company profile');
-    }
+    const myFundingSources = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false }, { relations: { fundingSourcesForeignAffiliation: true } });
+    // if (!myFundingSources) {
+    //   throw new NotFoundException('Funding Sources not found against your company profile');
+    // }
+
+    if (!myFundingSources) return null;
+
     return myFundingSources;
   }
 

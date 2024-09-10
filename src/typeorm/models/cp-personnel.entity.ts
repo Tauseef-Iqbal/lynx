@@ -4,7 +4,7 @@ import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
-@Entity({ name: 'cp_personeel' })
+@Entity({ name: 'cp_personnel' })
 export class CPPersonnelEntity extends CustomBaseEntity {
   @Column({ name: 'total_employees', type: 'enum', enum: TotalEmployees, nullable: true })
   totalEmployees?: string;
@@ -54,7 +54,7 @@ export class CPPersonnelEntity extends CustomBaseEntity {
   @Column({ name: 'strategic_competitors_related_foreign_ties', type: 'boolean', nullable: true })
   strategicCompetitorsRelatedForeignTies?: boolean;
 
-  @Column({ name: 'strategic_competitors_related_foreign_ties', type: 'text', nullable: true })
+  @Column({ name: 'strategic_competitors_related_foreign_ties_details', type: 'text', nullable: true })
   strategicCompetitorsRelatedForeignTiesDetails?: string;
 
   @Column({ name: 'foreign_nationals', type: 'boolean', nullable: true })

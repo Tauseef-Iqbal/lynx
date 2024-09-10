@@ -1,9 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class AddOwnerShipStructureDetailsDto {
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({ description: 'Type of the investment round' })
@@ -34,6 +36,7 @@ export class AddOwnerShipStructureDetailsDto {
   @ApiPropertyOptional({ description: 'Capital invested by the investor' })
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 2 })
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   capitalInvested?: number;
 
   @ApiPropertyOptional({ description: 'Ownership and voting rights of the investor' })

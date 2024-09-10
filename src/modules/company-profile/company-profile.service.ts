@@ -26,7 +26,7 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
     if (user?.companyProfile.id) {
       return this.updateCompanyProfile(user.companyProfile.id, user, createCompanyProfileDto, files);
     } else {
-      if (files.assets.length || createCompanyProfileDto.assets.length) {
+      if (files?.assets?.length || createCompanyProfileDto?.assets?.length) {
         createCompanyProfileDto.assets = await processFilesToAdd({
           incomingFiles: files.assets,
           incomingS3AndBase64: createCompanyProfileDto.assets,
@@ -46,7 +46,8 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
   async updateCompanyProfile(id: number, user: UserEntity, updateCompanyProfileDto: UpdateCompanyProfileDto, files: Assets): Promise<any> {
     const companyProfile = await this.findByFilter({ id, userProfile: { id: user.id } });
 
-    if (!companyProfile) throw new Error('Company not found');
+    // if (!companyProfile) throw new Error('Company not found');
+    if (!companyProfile) return null;
 
     if (companyProfile?.assets?.length || files?.assets?.length) {
       updateCompanyProfileDto.assets = await processFilesToUpdate({

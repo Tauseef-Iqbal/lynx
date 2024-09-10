@@ -32,9 +32,11 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
 
   async updateOwnershipStructure(id: number, user: UserEntity, updateOwnershipStructureDto: UpdateOwnershipStructureDto): Promise<CPOwnershipStructureEntity> {
     const existingOwnershipStructure = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id }, isDeleted: false }, { relations: { companyProfile: true, ownershipStructureDetails: true, ownershipStructureKeyManagement: true } });
-    if (!existingOwnershipStructure) {
-      throw new Error('Ownership Structure not associated with this company profile');
-    }
+    // if (!existingOwnershipStructure) {
+    //   throw new Error('Ownership Structure not associated with this company profile');
+    // }
+
+    if (!existingOwnershipStructure) return null;
 
     const { ownershipStructureDetails, ownershipStructureKeyManagement } = updateOwnershipStructureDto;
 
@@ -42,7 +44,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
       if (ownershipStructureDetails.id) {
         const existedOwnershipStructureDetails = await this.ownershipStructureDetailsRepository.findOne({ where: { id: ownershipStructureDetails.id, isDeleted: false } });
         if (!existedOwnershipStructureDetails) throw new NotFoundException(`Ownership Structure Details with id ${ownershipStructureDetails.id} isn't associated with the Ownership Structure with id ${id}`);
-        await this.ownershipStructureDetailsRepository.update(existedOwnershipStructureDetails.id, ownershipStructureDetails);
+        await this.ownershipStructureDetailsRepository.update({ id: existedOwnershipStructureDetails.id }, ownershipStructureDetails);
       } else {
         const newOwnershipStructureDetails = this.ownershipStructureDetailsRepository.create({
           ...ownershipStructureDetails,
@@ -77,14 +79,19 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
       delete updateOwnershipStructureDto.ownershipStructureKeyManagement;
     }
 
-    return this.update(id, updateOwnershipStructureDto as unknown as CPOwnershipStructureEntity);
+    await this.update(id, updateOwnershipStructureDto as unknown as CPOwnershipStructureEntity);
+
+    return this.getMyOwnershipStructure(user.companyProfile.id);
   }
 
   async getMyOwnershipStructure(companyProfileId: number): Promise<CPOwnershipStructureEntity> {
-    const myOwnershipStructure = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myOwnershipStructure) {
-      throw new NotFoundException('Ownership Structure not found against your company profile');
-    }
+    const myOwnershipStructure = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false }, { relations: { ownershipStructureDetails: true, ownershipStructureKeyManagement: true } });
+    // if (!myOwnershipStructure) {
+    //   throw new NotFoundException('Ownership Structure not found against your company profile');
+    // }
+
+    if (!myOwnershipStructure) return null;
+
     return myOwnershipStructure;
   }
 

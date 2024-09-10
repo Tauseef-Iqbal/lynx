@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -19,24 +19,22 @@ export class BusinessGoalsService extends BaseTypeOrmCrudService<CPBusinessGoals
     if (existedBusinessGoals) {
       return this.updateBusinessGoals(existedBusinessGoals.id, user, addBusinessGoalsDto);
     }
-
-    return this.create({ ...addBusinessGoalsDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPBusinessGoalsEntity);
+    return this.create({ companyProfile: { id: user.companyProfile.id, ...addBusinessGoalsDto } } as unknown as CPBusinessGoalsEntity);
   }
 
   async updateBusinessGoals(id: number, user: UserEntity, updateBusinessGoalsDto: UpdateBusinessGoalsDto): Promise<CPBusinessGoalsEntity> {
     const businessGoals = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!businessGoals) {
-      throw new Error('Business Goals not associated with this company profile');
-    }
+    // if (!businessGoals) throw new Error('Business Goals not associated with this company profile');
+    if (!businessGoals) return null;
 
     return this.update(id, updateBusinessGoalsDto as unknown as CPBusinessGoalsEntity);
   }
 
   async getMyBusinessGoals(companyProfileId: number): Promise<CPBusinessGoalsEntity> {
     const myBusinessGoals = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myBusinessGoals) {
-      throw new NotFoundException('Business Goals not found against your company profile');
-    }
+    // if (!myBusinessGoals) throw new NotFoundException('Business Goals not found against your company profile');
+    if (!myBusinessGoals) null;
+
     return myBusinessGoals;
   }
 

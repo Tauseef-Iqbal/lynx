@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -25,18 +25,23 @@ export class PointsOfContactService extends BaseTypeOrmCrudService<CPPointsOfCon
 
   async updatePointsOfContact(id: number, user: UserEntity, updatePointsOfContactDto: UpdatePointsOfContactDto): Promise<CPPointsOfContactEntity> {
     const pointsOfContact = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!pointsOfContact) {
-      throw new Error('Points Of Contact not associated with this company profile');
-    }
+    // if (!pointsOfContact) {
+    //   throw new Error('Points Of Contact not associated with this company profile');
+    // }
+
+    if (!pointsOfContact) return null;
 
     return this.update(id, updatePointsOfContactDto as unknown as CPPointsOfContactEntity);
   }
 
   async getMyPointsOfContact(companyProfileId: number): Promise<CPPointsOfContactEntity> {
     const myPointsOfContact = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myPointsOfContact) {
-      throw new NotFoundException('Points Of Contact not found against your company profile');
-    }
+    // if (!myPointsOfContact) {
+    //   throw new NotFoundException('Points Of Contact not found against your company profile');
+    // }
+
+    if (!myPointsOfContact) return null;
+
     return myPointsOfContact;
   }
 

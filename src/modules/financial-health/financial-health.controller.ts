@@ -1,10 +1,10 @@
-import { Body, Controller, HttpStatus, Post, Put, UploadedFiles, UseInterceptors, Param, UseGuards, Get, Delete, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Put, UploadedFiles, UseInterceptors, Param, UseGuards, Get, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/shared/decorators';
 import { ResponseDto } from 'src/shared/dtos';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { CompanyProfileGuard } from 'src/shared/middlewares';
-import { CPFinancialHealthEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 import { CreateFinancialHealthSectionDto, UpdateFinancialHealthSectionDto } from './dtos';
 import { FinancialHealthService } from './financial-health.service';
 import { FinancialHealthFiles } from './interfaces';
@@ -81,17 +81,17 @@ export class FinancialHealthController {
     return new ResponseDto(HttpStatus.OK, 'Financial Health Section fetched successfully!', response).toJSON();
   }
 
-  @ApiOperation({ summary: 'Delete Financial Health By ID' })
-  @Delete('/:id')
-  async deleteFinancialHealth(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.financialHealthService.update(id, { isDeleted: true } as unknown as CPFinancialHealthEntity);
-    return new ResponseDto(HttpStatus.OK, 'Financial Health Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete Financial Health By ID' })
+  // @Delete('/:id')
+  // async deleteFinancialHealth(@Param('id', ParseIntPipe) id: number) {
+  //   const response = await this.financialHealthService.update(id, { isDeleted: true } as unknown as CPFinancialHealthEntity);
+  //   return new ResponseDto(HttpStatus.OK, 'Financial Health Section deleted successfully!', response).toJSON();
+  // }
 
-  @ApiOperation({ summary: 'Delete My Financial Health' })
-  @Delete('section/me')
-  async deleteMyFinancialHealth(@User() user: UserEntity) {
-    const response = await this.financialHealthService.deleteMyFinancialHealth(user.companyProfile.id);
-    return new ResponseDto(HttpStatus.OK, 'Financial Health Section deleted successfully!', response).toJSON();
-  }
+  // @ApiOperation({ summary: 'Delete My Financial Health' })
+  // @Delete('section/me')
+  // async deleteMyFinancialHealth(@User() user: UserEntity) {
+  //   const response = await this.financialHealthService.deleteMyFinancialHealth(user.companyProfile.id);
+  //   return new ResponseDto(HttpStatus.OK, 'Financial Health Section deleted successfully!', response).toJSON();
+  // }
 }

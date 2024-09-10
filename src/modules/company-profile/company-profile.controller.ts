@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/shared/decorators';
 import { ResponseDto } from 'src/shared/dtos';
 import { JwtAuthGuard } from 'src/shared/guards';
-import { CompanyProfileEntity, UserEntity } from 'src/typeorm/models';
+import { UserEntity } from 'src/typeorm/models';
 import { CompanyProfileService } from './company-profile.service';
 import { CreateCompanyProfileDto, UpdateCompanyProfileDto } from './dtos/company-profile.dto';
 import { Assets } from './interfaces';
@@ -64,15 +64,15 @@ export class CompanyProfileController {
     return this.companyProfileService.getMyCompanyProfile(user);
   }
 
-  @ApiOperation({ summary: 'Delete Company Profile By Id' })
-  @Delete('/:id')
-  async deleteCompanyProfile(@Param('id', ParseIntPipe) id: number) {
-    return this.companyProfileService.update(id, { isDeleted: true } as unknown as CompanyProfileEntity);
-  }
+  // @ApiOperation({ summary: 'Delete Company Profile By Id' })
+  // @Delete('/:id')
+  // async deleteCompanyProfile(@Param('id', ParseIntPipe) id: number) {
+  //   return this.companyProfileService.update(id, { isDeleted: true } as unknown as CompanyProfileEntity);
+  // }
 
-  @ApiOperation({ summary: 'Delete My Company Profile' })
-  @Delete('profile/me')
-  async deleteMyCompanyProfile(@User() user: UserEntity) {
-    return this.companyProfileService.update(user.companyProfile.id, { isDeleted: true } as unknown as CompanyProfileEntity);
-  }
+  // @ApiOperation({ summary: 'Delete My Company Profile' })
+  // @Delete('profile/me')
+  // async deleteMyCompanyProfile(@User() user: UserEntity) {
+  //   return this.companyProfileService.update(user.companyProfile.id, { isDeleted: true } as unknown as CompanyProfileEntity);
+  // }
 }

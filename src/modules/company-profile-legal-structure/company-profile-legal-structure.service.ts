@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
 import { Repository } from 'typeorm';
-import { CompanyProfileLegalStructureEntity } from 'src/typeorm/models';
+import { CompanyProfileLegalStructureEntity, UserEntity } from 'src/typeorm/models';
 import { S3Service } from '../global/providers';
 import { ConfigService } from '@nestjs/config';
 import { CreateCompanyProfileLegalStructureDto, UpdateCompanyProfileLegalStructureDto } from './dtos';
@@ -30,13 +30,13 @@ export class CompanyProfileLegalStructureService extends BaseTypeOrmCrudService<
    * @param files
    * @returns
    */
-  async createCompanyProfileLegalStructure(user: any, createCpLegalStructureDto: CreateCompanyProfileLegalStructureDto, files: CpLegalStrucutreFiles): Promise<CompanyProfileLegalStructureEntity> {
+  async createCompanyProfileLegalStructure(user: UserEntity, createCpLegalStructureDto: CreateCompanyProfileLegalStructureDto, files: CpLegalStrucutreFiles): Promise<CompanyProfileLegalStructureEntity> {
     if (files.completedProjectsFiles) {
-      createCpLegalStructureDto.completedProjectsFiles = await uploadFilesToS3(user, files.completedProjectsFiles, createCpLegalStructureDto.legalStructure, this.s3Service);
+      createCpLegalStructureDto.completedProjectsFiles = await uploadFilesToS3(user, files.completedProjectsFiles, user.companyProfile.name, this.s3Service, this.configService);
     }
 
     if (files.dbaFiles) {
-      createCpLegalStructureDto.dbaFiles = await uploadFilesToS3(user, files.dbaFiles, createCpLegalStructureDto.legalStructure, this.s3Service, MAX_DBA_FILE_SIZE_BYTES, MAX_DBA_FILE_SIZE_MB);
+      createCpLegalStructureDto.dbaFiles = await uploadFilesToS3(user, files.dbaFiles, user.companyProfile.name, this.s3Service, this.configService, MAX_DBA_FILE_SIZE_BYTES, MAX_DBA_FILE_SIZE_MB);
     }
 
     // create the company profile legal structure with company profile relation
@@ -55,18 +55,18 @@ export class CompanyProfileLegalStructureService extends BaseTypeOrmCrudService<
    * @param files
    * @returns
    */
-  async updateCompanyProfileLegalStructure(id: number, user: any, updateCpLegalStructureDto: UpdateCompanyProfileLegalStructureDto, files: CpLegalStrucutreFiles): Promise<CompanyProfileLegalStructureEntity> {
+  async updateCompanyProfileLegalStructure(id: number, user: UserEntity, updateCpLegalStructureDto: UpdateCompanyProfileLegalStructureDto, files: CpLegalStrucutreFiles): Promise<CompanyProfileLegalStructureEntity> {
     const cpLegalStructure = await this.findById(id, { relations: { companyProfile: true, orgFacilities: true } });
     if (!cpLegalStructure) {
       throw new Error('Company Legal Structure not associated with this company profile');
     }
 
     if (files.completedProjectsFiles) {
-      updateCpLegalStructureDto.completedProjectsFiles = await filesToUpdate(user, files.completedProjectsFiles, cpLegalStructure.completedProjectsFiles, updateCpLegalStructureDto.legalStructure, this.s3Service, this.configService);
+      updateCpLegalStructureDto.completedProjectsFiles = await filesToUpdate(user, files.completedProjectsFiles, cpLegalStructure.completedProjectsFiles, user.companyProfile.name, this.s3Service, this.configService);
     }
 
     if (files.dbaFiles) {
-      updateCpLegalStructureDto.dbaFiles = await filesToUpdate(user, files.dbaFiles, cpLegalStructure.dbaFiles, updateCpLegalStructureDto.legalStructure, this.s3Service, this.configService);
+      updateCpLegalStructureDto.dbaFiles = await filesToUpdate(user, files.dbaFiles, cpLegalStructure.dbaFiles, user.companyProfile.name, this.s3Service, this.configService);
     }
 
     if (updateCpLegalStructureDto.orgFacilities && updateCpLegalStructureDto.orgFacilities.length > 0) {

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
 import { CPToolsAndApplicationsEntity, UserEntity } from 'src/typeorm/models';
@@ -25,18 +25,23 @@ export class ToolsAndApplicationsService extends BaseTypeOrmCrudService<CPToolsA
 
   async updateToolsAndApplications(id: number, user: UserEntity, updateToolsAndApplicationsDto: UpdateToolsAndApplicationsDto): Promise<CPToolsAndApplicationsEntity> {
     const toolsAndApplications = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    if (!toolsAndApplications) {
-      throw new Error('Tools and Applications not associated with this company profile');
-    }
+    // if (!toolsAndApplications) {
+    //   throw new Error('Tools and Applications not associated with this company profile');
+    // }
+
+    if (!toolsAndApplications) return null;
 
     return this.update(id, updateToolsAndApplicationsDto as unknown as CPToolsAndApplicationsEntity);
   }
 
   async getMyToolsAndApplications(companyProfileId: number): Promise<CPToolsAndApplicationsEntity> {
     const myToolsAndApplications = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
-    if (!myToolsAndApplications) {
-      throw new NotFoundException('Tools and Applications not found against your company profile');
-    }
+    // if (!myToolsAndApplications) {
+    //   throw new NotFoundException('Tools and Applications not found against your company profile');
+    // }
+
+    if (!myToolsAndApplications) return null;
+
     return myToolsAndApplications;
   }
 

@@ -30,9 +30,16 @@ import { PastPerformanceModule } from './modules/past-performance/past-performan
 import { CertificationsModule } from './modules/certifications/certifications.module';
 import { AwardsModule } from './modules/awards/awards.module';
 import { BusinessGoalsModule } from './modules/business-goals';
+import { BusinessInfoModule } from './modules/advanced-business-information/cp-advanced-business-info.module';
+import { RequiredSystemModule } from './modules/cp-required-system';
 import { SupplyChainModule } from './modules/supply-chain';
 import { PersonnelModule } from './modules/personnel';
 import { PointsOfContactModule } from './modules/points-of-contact';
+import { DataComplianceDocumentationModule } from './modules/data-compliance-documentation/data-compliance-documentation.module';
+import { CpControlsAndProtocolsModule } from './modules/cp-controls-and-protocols/cp-controls-and-protocols.module';
+import { ResearchAndDevelopmentModule } from './modules/research-and-development';
+import { DataManagementAndStorageModule } from './modules/data-management-and-storage';
+import { FCIAndCUIModule } from './modules/fci-and-cui';
 
 @Module({
   imports: [
@@ -67,9 +74,16 @@ import { PointsOfContactModule } from './modules/points-of-contact';
     CertificationsModule,
     AwardsModule,
     BusinessGoalsModule,
+    BusinessInfoModule,
+    RequiredSystemModule,
     SupplyChainModule,
     PersonnelModule,
     PointsOfContactModule,
+    ResearchAndDevelopmentModule,
+    DataComplianceDocumentationModule,
+    CpControlsAndProtocolsModule,
+    DataManagementAndStorageModule,
+    FCIAndCUIModule,
   ],
   providers: [
     {

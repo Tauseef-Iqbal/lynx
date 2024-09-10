@@ -1,13 +1,13 @@
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
 import { CpLegalStructureOrgFacilityEntity } from './company-profile-org-facility.entity';
 import { CompanyProfileEntity } from './company-profile.entity';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity({ name: 'cp_legal_structure' })
 export class CompanyProfileLegalStructureEntity extends CustomBaseEntity {
   @Index()
-  @Column({ name: 'legal_structure', nullable: true, type: 'varchar', length: 255 })
-  legalStructure: string;
+  @Column({ name: 'legal_structure', nullable: true, type: 'varchar', array: true, length: 255 })
+  legalStructure: string[];
 
   @Column({ name: 'dba_name', nullable: true, type: 'varchar', length: 255 })
   dbaName: string;
