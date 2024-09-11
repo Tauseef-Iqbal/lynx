@@ -18,7 +18,7 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
   }
 
   async addFundingSources(user: UserEntity, addFundingSourcesDto: AddFundingSourcesDto): Promise<CPFundingSourcesEntity> {
-    const existedFundingSources = await this.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
+    const existedFundingSources = await this.getFundingSourcesByFilter({ companyProfile: { id: user.companyProfile.id } });
     if (existedFundingSources) {
       return this.updateFundingSources(existedFundingSources.id, user, addFundingSourcesDto);
     }
@@ -26,7 +26,7 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
   }
 
   async updateFundingSources(id: number, user: UserEntity, updateFundingSourcesDto: UpdateFundingSourcesDto): Promise<CPFundingSourcesEntity> {
-    const existedFundingSources = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { fundingSourcesForeignAffiliation: true } });
+    const existedFundingSources = await this.getFundingSourcesByFilter({ id, companyProfile: { id: user.companyProfile.id } });
     // if (!existedFundingSources) {
     //   throw new Error('Funding Sources not associated with this company profile');
     // }
@@ -34,14 +34,14 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
     if (!existedFundingSources) return null;
 
     if (updateFundingSourcesDto.fundingSourcesForeignAffiliation) {
-      const existingForeignAffiliationsIds: number[] = existedFundingSources.fundingSourcesForeignAffiliation.map((project) => Number(project.id));
-      const foreignAffiliationsIdsToKeep = updateFundingSourcesDto.fundingSourcesForeignAffiliation.filter((project) => project.id).map((project) => project.id);
+      const existingForeignAffiliationsIds: number[] = existedFundingSources.fundingSourcesForeignAffiliation.map((fundingSourcesForeignAffiliation) => Number(fundingSourcesForeignAffiliation.id));
+      const foreignAffiliationsIdsToKeep = updateFundingSourcesDto.fundingSourcesForeignAffiliation.filter((fundingSourcesForeignAffiliation) => fundingSourcesForeignAffiliation.id).map((fundingSourcesForeignAffiliation) => fundingSourcesForeignAffiliation.id);
       const foreignAffiliationsToDelete = existingForeignAffiliationsIds.filter((existingId) => !foreignAffiliationsIdsToKeep.includes(existingId));
       if (foreignAffiliationsToDelete.length) {
-        await this.fundingSourcesForeignAffiliationRepository.update(foreignAffiliationsToDelete, { isDeleted: true });
+        await this.fundingSourcesForeignAffiliationRepository.delete(foreignAffiliationsToDelete);
       }
 
-      if (foreignAffiliationsIdsToKeep.length) {
+      if (updateFundingSourcesDto.fundingSourcesForeignAffiliation) {
         for (const foreignAffiliation of updateFundingSourcesDto.fundingSourcesForeignAffiliation) {
           if (foreignAffiliation.id) {
             await this.fundingSourcesForeignAffiliationRepository.update(foreignAffiliation.id, foreignAffiliation);
@@ -55,12 +55,18 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
         }
       }
       delete updateFundingSourcesDto.fundingSourcesForeignAffiliation;
+    } else {
+      await this.fundingSourcesForeignAffiliationRepository.delete({ fundingSources: { id: existedFundingSources.id } });
     }
-    return this.update(id, updateFundingSourcesDto as unknown as CPFundingSourcesEntity);
+
+    await this.update(id, updateFundingSourcesDto as unknown as CPFundingSourcesEntity);
+
+    return this.getMyFundingSources(user.companyProfile.id);
   }
 
   async getMyFundingSources(companyProfileId: number): Promise<CPFundingSourcesEntity> {
-    const myFundingSources = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false }, { relations: { fundingSourcesForeignAffiliation: true } });
+    const myFundingSources = await this.getFundingSourcesByFilter({ companyProfile: { id: companyProfileId } });
+
     // if (!myFundingSources) {
     //   throw new NotFoundException('Funding Sources not found against your company profile');
     // }
@@ -68,6 +74,21 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
     if (!myFundingSources) return null;
 
     return myFundingSources;
+  }
+
+  async getFundingSourcesByFilter(filter: any): Promise<CPFundingSourcesEntity> {
+    return this.findByRelationFilters(filter, {
+      relations: {
+        companyProfile: 'companyProfile',
+        fundingSourcesForeignAffiliation: 'fundingSourcesForeignAffiliation',
+      },
+      relationFilters: {
+        fundingSourcesForeignAffiliation: {
+          condition: 'fundingSourcesForeignAffiliation.isDeleted = :isDeleted',
+          params: { isDeleted: false },
+        },
+      },
+    });
   }
 
   async deleteMyFundingSources(companyProfileId: number): Promise<CPFundingSourcesEntity> {

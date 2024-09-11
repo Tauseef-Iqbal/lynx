@@ -1,3 +1,9 @@
+export enum GeneratedRevenue {
+  YES = 'Yes',
+  No = 'No',
+  NOT_APPLICABLE = 'Not Applicable',
+}
+
 export enum GeneratedRevenueRange {
   LESS_THAN_100K = 'Less than $100,000',
   BETWEEN_100K_AND_499K = '$100,000 - $499,999',
@@ -11,4 +17,5 @@ export enum GeneratedRevenueRange {
 export enum CompanyRevenueStream {
   DEPENDENT = 'Dependent on a few key customers',
   DIVERSIFIED = 'Diversified across multiple customers',
+  NOT_APPLICABLE = 'Not Applicable',
 }

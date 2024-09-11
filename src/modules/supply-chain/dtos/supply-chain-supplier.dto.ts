@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsString, IsOptional, Length, IsUrl, IsNumber } from 'class-validator';
 
 export class AddSupplyChainSupplierDto {
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   id?: number;
@@ -63,4 +65,9 @@ export class AddSupplyChainSupplierDto {
   @IsOptional()
   @IsString()
   operationsCriticality?: string;
+
+  @ApiPropertyOptional({ description: 'Services Provided', type: String })
+  @IsOptional()
+  @IsString()
+  supplierRoleDescription?: string;
 }

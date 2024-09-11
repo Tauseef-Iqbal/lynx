@@ -22,7 +22,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
   }
 
   async addOwnershipStructure(user: UserEntity, addOwnershipStructureDto: AddOwnershipStructureDto): Promise<CPOwnershipStructureEntity> {
-    const existedOwnershipStructure = await this.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
+    const existedOwnershipStructure = await this.getOwnershipStructureByFilter({ companyProfile: { id: user.companyProfile.id } });
     if (existedOwnershipStructure) {
       return this.updateOwnershipStructure(existedOwnershipStructure.id, user, addOwnershipStructureDto);
     }
@@ -31,7 +31,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
   }
 
   async updateOwnershipStructure(id: number, user: UserEntity, updateOwnershipStructureDto: UpdateOwnershipStructureDto): Promise<CPOwnershipStructureEntity> {
-    const existingOwnershipStructure = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id }, isDeleted: false }, { relations: { companyProfile: true, ownershipStructureDetails: true, ownershipStructureKeyManagement: true } });
+    const existingOwnershipStructure = await this.getOwnershipStructureByFilter({ id, companyProfile: { id: user.companyProfile.id } });
     // if (!existingOwnershipStructure) {
     //   throw new Error('Ownership Structure not associated with this company profile');
     // }
@@ -41,10 +41,8 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
     const { ownershipStructureDetails, ownershipStructureKeyManagement } = updateOwnershipStructureDto;
 
     if (ownershipStructureDetails) {
-      if (ownershipStructureDetails.id) {
-        const existedOwnershipStructureDetails = await this.ownershipStructureDetailsRepository.findOne({ where: { id: ownershipStructureDetails.id, isDeleted: false } });
-        if (!existedOwnershipStructureDetails) throw new NotFoundException(`Ownership Structure Details with id ${ownershipStructureDetails.id} isn't associated with the Ownership Structure with id ${id}`);
-        await this.ownershipStructureDetailsRepository.update({ id: existedOwnershipStructureDetails.id }, ownershipStructureDetails);
+      if (existingOwnershipStructure.ownershipStructureDetails) {
+        await this.ownershipStructureDetailsRepository.update({ id: existingOwnershipStructure.ownershipStructureDetails.id }, ownershipStructureDetails);
       } else {
         const newOwnershipStructureDetails = this.ownershipStructureDetailsRepository.create({
           ...ownershipStructureDetails,
@@ -53,6 +51,8 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
         await this.ownershipStructureDetailsRepository.save(newOwnershipStructureDetails);
       }
       delete updateOwnershipStructureDto.ownershipStructureDetails;
+    } else {
+      await this.ownershipStructureDetailsRepository.delete({ ownershipStructure: { id: existingOwnershipStructure.id } });
     }
 
     if (ownershipStructureKeyManagement) {
@@ -60,7 +60,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
       const keyManagementsIdsToKeep = ownershipStructureKeyManagement.filter((keyManagement) => keyManagement.id).map((keyManagement) => keyManagement.id);
       const keyManagementsToDelete = existingKeyManagementIds.filter((existingId) => !keyManagementsIdsToKeep.includes(existingId));
       if (keyManagementsToDelete.length) {
-        await this.ownershipStructureKeyManagementRepository.update(keyManagementsToDelete, { isDeleted: true });
+        await this.ownershipStructureKeyManagementRepository.delete(keyManagementsToDelete);
       }
 
       for (const keyManagement of ownershipStructureKeyManagement) {
@@ -77,6 +77,8 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
         }
       }
       delete updateOwnershipStructureDto.ownershipStructureKeyManagement;
+    } else {
+      await this.ownershipStructureKeyManagementRepository.delete({ ownershipStructure: { id: existingOwnershipStructure.id } });
     }
 
     await this.update(id, updateOwnershipStructureDto as unknown as CPOwnershipStructureEntity);
@@ -85,7 +87,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
   }
 
   async getMyOwnershipStructure(companyProfileId: number): Promise<CPOwnershipStructureEntity> {
-    const myOwnershipStructure = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false }, { relations: { ownershipStructureDetails: true, ownershipStructureKeyManagement: true } });
+    const myOwnershipStructure = await this.getOwnershipStructureByFilter({ companyProfile: { id: companyProfileId } });
     // if (!myOwnershipStructure) {
     //   throw new NotFoundException('Ownership Structure not found against your company profile');
     // }
@@ -93,6 +95,26 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
     if (!myOwnershipStructure) return null;
 
     return myOwnershipStructure;
+  }
+
+  async getOwnershipStructureByFilter(filter: any): Promise<CPOwnershipStructureEntity> {
+    return this.findByRelationFilters(filter, {
+      relations: {
+        companyProfile: 'companyProfile',
+        ownershipStructureDetails: 'ownershipStructureDetails',
+        ownershipStructureKeyManagement: 'ownershipStructureKeyManagement',
+      },
+      relationFilters: {
+        ownershipStructureDetails: {
+          condition: 'ownershipStructureDetails.isDeleted = :isDeleted',
+          params: { isDeleted: false },
+        },
+        ownershipStructureKeyManagement: {
+          condition: 'ownershipStructureKeyManagement.isDeleted = :isDeleted',
+          params: { isDeleted: false },
+        },
+      },
+    });
   }
 
   async deleteMyOwnershipStructure(companyProfileId: number): Promise<CPOwnershipStructureEntity> {

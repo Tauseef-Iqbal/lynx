@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3Service } from 'src/modules/global/providers';
@@ -28,8 +28,8 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
     if (existedFinancialHealth) {
       return this.updateFinancialHealthSection(existedFinancialHealth.id, user, createFinancialHealthSectionDto, files);
     }
-    if (files.financialStatementsFiles) {
-      if (!createFinancialHealthSectionDto.financialStatements) throw new BadRequestException('financialStatementsFiles should not be provided when financialStatements does not meet the required condition.');
+
+    if (createFinancialHealthSectionDto?.financialStatements && (files?.financialStatementsFiles?.length || createFinancialHealthSectionDto?.financialStatementsFiles?.length)) {
       createFinancialHealthSectionDto.financialStatementsFiles = await processFilesToAdd({
         incomingFiles: files.financialStatementsFiles,
         incomingS3AndBase64: createFinancialHealthSectionDto.financialStatementsFiles,
@@ -39,8 +39,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.businessPlansFiles) {
-      if (!createFinancialHealthSectionDto.businessPlans) throw new BadRequestException('businessPlansFiles should not be provided when businessPlans does not meet the required condition.');
+    if (createFinancialHealthSectionDto?.businessPlans && (files?.businessPlansFiles?.length || createFinancialHealthSectionDto?.businessPlansFiles?.length)) {
       createFinancialHealthSectionDto.businessPlansFiles = await processFilesToAdd({
         incomingFiles: files.businessPlansFiles,
         incomingS3AndBase64: createFinancialHealthSectionDto.businessPlansFiles,
@@ -50,8 +49,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.goodStandingCertificatesFiles) {
-      if (!createFinancialHealthSectionDto.goodStandingCertificates) throw new BadRequestException('goodStandingCertificatesFiles should not be provided when goodStandingCertificates does not meet the required condition.');
+    if (createFinancialHealthSectionDto?.goodStandingCertificates && (files?.goodStandingCertificatesFiles?.length || createFinancialHealthSectionDto?.goodStandingCertificatesFiles?.length)) {
       createFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToAdd({
         incomingFiles: files.goodStandingCertificatesFiles,
         incomingS3AndBase64: createFinancialHealthSectionDto.goodStandingCertificatesFiles,
@@ -61,8 +59,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.financialDisclosureStatementsFiles) {
-      if (!createFinancialHealthSectionDto.financialDisclosureStatements) throw new BadRequestException('financialDisclosureStatementsFiles should not be provided when financialDisclosureStatements does not meet the required condition.');
+    if (createFinancialHealthSectionDto?.financialDisclosureStatements && (files?.financialDisclosureStatementsFiles?.length || createFinancialHealthSectionDto?.financialDisclosureStatementsFiles?.length)) {
       createFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToAdd({
         incomingFiles: files.financialDisclosureStatementsFiles,
         incomingS3AndBase64: createFinancialHealthSectionDto.financialDisclosureStatementsFiles,
@@ -72,8 +69,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.financialAuditsFiles) {
-      if (!createFinancialHealthSectionDto.financialAudits) throw new BadRequestException('financialAuditsFiles should not be provided when financialAudits does not meet the required condition.');
+    if (createFinancialHealthSectionDto?.financialAudits && (files?.financialAuditsFiles?.length || createFinancialHealthSectionDto.financialAuditsFiles?.length)) {
       createFinancialHealthSectionDto.financialAuditsFiles = await processFilesToAdd({
         incomingFiles: files.financialAuditsFiles,
         incomingS3AndBase64: createFinancialHealthSectionDto.financialAuditsFiles,
@@ -105,8 +101,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
 
     if (!financialHealthSection) return null;
 
-    if (files.financialStatementsFiles || updateFinancialHealthSectionDto.financialStatementsFiles) {
-      if (files.financialStatementsFiles && !updateFinancialHealthSectionDto.financialStatements) throw new BadRequestException('financialStatementsFiles should not be provided when financialStatements does not meet the required condition.');
+    if (updateFinancialHealthSectionDto?.financialStatements && (files?.financialStatementsFiles?.length || updateFinancialHealthSectionDto?.financialStatementsFiles?.length)) {
       updateFinancialHealthSectionDto.financialStatementsFiles = await processFilesToUpdate({
         existingFiles: financialHealthSection.financialStatementsFiles,
         incomingFiles: files.financialStatementsFiles,
@@ -117,8 +112,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.businessPlansFiles || updateFinancialHealthSectionDto.businessPlansFiles) {
-      if (files.businessPlansFiles && !updateFinancialHealthSectionDto.businessPlans) throw new BadRequestException('businessPlansFiles should not be provided when businessPlans does not meet the required condition.');
+    if (updateFinancialHealthSectionDto?.businessPlans && (files?.businessPlansFiles?.length || updateFinancialHealthSectionDto?.businessPlansFiles?.length)) {
       updateFinancialHealthSectionDto.businessPlansFiles = await processFilesToUpdate({
         existingFiles: financialHealthSection.businessPlansFiles,
         incomingFiles: files.businessPlansFiles,
@@ -129,8 +123,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.goodStandingCertificatesFiles || updateFinancialHealthSectionDto.goodStandingCertificatesFiles) {
-      if (files.goodStandingCertificatesFiles && !updateFinancialHealthSectionDto.goodStandingCertificates) throw new BadRequestException('goodStandingCertificatesFiles should not be provided when goodStandingCertificates does not meet the required condition.');
+    if (updateFinancialHealthSectionDto?.goodStandingCertificates && (files?.goodStandingCertificatesFiles?.length || updateFinancialHealthSectionDto?.goodStandingCertificatesFiles?.length)) {
       updateFinancialHealthSectionDto.goodStandingCertificatesFiles = await processFilesToUpdate({
         existingFiles: financialHealthSection.goodStandingCertificatesFiles,
         incomingFiles: files.goodStandingCertificatesFiles,
@@ -141,8 +134,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.financialDisclosureStatementsFiles || updateFinancialHealthSectionDto.financialDisclosureStatementsFiles) {
-      if (files.financialDisclosureStatementsFiles && !updateFinancialHealthSectionDto.financialDisclosureStatements) throw new BadRequestException('financialDisclosureStatementsFiles should not be provided when financialDisclosureStatements does not meet the required condition.');
+    if (updateFinancialHealthSectionDto?.financialDisclosureStatements && (files?.financialDisclosureStatementsFiles?.length || updateFinancialHealthSectionDto?.financialDisclosureStatementsFiles?.length)) {
       updateFinancialHealthSectionDto.financialDisclosureStatementsFiles = await processFilesToUpdate({
         existingFiles: financialHealthSection.financialDisclosureStatementsFiles,
         incomingFiles: files.financialDisclosureStatementsFiles,
@@ -153,8 +145,7 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
       });
     }
 
-    if (files.financialAuditsFiles || updateFinancialHealthSectionDto.financialAuditsFiles) {
-      if (files.financialAuditsFiles && !updateFinancialHealthSectionDto.financialAudits) throw new BadRequestException('financialAuditsFiles should not be provided when financialAudits does not meet the required condition.');
+    if (updateFinancialHealthSectionDto?.financialAudits && (files?.financialAuditsFiles?.length || updateFinancialHealthSectionDto?.financialAuditsFiles?.length)) {
       updateFinancialHealthSectionDto.financialAuditsFiles = await processFilesToUpdate({
         existingFiles: financialHealthSection.financialAuditsFiles,
         incomingFiles: files.financialAuditsFiles,

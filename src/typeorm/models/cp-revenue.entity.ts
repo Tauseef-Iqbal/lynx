@@ -1,4 +1,4 @@
-import { CompanyRevenueStream, GeneratedRevenueRange } from 'src/modules/revenue/enums';
+import { CompanyRevenueStream, GeneratedRevenue, GeneratedRevenueRange } from 'src/modules/revenue/enums';
 import { ICustomerDetails } from 'src/modules/revenue/interfaces';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
@@ -10,8 +10,13 @@ export class CPRevenueEntity extends CustomBaseEntity {
   @Column({ name: 'growth_state', type: 'jsonb', nullable: true })
   growthState?: string[] | string;
 
-  @Column({ name: 'generated_revenue', type: 'text', nullable: true })
-  generatedRevenue?: string;
+  @Column({
+    name: 'generated_revenue',
+    type: 'enum',
+    enum: GeneratedRevenue,
+    nullable: true,
+  })
+  generatedRevenue?: GeneratedRevenue;
 
   @Column({
     name: 'generated_revenue_range',

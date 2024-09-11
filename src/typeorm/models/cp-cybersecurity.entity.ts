@@ -29,6 +29,9 @@ export class CPCybersecurityEntity extends CustomBaseEntity {
   @Column({ name: 'cybersecurity_standards_compliant_details', type: 'jsonb', nullable: true })
   cybersecurityStandardsCompliantDetails?: ICybersecurityStandardsCompliantDetails;
 
+  @Column({ name: 'cybersecurity_standards_compliant_files', type: 'text', array: true, nullable: true })
+  cybersecurityStandardsCompliantFiles?: string[];
+
   @Column({ name: ' incident_response_plan', type: 'boolean', nullable: true })
   incidentResponsePlan?: boolean;
 
@@ -46,6 +49,9 @@ export class CPCybersecurityEntity extends CustomBaseEntity {
 
   @Column({ name: 'encrypt_data_details', type: 'jsonb', nullable: true })
   encryptDataDetails?: IEncryptDataDetails;
+
+  @Column({ name: 'encrypt_data_files', type: 'text', array: true, nullable: true })
+  encryptDataFiles?: string[];
 
   @Column({ name: 'cybersecurity_audits', type: 'boolean', nullable: true })
   cybersecurityAudits?: boolean;

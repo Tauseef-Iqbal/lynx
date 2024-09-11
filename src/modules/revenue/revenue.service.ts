@@ -18,7 +18,7 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
   }
 
   async addRevenue(user: UserEntity, addRevenueDto: AddRevenueDto): Promise<CPRevenueEntity> {
-    const existedRevenue = await this.findByFilter({ companyProfile: { id: user.companyProfile.id } });
+    const existedRevenue = await this.getRevenueByFilter({ companyProfile: { id: user.companyProfile.id } });
     if (existedRevenue) {
       return this.updateRevenue(existedRevenue.id, user, addRevenueDto);
     }
@@ -27,7 +27,7 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
   }
 
   async updateRevenue(id: number, user: UserEntity, updateRevenueDto: UpdateRevenueDto): Promise<CPRevenueEntity> {
-    const existingRevenue = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true, projectsAwarded: true } });
+    const existingRevenue = await this.getRevenueByFilter({ id, companyProfile: { id: user.companyProfile.id } });
     // if (!existingRevenue) {
     //   throw new Error('Revenue not associated with this company profile');
     // }
@@ -40,7 +40,7 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
       const projectsToDelete = existingProjectsIds.filter((existingId) => !projectIdsToKeep.includes(existingId));
 
       if (projectsToDelete.length) {
-        await this.revenueProjectsAwardedRepository.update(projectsToDelete, { isDeleted: true });
+        await this.revenueProjectsAwardedRepository.delete(projectsToDelete);
       }
 
       for (const project of updateRevenueDto.projectsAwarded) {
@@ -57,13 +57,17 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
         }
       }
       delete updateRevenueDto.projectsAwarded;
+    } else {
+      await this.revenueProjectsAwardedRepository.delete({ cpRevenue: { id: existingRevenue.id } });
     }
 
-    return this.update(id, updateRevenueDto as unknown as CPRevenueEntity);
+    await this.update(id, updateRevenueDto as unknown as CPRevenueEntity);
+
+    return this.getMyRevenue(user.companyProfile.id);
   }
 
   async getMyRevenue(companyProfileId: number): Promise<CPRevenueEntity> {
-    const myRevenue = await this.findByFilter({ companyProfile: { id: companyProfileId } }, { relations: { projectsAwarded: true } });
+    const myRevenue = await this.getRevenueByFilter({ companyProfile: { id: companyProfileId } });
     // if (!myRevenue) {
     //   throw new NotFoundException('Revenue not found against your company profile');
     // }
@@ -71,6 +75,21 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
     if (!myRevenue) return null;
 
     return myRevenue;
+  }
+
+  async getRevenueByFilter(filter: any): Promise<CPRevenueEntity> {
+    return this.findByRelationFilters(filter, {
+      relations: {
+        companyProfile: 'companyProfile',
+        projectsAwarded: 'projectsAwarded',
+      },
+      relationFilters: {
+        projectsAwarded: {
+          condition: 'projectsAwarded.isDeleted = :isDeleted',
+          params: { isDeleted: false },
+        },
+      },
+    });
   }
 
   async deleteMyRevenue(companyProfileId: number): Promise<CPRevenueEntity> {

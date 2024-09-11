@@ -1,9 +1,8 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { GeneratedRevenueRange, CompanyRevenueStream } from 'src/modules/revenue/enums';
-import { Type } from 'class-transformer';
+import { GeneratedRevenueRange, CompanyRevenueStream, GeneratedRevenue } from 'src/modules/revenue/enums';
+import { Expose, Transform, Type } from 'class-transformer';
 import { AddRevenueProjectsAwardedDto } from './revenue-projects-awarded.dto';
-import { ConditionalValue } from 'src/shared/validators';
 
 class CustomerDetailsDto {
   @ApiPropertyOptional({ description: 'Customer Name', example: 'John Doe' })
@@ -29,9 +28,17 @@ export class AddRevenueDto {
   growthState?: string[] | string;
 
   @ApiPropertyOptional({ description: 'Generated Revenue', example: 'Yes' })
-  @IsString()
+  @IsEnum(GeneratedRevenue)
   @IsOptional()
-  generatedRevenue?: string;
+  @IsString()
+  generatedRevenue?: GeneratedRevenue;
+
+  @ApiPropertyOptional({ description: 'Generated Revenue Range', enum: GeneratedRevenueRange })
+  @IsEnum(GeneratedRevenueRange)
+  @IsOptional()
+  @Expose()
+  @Transform(({ obj, value }) => (obj.generatedRevenue === GeneratedRevenue.No || obj.generatedRevenue === GeneratedRevenue.NOT_APPLICABLE ? null : value), { toClassOnly: true })
+  generatedRevenueRange?: GeneratedRevenueRange;
 
   @ApiPropertyOptional({ description: 'Generated Revenue Range', type: [AddRevenueProjectsAwardedDto] })
   @Type(() => AddRevenueProjectsAwardedDto)
@@ -40,20 +47,17 @@ export class AddRevenueDto {
   @IsOptional()
   projectsAwarded?: AddRevenueProjectsAwardedDto[];
 
-  @ApiPropertyOptional({ description: 'Generated Revenue Range', enum: GeneratedRevenueRange })
-  @IsEnum(GeneratedRevenueRange)
-  @IsOptional()
-  generatedRevenueRange?: GeneratedRevenueRange;
-
   @ApiPropertyOptional({ description: 'Five Percent Foreign Revenue', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   fivePercentForeignRevenue?: boolean;
 
   @ApiPropertyOptional({ description: 'Five Percent Foreign Revenue Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('fivePercentForeignRevenue', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.fivePercentForeignRevenue === false || obj.fivePercentForeignRevenue === 'false' ? null : value), { toClassOnly: true })
   fivePercentForeignRevenueDetails?: string;
 
   @ApiPropertyOptional({ description: 'Company Revenue Stream', enum: CompanyRevenueStream })
@@ -66,55 +70,66 @@ export class AddRevenueDto {
   @ValidateNested()
   @Type(() => CustomerDetailsDto)
   @IsOptional()
+  @Expose()
+  @Transform(({ obj, value }) => (obj.companyRevenueStream === CompanyRevenueStream.DIVERSIFIED || obj.companyRevenueStream === CompanyRevenueStream.NOT_APPLICABLE ? null : value), { toClassOnly: true })
   customerDetails?: CustomerDetailsDto;
 
   @ApiPropertyOptional({ description: 'IRS Tax Filed', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   irsTaxFiled?: boolean;
 
   @ApiPropertyOptional({ description: 'Financial Backing Investments', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   financialBackingInvestments?: boolean;
 
   @ApiPropertyOptional({ description: 'Financial Backing Investments Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('financialBackingInvestments', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.financialBackingInvestments === false || obj.financialBackingInvestments === 'false' ? null : value), { toClassOnly: true })
   financialBackingInvestmentsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   revenueSharingAgreements?: boolean;
 
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('revenueSharingAgreements', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.revenueSharingAgreements === false || obj.revenueSharingAgreements === 'false' ? null : value), { toClassOnly: true })
   revenueSharingAgreementsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Restrictions', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   revenueRestrictions?: boolean;
 
   @ApiPropertyOptional({ description: 'Revenue Restrictions Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('revenueRestrictions', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.revenueRestrictions === false || obj.revenueRestrictions === 'false' ? null : value), { toClassOnly: true })
   revenueRestrictionsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Revenue Growth Plan', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   revenueGrowthPlan?: boolean;
 
   @ApiPropertyOptional({ description: 'Revenue Growth Plan Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('revenueGrowthPlan', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.revenueGrowthPlan === false || obj.revenueGrowthPlan === 'false' ? null : value), { toClassOnly: true })
   revenueGrowthPlanDetails?: string;
 }
 

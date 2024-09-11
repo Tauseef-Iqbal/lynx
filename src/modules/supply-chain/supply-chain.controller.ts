@@ -70,7 +70,7 @@ export class SupplyChainController {
   @ApiOperation({ summary: 'Get Supply Chain By ID' })
   @Get('/:id')
   async getSupplyChainById(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.supplyChainService.findById(id);
+    const response = await this.supplyChainService.findById(id, { relations: { supplyChainSupplier: true } });
     return new ResponseDto(HttpStatus.OK, 'Supply Chain Section fetched successfully!', response).toJSON();
   }
 

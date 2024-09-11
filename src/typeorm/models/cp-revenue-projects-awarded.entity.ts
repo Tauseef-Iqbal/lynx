@@ -19,6 +19,9 @@ export class CPRevenueProjectsAwardedEntity extends CustomBaseEntity {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
+  @Column({ name: 'past_performance', type: 'boolean', nullable: true })
+  pastPerformance?: boolean;
+
   @Index()
   @ManyToOne(() => CPRevenueEntity, (cp_revenue) => cp_revenue.projectsAwarded, {
     nullable: false,

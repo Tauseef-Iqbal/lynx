@@ -1,9 +1,8 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { IResearchAndDevelopmentTeamDetails, IGovtGrantsForResearchDetails } from 'src/modules/research-and-development/interfaces';
 import { ResearchAndDevelopmentInnovationsDto, ResearchAndDevelopmentDefencePatentsDto, ResearchAndDevelopmentResearchPapersDto, ResearchAndDevelopmentResearchFundingDto, ResearchAndDevelopmentResearchInstitutionsDto } from '../dtos';
-import { ConditionalValue } from 'src/shared/validators';
 
 class ResearchAndDevelopmentTeamDetailsDto implements IResearchAndDevelopmentTeamDetails {
   @ApiPropertyOptional({ description: 'Team Size', example: '201-500' })
@@ -41,6 +40,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   researchAndDevelopmentTeam?: boolean;
 
   @ApiPropertyOptional({ description: 'Details of the research and development team', type: ResearchAndDevelopmentTeamDetailsDto })
@@ -48,7 +48,8 @@ export class AddResearchAndDevelopmentDto {
   @ValidateNested()
   @Type(() => ResearchAndDevelopmentTeamDetailsDto)
   @IsOptional()
-  @ConditionalValue('researchAndDevelopmentTeam', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.researchAndDevelopmentTeam === false || obj.researchAndDevelopmentTeam === 'false' ? null : value), { toClassOnly: true })
   researchAndDevelopmentTeamDetails?: ResearchAndDevelopmentTeamDetailsDto;
 
   @ApiPropertyOptional({ description: 'Innovations', type: ResearchAndDevelopmentInnovationsDto })
@@ -71,6 +72,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   reseachPapers10Years?: boolean;
 
   @ApiPropertyOptional({ description: 'Research Papers', type: ResearchAndDevelopmentResearchPapersDto })
@@ -78,7 +80,8 @@ export class AddResearchAndDevelopmentDto {
   @ValidateNested({ each: true })
   @Type(() => ResearchAndDevelopmentResearchPapersDto)
   @IsOptional()
-  @ConditionalValue('reseachPapers10Years', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.reseachPapers10Years === false || obj.reseachPapers10Years === 'false' ? null : value), { toClassOnly: true })
   researchAndDevelopmentResearchPapers?: ResearchAndDevelopmentResearchPapersDto[];
 
   @ApiPropertyOptional({
@@ -87,6 +90,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   reseachFunding10Years?: boolean;
 
   @ApiPropertyOptional({ description: 'Research Funding', type: ResearchAndDevelopmentResearchFundingDto })
@@ -94,7 +98,8 @@ export class AddResearchAndDevelopmentDto {
   @ValidateNested({ each: true })
   @Type(() => ResearchAndDevelopmentResearchFundingDto)
   @IsOptional()
-  @ConditionalValue('reseachFunding10Years', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.reseachFunding10Years === false || obj.reseachFunding10Years === 'false' ? null : value), { toClassOnly: true })
   researchAndDevelopmentResearchFunding?: ResearchAndDevelopmentResearchFundingDto[];
 
   @ApiPropertyOptional({
@@ -103,6 +108,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   reseachInstitutionsCollaboration?: boolean;
 
   @ApiPropertyOptional({ description: 'Research Institutions', type: ResearchAndDevelopmentResearchInstitutionsDto })
@@ -110,7 +116,8 @@ export class AddResearchAndDevelopmentDto {
   @ValidateNested({ each: true })
   @Type(() => ResearchAndDevelopmentResearchInstitutionsDto)
   @IsOptional()
-  @ConditionalValue('reseachInstitutionsCollaboration', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.reseachInstitutionsCollaboration === false || obj.reseachInstitutionsCollaboration === 'false' ? null : value), { toClassOnly: true })
   researchAndDevelopmentResearchInstitutions?: ResearchAndDevelopmentResearchInstitutionsDto[];
 
   @ApiPropertyOptional({
@@ -119,6 +126,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   projectsOfferedToGovt?: boolean;
 
   @ApiPropertyOptional({
@@ -127,7 +135,8 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsString()
-  @ConditionalValue('projectsOfferedToGovt', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.projectsOfferedToGovt === false || obj.projectsOfferedToGovt === 'false' ? null : value), { toClassOnly: true })
   projectsOfferedToGovtDetails?: string;
 
   @ApiPropertyOptional({
@@ -136,6 +145,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   govtGrantsForResearch?: boolean;
 
   @ApiPropertyOptional({ description: 'Projects offered to Govt', type: GovtGrantsForResearchDetailsDto })
@@ -143,7 +153,8 @@ export class AddResearchAndDevelopmentDto {
   @ValidateNested()
   @Type(() => GovtGrantsForResearchDetailsDto)
   @IsOptional()
-  @ConditionalValue('govtGrantsForResearch', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.govtGrantsForResearch === false || obj.govtGrantsForResearch === 'false' ? null : value), { toClassOnly: true })
   govtGrantsForResearchDetails?: GovtGrantsForResearchDetailsDto;
 
   @ApiPropertyOptional({
@@ -152,7 +163,9 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
-  @ConditionalValue('govtGrantsForResearch', (value) => value === false)
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
+  @Expose()
+  @Transform(({ obj, value }) => (obj.govtGrantsForResearch === true || obj.govtGrantsForResearch === 'true' ? null : value), { toClassOnly: true })
   interestedInGovtGrantsForResearch?: boolean;
 
   @ApiPropertyOptional({
@@ -161,6 +174,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   controlledTechnologyActivities?: boolean;
 
   @ApiPropertyOptional({
@@ -169,7 +183,8 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsString()
-  @ConditionalValue('controlledTechnologyActivities', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.controlledTechnologyActivities === false || obj.controlledTechnologyActivities === 'false' ? null : value), { toClassOnly: true })
   controlledTechnologyActivitiesDetails?: string;
 
   @ApiPropertyOptional({
@@ -178,6 +193,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   jointVentures?: boolean;
 
   @ApiPropertyOptional({
@@ -186,7 +202,8 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsString()
-  @ConditionalValue('jointVentures', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.jointVentures === false || obj.jointVentures === 'false' ? null : value), { toClassOnly: true })
   jointVenturesDetails?: string;
 
   @ApiPropertyOptional({
@@ -195,6 +212,7 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   intellectualPropertyProtection?: boolean;
 
   @ApiPropertyOptional({
@@ -203,7 +221,8 @@ export class AddResearchAndDevelopmentDto {
   })
   @IsOptional()
   @IsString()
-  @ConditionalValue('intellectualPropertyProtection', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.intellectualPropertyProtection === false || obj.intellectualPropertyProtection === 'false' ? null : value), { toClassOnly: true })
   intellectualPropertyProtectionDetails?: string;
 }
 

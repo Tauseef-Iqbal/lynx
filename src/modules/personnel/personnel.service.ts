@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -26,7 +26,7 @@ export class PersonnelService extends BaseTypeOrmCrudService<CPPersonnelEntity> 
     if (existedPersonnel) {
       return this.updatePersonnel(existedPersonnel.id, user, addPersonnelDto, files);
     } else {
-      if (files.FOCIDesignationFiles.length || addPersonnelDto.FOCIDesignationFiles.length) {
+      if (addPersonnelDto?.FOCIDesignation && (files?.FOCIDesignationFiles?.length || addPersonnelDto?.FOCIDesignationFiles?.length)) {
         addPersonnelDto.FOCIDesignationFiles = await processFilesToAdd({
           incomingFiles: files.FOCIDesignationFiles,
           incomingS3AndBase64: addPersonnelDto.FOCIDesignationFiles,
@@ -47,8 +47,7 @@ export class PersonnelService extends BaseTypeOrmCrudService<CPPersonnelEntity> 
 
     if (!personnel) return null;
 
-    if (files.FOCIDesignationFiles || updatePersonnelDto.FOCIDesignationFiles) {
-      if (files.FOCIDesignationFiles && !updatePersonnelDto.FOCIDesignation) throw new BadRequestException('FOCIDesignationFiles should not be provided when FOCIDesignation does not meet the required condition.');
+    if (updatePersonnelDto?.FOCIDesignation && (files?.FOCIDesignationFiles?.length || updatePersonnelDto?.FOCIDesignationFiles?.length)) {
       updatePersonnelDto.FOCIDesignationFiles = await processFilesToUpdate({
         existingFiles: personnel.FOCIDesignationFiles,
         incomingFiles: files.FOCIDesignationFiles,
@@ -73,8 +72,8 @@ export class PersonnelService extends BaseTypeOrmCrudService<CPPersonnelEntity> 
     return myPersonnel;
   }
 
-  async deleteMyPersonnel(companyProfileId: number): Promise<CPPersonnelEntity> {
-    const myPersonnel = await this.getMyPersonnel(companyProfileId);
-    return this.update(myPersonnel.id, { isDeleted: true } as unknown as CPPersonnelEntity);
-  }
+  // async deleteMyPersonnel(companyProfileId: number): Promise<CPPersonnelEntity> {
+  //   const myPersonnel = await this.getMyPersonnel(companyProfileId);
+  //   return this.update(myPersonnel.id, { isDeleted: true } as unknown as CPPersonnelEntity);
+  // }
 }

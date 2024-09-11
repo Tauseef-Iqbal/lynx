@@ -31,15 +31,17 @@ export class ResearchAndDevelopmentController {
 
   @ApiOperation({ summary: 'Get My Research And Development' })
   @Get('section/me')
-  async getMyCybersecurity(@User() user: UserEntity) {
+  async getMyResearchAndDevelopment(@User() user: UserEntity) {
     const response = await this.researchAndDevelopmentService.getMyResearchAndDevelopment(user?.companyProfile?.id);
     return new ResponseDto(HttpStatus.OK, 'My Research And Development fetched successfully!', response).toJSON();
   }
 
   @ApiOperation({ summary: 'Get Research And Development' })
   @Get('/:id')
-  async getMyResearchAndDevelopmentByID(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.researchAndDevelopmentService.findById(id, { relations: { projectsAwarded: true } });
+  async getResearchAndDevelopmentByID(@Param('id', ParseIntPipe) id: number) {
+    const response = await this.researchAndDevelopmentService.findById(id, {
+      relations: { researchAndDevelopmentInnovations: true, researchAndDevelopmentDefencePatents: true, researchAndDevelopmentResearchPapers: true, researchAndDevelopmentResearchFunding: true, researchAndDevelopmentResearchInstitutions: true },
+    });
     return new ResponseDto(HttpStatus.OK, 'Research And Development fetched successfully!', response).toJSON();
   }
 

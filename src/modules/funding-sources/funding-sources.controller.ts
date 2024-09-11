@@ -38,7 +38,7 @@ export class FundingSourcesController {
   @ApiOperation({ summary: 'Get Funding Sources By ID' })
   @Get('/:id')
   async getFundingSourcesById(@Param('id', ParseIntPipe) id: number) {
-    const response = await this.fundingSourcesService.findById(id);
+    const response = await this.fundingSourcesService.findById(id, { relations: { fundingSourcesForeignAffiliation: true } });
     return new ResponseDto(HttpStatus.OK, 'Funding Sources Section fetched successfully!', response).toJSON();
   }
 

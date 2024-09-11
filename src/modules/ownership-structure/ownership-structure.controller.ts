@@ -30,15 +30,15 @@ export class OwnershipStructureController {
 
   @ApiOperation({ summary: 'Get My Ownership Structure' })
   @Get('section/me')
-  async getMyCybersecurity(@User() user: UserEntity) {
+  async getMyOwnershipStructure(@User() user: UserEntity) {
     const response = await this.ownershipStructureService.getMyOwnershipStructure(user?.companyProfile?.id);
     return new ResponseDto(HttpStatus.OK, 'My Ownership Structure fetched successfully!', response).toJSON();
   }
 
   @ApiOperation({ summary: 'Get Ownership Structure' })
   @Get('/:id')
-  async getMyOwnershipStructureByID(@Param('id', ParseIntPipe) id: number) {
-    return await this.ownershipStructureService.getMyOwnershipStructure(id);
+  async getOwnershipStructureByID(@Param('id', ParseIntPipe) id: number) {
+    return await this.ownershipStructureService.findById(id, { relations: { ownershipStructureDetails: true, ownershipStructureKeyManagement: true } });
   }
 
   // @ApiOperation({ summary: 'Delete Ownership Structure' })

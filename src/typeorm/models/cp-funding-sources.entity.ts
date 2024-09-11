@@ -3,6 +3,7 @@ import { Column, Entity, Index, JoinColumn, OneToOne, OneToMany } from 'typeorm'
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CPFundingSourcesForeignAffiliationEntity } from './cp-funding-sources-foreign-affiliation.entity';
 import { CustomBaseEntity } from './custom-base.entity';
+import { ForeignAffiliation } from 'src/modules/funding-sources/enums';
 
 @Entity({ name: 'cp_funding_sources' })
 export class CPFundingSourcesEntity extends CustomBaseEntity {
@@ -24,8 +25,8 @@ export class CPFundingSourcesEntity extends CustomBaseEntity {
   @Column({ name: 'awardee_has_venture_capital', type: 'boolean', nullable: true })
   awardeeHasVentureCapital?: boolean;
 
-  @Column({ name: 'foreign_affiliation', type: 'varchar', length: 255, nullable: true })
-  foreignAffiliation?: string;
+  @Column({ name: 'foreign_affiliation', type: 'enum', enum: ForeignAffiliation, nullable: true })
+  foreignAffiliation?: ForeignAffiliation;
 
   @Column({ name: 'investor_details', type: 'jsonb', nullable: true })
   investorDetails?: IInvestorDetails;

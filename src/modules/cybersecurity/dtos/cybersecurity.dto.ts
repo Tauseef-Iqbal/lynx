@@ -1,8 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IBaseCyberSecurityDetails, ICybersecurityStandardsCompliantDetails, IEncryptDataDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
-import { ConditionalValue } from 'src/shared/validators';
 
 class BaseCyberSecurityDetailsDto implements IBaseCyberSecurityDetails {
   @ApiPropertyOptional({ description: 'The frequency of the cybersecurity activity (e.g., monthly, quarterly).' })
@@ -95,160 +94,216 @@ export class AddCybersecurityDto {
   @ApiPropertyOptional({ description: 'Indicates whether the organization has a dedicated cybersecurity team.' })
   @IsOptional()
   @IsBoolean()
-  cybersecurityTeam?: boolean;
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
+  cybersecurityTeam?: string;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity team.' })
   @IsOptional()
   @IsString()
-  @ConditionalValue('cybersecurityTeam', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityTeam === false || obj.cybersecurityTeam === 'false' ? null : value), { toClassOnly: true })
   cybersecurityTeamDetails?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization has a cybersecurity policy.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cybersecurityPolicy?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity policy.' })
   @IsOptional()
   @IsString()
-  @ConditionalValue('cybersecurityPolicy', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityPolicy === false ? null : value), { toClassOnly: true })
   cybersecurityPolicyDetails?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts penetration testing.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   penetrationTesting?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s penetration testing activities.', type: PenetrationTestingDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => PenetrationTestingDetailsDto)
-  @ConditionalValue('penetrationTesting', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.penetrationTesting === false || obj.penetrationTesting === 'false' ? null : value), { toClassOnly: true })
   penetrationTestingDetails?: PenetrationTestingDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization complies with cybersecurity standards.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cybersecurityStandardsCompliant?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s compliance with cybersecurity standards.', type: CybersecurityStandardsCompliantDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityStandardsCompliantDetailsDto)
-  @ConditionalValue('cybersecurityStandardsCompliant', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityStandardsCompliant === false || obj.cybersecurityStandardsCompliant === 'false' ? null : value), { toClassOnly: true })
   cybersecurityStandardsCompliantDetails?: CybersecurityStandardsCompliantDetailsDto;
+
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityStandardsCompliant === false || obj.cybersecurityStandardsCompliant === 'false' ? null : value), { toClassOnly: true })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  cybersecurityStandardsCompliantFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization has an incident response plan.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true, { toClassOnly: true })
   incidentResponsePlan?: boolean;
 
   @ApiPropertyOptional({ description: 'The date of the last cybersecurity incident.' })
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @ConditionalValue('incidentResponsePlan', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.incidentResponsePlan === false || obj.incidentResponsePlan === 'false' ? null : new Date(value)), { toClassOnly: true })
   lastIncident?: Date;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts cybersecurity training.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cybersecurityTraining?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity training activities.', type: CybersecurityTrainingDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityTrainingDetailsDto)
-  @ConditionalValue('cybersecurityTraining', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityTraining === false || obj.cybersecurityTraining === 'false' ? null : value), { toClassOnly: true })
   cybersecurityTrainingDetails?: CybersecurityTrainingDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization encrypts its data.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   encryptData?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s data encryption activities.', type: EncryptDataDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => EncryptDataDetailsDto)
-  @ConditionalValue('encryptData', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.encryptData === false || obj.encryptData === 'false' ? null : value), { toClassOnly: true })
   encryptDataDetails?: EncryptDataDetailsDto;
+
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Expose()
+  @Transform(({ obj, value }) => (obj.encryptData === false || obj.encryptData === 'false' ? null : value), { toClassOnly: true })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+
+    return value;
+  })
+  encryptDataFiles?: string[];
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts cybersecurity audits.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cybersecurityAudits?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s cybersecurity audits.', type: CybersecurityAuditsDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => CybersecurityAuditsDetailsDto)
-  @ConditionalValue('cybersecurityAudits', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cybersecurityAudits === false || obj.cybersecurityAudits === 'false' ? null : value), { toClassOnly: true })
   cybersecurityAuditsDetails?: CybersecurityAuditsDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether a foreign entity is involved in cybersecurity activities.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   foreignEntityInvolved?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the involvement of foreign entities in cybersecurity activities.', type: ForeignEntityInvolvedDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => ForeignEntityInvolvedDetailsDto)
-  @ConditionalValue('foreignEntityInvolved', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.foreignEntityInvolved === false || obj.foreignEntityInvolved === 'false' ? null : value), { toClassOnly: true })
   foreignEntityInvolvedDetails?: ForeignEntityInvolvedDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization manages access control for its systems.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   manageAccessControl?: boolean;
 
   @ApiPropertyOptional({ description: 'Details about the organization’s access control management activities.', type: ManageAccessControlDetailsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => ManageAccessControlDetailsDto)
-  @ConditionalValue('manageAccessControl', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.manageAccessControl === false || obj.manageAccessControl === 'false' ? null : value), { toClassOnly: true })
   manageAccessControlDetails?: ManageAccessControlDetailsDto;
 
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations have been reported.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cyberViolationsReported?: boolean;
 
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations were reported within 24 hours.' })
   @IsOptional()
   @IsBoolean()
-  @ConditionalValue('cyberViolationsReported', (value) => value === true)
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cyberViolationsReported === false || obj.cyberViolationsReported === 'false' ? null : value), { toClassOnly: true })
   cyberViolationsReported24Hrs?: boolean;
 
   @ApiPropertyOptional({ description: 'Indicates whether cyber violations have been resolved.' })
   @IsOptional()
   @IsBoolean()
-  @ConditionalValue('cyberViolationsReported', (value) => value === true)
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cyberViolationsReported === false || obj.cyberViolationsReported === 'false' ? null : value), { toClassOnly: true })
   cyberViolationsResolved?: boolean;
 
   @ApiPropertyOptional({ description: 'Summary of any cyber violations that have occurred.' })
   @IsOptional()
   @IsString()
-  @ConditionalValue('cyberViolationsReported', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cyberViolationsReported === false || obj.cyberViolationsReported === 'false' ? null : value), { toClassOnly: true })
   cyberViolationsSummary?: string;
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization is interested in a cybersecurity assessment.' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   interestedInCybersecurityAssessement?: boolean;
 
   @ApiPropertyOptional({ description: 'The preferred type of cybersecurity assessment.' })
   @IsOptional()
   @IsString()
-  @ConditionalValue('interestedInCybersecurityAssessement', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.interestedInCybersecurityAssessement === false || obj.interestedInCybersecurityAssessement === 'false' ? null : value), { toClassOnly: true })
   preferredAssessementType?: string;
 
   @ApiPropertyOptional({ description: 'Primary follow-up contact for cybersecurity-related matters.', type: PrimaryFollowUpContactDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => PrimaryFollowUpContactDto)
-  @ConditionalValue('interestedInCybersecurityAssessement', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.interestedInCybersecurityAssessement === false || obj.interestedInCybersecurityAssessement === 'false' ? null : value), { toClassOnly: true })
   primaryFollowUpContact?: PrimaryFollowUpContactDto;
 }
 

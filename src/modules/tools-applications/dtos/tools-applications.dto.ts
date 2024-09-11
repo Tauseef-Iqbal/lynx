@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Expose, Transform } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
-import { ConditionalValue } from 'src/shared/validators';
 
 export class AddToolsAndApplicationsDto {
   @ApiPropertyOptional({
@@ -34,6 +34,7 @@ export class AddToolsAndApplicationsDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   emailServiceProvider?: boolean;
 
@@ -43,7 +44,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('emailServiceProvider', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.emailServiceProvider === false || obj.emailServiceProvider === 'false' ? null : value), { toClassOnly: true })
   emailServiceProviderDetails?: string;
 
   @ApiPropertyOptional({
@@ -51,6 +53,7 @@ export class AddToolsAndApplicationsDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   cloudServices?: boolean;
 
@@ -60,7 +63,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('cloudServices', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.cloudServices === false || obj.cloudServices === 'false' ? null : value), { toClassOnly: true })
   cloudServicesDetails?: string;
 
   @ApiPropertyOptional({
@@ -68,6 +72,7 @@ export class AddToolsAndApplicationsDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   onPremiseSoftwareHardwareSystems?: boolean;
 
@@ -77,7 +82,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('onPremiseSoftwareHardwareSystems', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.onPremiseSoftwareHardwareSystems === false || obj.onPremiseSoftwareHardwareSystems === 'false' ? null : value), { toClassOnly: true })
   onPremiseSoftwareHardwareSystemsDetails?: string;
 
   @ApiPropertyOptional({
@@ -85,6 +91,7 @@ export class AddToolsAndApplicationsDto {
     example: false,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   nonCompanyOwnedMobileDevices?: boolean;
 
@@ -94,7 +101,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('nonCompanyOwnedMobileDevices', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.nonCompanyOwnedMobileDevices === false || obj.nonCompanyOwnedMobileDevices === 'false' ? null : value), { toClassOnly: true })
   mdmSolution?: string;
 
   @ApiPropertyOptional({
@@ -102,6 +110,7 @@ export class AddToolsAndApplicationsDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   technologyAssets?: boolean;
 
@@ -111,7 +120,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('technologyAssets', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.technologyAssets === false || obj.technologyAssets === 'false' ? null : value), { toClassOnly: true })
   technologyAssetsDetails?: string;
 
   @ApiPropertyOptional({
@@ -119,6 +129,7 @@ export class AddToolsAndApplicationsDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   financialCovenants?: boolean;
 
@@ -128,7 +139,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('financialCovenants', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.financialCovenants === false || obj.financialCovenants === 'false' ? null : value), { toClassOnly: true })
   financialCovenantsDetails?: string;
 
   @ApiPropertyOptional({
@@ -137,7 +149,8 @@ export class AddToolsAndApplicationsDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('financialCovenants', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.financialCovenants === false || obj.financialCovenants === 'false' ? null : value), { toClassOnly: true })
   securityMeasures?: string;
 }
 

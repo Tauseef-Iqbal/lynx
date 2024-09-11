@@ -1,9 +1,9 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ConditionalValue } from 'src/shared/validators';
+import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { IInvestorDetails } from '../interfaces';
 import { AddForeignFundingForeignAffiliationDto } from './foreign-funding-foreign-affiliation.dto';
-import { Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
+import { ForeignAffiliation } from '../enums';
 
 export class AddFundingSourcesDto {
   @ApiPropertyOptional({
@@ -37,6 +37,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   raiseEquity?: boolean;
 
@@ -48,7 +49,8 @@ export class AddFundingSourcesDto {
   @IsString({ each: true })
   @IsArray()
   @IsOptional()
-  @ConditionalValue('raiseEquity', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.raiseEquity === false || obj.raiseEquity === 'false' ? null : value), { toClassOnly: true })
   equityStages?: string[];
 
   @ApiPropertyOptional({
@@ -56,6 +58,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   awardeeHasVentureCapital?: boolean;
 
@@ -65,8 +68,10 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('awardeeHasVentureCapital', (value) => value === true)
-  foreignAffiliation?: string;
+  @IsEnum(ForeignAffiliation)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.awardeeHasVentureCapital === false || obj.awardeeHasVentureCapital === 'false' ? null : value), { toClassOnly: true })
+  foreignAffiliation?: ForeignAffiliation;
 
   @ApiPropertyOptional({
     description: 'Details about the investors',
@@ -75,6 +80,8 @@ export class AddFundingSourcesDto {
   })
   @IsObject()
   @IsOptional()
+  @Expose()
+  @Transform(({ obj, value }) => (obj.foreignAffiliation === ForeignAffiliation.NO || obj.foreignAffiliation === ForeignAffiliation.UNABLE_TO_DETERMINE ? null : value), { toClassOnly: true })
   investorDetails?: IInvestorDetails;
 
   @ApiPropertyOptional({
@@ -82,6 +89,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   foreignFunding?: boolean;
 
@@ -90,6 +98,8 @@ export class AddFundingSourcesDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AddForeignFundingForeignAffiliationDto)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.foreignFunding === false || obj.foreignFunding === 'false' ? null : value), { toClassOnly: true })
   fundingSourcesForeignAffiliation?: AddForeignFundingForeignAffiliationDto[];
 
   @ApiPropertyOptional({
@@ -97,6 +107,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   governmentBackedFunding?: boolean;
 
@@ -106,7 +117,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('governmentBackedFunding', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.governmentBackedFunding === false || obj.governmentBackedFunding === 'false' ? null : value), { toClassOnly: true })
   governmentBackedFundingDetails?: string;
 
   @ApiPropertyOptional({
@@ -114,6 +126,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   fundingRestrictions?: boolean;
 
@@ -123,7 +136,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('fundingRestrictions', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.fundingRestrictions === false || obj.fundingRestrictions === 'false' ? null : value), { toClassOnly: true })
   fundingRestrictionsDetails?: string;
 
   @ApiPropertyOptional({
@@ -131,6 +145,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   additionalFundingStrategy?: boolean;
 
@@ -140,7 +155,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('additionalFundingStrategy', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.additionalFundingStrategy === false || obj.additionalFundingStrategy === 'false' ? null : value), { toClassOnly: true })
   additionalFundingStrategyDetails?: string;
 
   @ApiPropertyOptional({
@@ -148,6 +164,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   outstandingDebts?: boolean;
 
@@ -157,7 +174,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('outstandingDebts', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.outstandingDebts === false || obj.outstandingDebts === 'false' ? null : value), { toClassOnly: true })
   outstandingDebtsDetails?: string;
 
   @ApiPropertyOptional({
@@ -165,6 +183,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   fundingInstruments?: boolean;
 
@@ -174,7 +193,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('fundingInstruments', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.fundingInstruments === false || obj.fundingInstruments === 'false' ? null : value), { toClassOnly: true })
   fundingInstrumentsDetails?: string;
 
   @ApiPropertyOptional({
@@ -182,6 +202,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   financialAudits?: boolean;
 
@@ -191,7 +212,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('financialAudits', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.financialAudits === false || obj.financialAudits === 'false' ? null : value), { toClassOnly: true })
   auditDetails?: string;
 
   @ApiPropertyOptional({
@@ -199,6 +221,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   strategicPartnership?: boolean;
 
@@ -208,7 +231,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('strategicPartnership', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.strategicPartnership === false || obj.strategicPartnership === 'false' ? null : value), { toClassOnly: true })
   strategicPartnershipDetails?: string;
 
   @ApiPropertyOptional({
@@ -216,6 +240,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   foreignFinancialInterest?: boolean;
 
@@ -225,7 +250,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('foreignFinancialInterest', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.foreignFinancialInterest === false || obj.foreignFinancialInterest === 'false' ? null : value), { toClassOnly: true })
   foreignFinancialInterestDetails?: string;
 
   @ApiPropertyOptional({
@@ -233,6 +259,7 @@ export class AddFundingSourcesDto {
     example: true,
   })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   contingencyFinancingPlan?: boolean;
 
@@ -242,7 +269,8 @@ export class AddFundingSourcesDto {
   })
   @IsString()
   @IsOptional()
-  @ConditionalValue('contingencyFinancingPlan', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.contingencyFinancingPlan === false || obj.contingencyFinancingPlan === 'false' ? null : value), { toClassOnly: true })
   contingencyFinancingPlanDetails?: string;
 }
 

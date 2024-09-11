@@ -1,7 +1,6 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ConditionalValue } from 'src/shared/validators';
 import { AddOwnershipStructureKeyManagementDto, AddOwnerShipStructureDetailsDto } from '../dtos';
 
 export class OwnershipAgreementsDetailsDto {
@@ -49,6 +48,7 @@ export class AddOwnershipStructureDto {
 
   @ApiPropertyOptional({ description: 'Agreement or Relationship', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   ownershipAgreementsDetails?: boolean;
 
@@ -57,22 +57,26 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalValue('percentForeignInterest', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.ownershipAgreementsDetails === false || obj.ownershipAgreementsDetails === 'false' ? null : value), { toClassOnly: true })
   ownershipDetails?: OwnershipAgreementsDetailsDto;
 
   @ApiPropertyOptional({ description: 'Agreements with Foreign Persons', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   agreementsWithForeignPersons?: boolean;
 
   @ApiPropertyOptional({ description: 'Revenue Sharing Agreements Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('ownershipAgreementsDetails', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.agreementsWithForeignPersons === false || obj.agreementsWithForeignPersons === 'false' ? null : value), { toClassOnly: true })
   revenueSharingAgreementsDetails?: string;
 
   @ApiPropertyOptional({ description: 'Percent Foreign Interest', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   percentForeignInterest?: boolean;
 
@@ -81,11 +85,13 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalValue('percentForeignInterest', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.percentForeignInterest === false || obj.percentForeignInterest === 'false' ? null : value), { toClassOnly: true })
   foreignInterestDetails?: ForeignInterestDetailsDto;
 
   @ApiPropertyOptional({ description: 'Foreign Owned Business', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   foreignOwnedBusiness?: boolean;
 
@@ -94,18 +100,21 @@ export class AddOwnershipStructureDto {
   @ValidateNested()
   @IsObject()
   @IsOptional()
-  @ConditionalValue('foreignOwnedBusiness', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.foreignOwnedBusiness === false || obj.foreignOwnedBusiness === 'false' ? null : value), { toClassOnly: true })
   foreignOwnedBusinessDetails?: ForeignInterestDetailsDto;
 
   @ApiPropertyOptional({ description: 'Beneficial Owner', example: true })
   @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   @IsOptional()
   beneficialOwner?: boolean;
 
   @ApiPropertyOptional({ description: 'Beneficial Owner Details', example: 'Details here' })
   @IsString()
   @IsOptional()
-  @ConditionalValue('beneficialOwner', (value) => value === true)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.beneficialOwner === false || obj.beneficialOwner === 'false' ? null : value), { toClassOnly: true })
   beneficialOwnerDetails?: string;
 }
 

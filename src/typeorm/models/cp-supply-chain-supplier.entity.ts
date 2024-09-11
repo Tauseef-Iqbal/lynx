@@ -37,6 +37,9 @@ export class CPSupplyChainSupplierEntity extends CustomBaseEntity {
   @Column({ name: 'operations_criticality', type: 'text', nullable: true })
   operationsCriticality?: string;
 
+  @Column({ name: 'supplier_role_description', type: 'text', nullable: true })
+  supplierRoleDescription?: string;
+
   @Index()
   @OneToOne(() => CPSupplyChainEntity, (supplyChain) => supplyChain.supplyChainSupplier, {
     nullable: false,

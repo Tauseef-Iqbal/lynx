@@ -37,6 +37,39 @@ export class BaseTypeOrmCrudService<T> {
     return this.repository.findOne({ where: { ...filter } as any, relations: options?.relations });
   }
 
+  async findByRelationFilters(
+    filter: Record<string, any> = {},
+    options: {
+      relations?: Record<string, string>;
+      relationFilters?: Record<string, { condition: string; params: Record<string, any> }>;
+    } = {},
+  ): Promise<T | null> {
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+
+    Object.keys(filter).forEach((key) => {
+      if (typeof filter[key] === 'object' && filter[key] !== null) {
+        Object.keys(filter[key]).forEach((nestedKey) => {
+          queryBuilder.andWhere(`entity.${key}.${nestedKey} = :${key}_${nestedKey}`, { [`${key}_${nestedKey}`]: filter[key][nestedKey] });
+        });
+      } else {
+        queryBuilder.andWhere(`entity.${key} = :${key}`, { [key]: filter[key] });
+      }
+    });
+
+    if (options.relations) {
+      Object.entries(options.relations).forEach(([relation, alias]) => {
+        if (options.relationFilters && options.relationFilters[relation]) {
+          const relationFilter = options.relationFilters[relation];
+          queryBuilder.leftJoinAndSelect(`entity.${relation}`, alias, relationFilter.condition, relationFilter.params);
+        } else {
+          queryBuilder.leftJoinAndSelect(`entity.${relation}`, alias);
+        }
+      });
+    }
+
+    return queryBuilder.getOne();
+  }
+
   async update(id: number, params: T): Promise<T> {
     const existingData = await this.findById(id);
     const newData = this.repository.merge(existingData, params);

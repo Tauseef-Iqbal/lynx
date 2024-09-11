@@ -9,8 +9,11 @@ export class CPSupplyChainEntity extends CustomBaseEntity {
   @Column({ name: 'supply_chain_entities', type: 'boolean', nullable: true })
   supplyChainEntities?: boolean;
 
-  @Column({ name: 'sole_source_suppliers', type: 'text', nullable: true })
-  soleSourceSuppliers?: string;
+  @Column({ name: 'sole_source_suppliers', type: 'boolean', nullable: true })
+  soleSourceSuppliers?: boolean;
+
+  @Column({ name: 'sole_source_suppliers_details', type: 'text', nullable: true })
+  soleSourceSuppliersDetails?: string;
 
   @Column({ name: 'contingency_plan', type: 'boolean', nullable: true })
   contingencyPlan?: boolean;

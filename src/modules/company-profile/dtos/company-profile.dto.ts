@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsEnum, IsInt, IsNotEmpty, IsObject, IsOptional, IsString, IsUrl, Matches, ValidateIf, ValidateNested } from 'class-validator';
-import { ConditionalValue } from 'src/shared/validators';
 import { CompanyClassification } from '../enums';
 import { IAssets } from '../interfaces';
 import { IsSocialMediaUrl } from '../validators';
@@ -137,7 +136,8 @@ export class CreateCompanyProfileDto {
   @IsArray({ message: 'classificationTypes must be an array.' })
   @IsString({ each: true, message: 'Each classificationType must be a string.' })
   @IsNotEmpty({ each: true, message: 'classificationTypes cannot be an empty array.' })
-  @ConditionalValue('classification', (value) => value === CompanyClassification.SMALL_BUSINESS)
+  @Expose()
+  @Transform(({ obj, value }) => (obj.classification === CompanyClassification.OTHER_THAN_SMALL_BUSINESS ? null : value), { toClassOnly: true })
   classificationTypes?: string[];
 
   @ApiPropertyOptional({ description: 'Industry Associations' })

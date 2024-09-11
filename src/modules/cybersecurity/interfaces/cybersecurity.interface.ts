@@ -33,3 +33,8 @@ export interface IPrimaryFollowUpContact {
   email?: string;
   phone?: string;
 }
+
+export interface CybersecurityFiles {
+  cybersecurityStandardsCompliantFiles?: Express.Multer.File[];
+  encryptDataFiles?: Express.Multer.File[];
+}

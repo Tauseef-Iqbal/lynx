@@ -1,11 +1,13 @@
-import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CybersecurityService } from './cybersecurity.service';
 import { ResponseDto } from 'src/shared/dtos';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddCybersecurityDto, UpdateCybersecurityDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { CybersecurityFiles } from './interfaces';
 
 @ApiTags('Cybersecurity')
 @ApiBearerAuth()
@@ -16,15 +18,45 @@ export class CybersecurityController {
 
   @ApiOperation({ summary: 'Add Cybersecurity' })
   @Post()
-  async addCybersecurity(@User() user: UserEntity, @Body() addCybersecurityDto: AddCybersecurityDto) {
-    const cybersecurity = await this.cybersecurityService.addCybersecurity(user, addCybersecurityDto);
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'cybersecurityStandardsCompliantFiles', maxCount: 10 },
+        { name: 'encryptDataFiles', maxCount: 10 },
+      ],
+      {
+        limits: {
+          fileSize: 500 * 1024 * 1024,
+        },
+      },
+    ),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: AddCybersecurityDto })
+  async addCybersecurity(@User() user: UserEntity, @Body() addCybersecurityDto: AddCybersecurityDto, @UploadedFiles() files: CybersecurityFiles) {
+    const cybersecurity = await this.cybersecurityService.addCybersecurity(user, addCybersecurityDto, files);
     return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cybersecurity).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Cybersecurity' })
   @Put('/:id')
-  async updateCybersecurity(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateCybersecurityDto: UpdateCybersecurityDto) {
-    const cybersecurity = await this.cybersecurityService.updateCybersecurity(id, user, updateCybersecurityDto);
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'cybersecurityStandardsCompliantFiles', maxCount: 10 },
+        { name: 'encryptDataFiles', maxCount: 10 },
+      ],
+      {
+        limits: {
+          fileSize: 500 * 1024 * 1024,
+        },
+      },
+    ),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateCybersecurityDto })
+  async updateCybersecurity(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updateCybersecurityDto: UpdateCybersecurityDto, @UploadedFiles() files: CybersecurityFiles) {
+    const cybersecurity = await this.cybersecurityService.updateCybersecurity(id, user, updateCybersecurityDto, files);
     return new ResponseDto(HttpStatus.CREATED, 'Cybersecurity added successfully!', cybersecurity).toJSON();
   }
 
