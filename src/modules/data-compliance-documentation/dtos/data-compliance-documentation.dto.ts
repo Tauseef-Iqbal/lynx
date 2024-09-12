@@ -1,10 +1,12 @@
 import { IsBoolean, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class UpsertDataComplianceDocumentationDto {
   @ApiPropertyOptional({ description: 'The ID of the DataComplianceDocumentation.' })
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   // Documented Data Governance Policy

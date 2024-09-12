@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { RoundType, SharesType } from '../enums';
 
 export class AddOwnerShipStructureDetailsDto {
   @IsNumber()
@@ -9,9 +10,9 @@ export class AddOwnerShipStructureDetailsDto {
   id?: number;
 
   @ApiPropertyOptional({ description: 'Type of the investment round' })
-  @IsString()
+  @IsEnum(RoundType)
   @IsOptional()
-  roundType?: string;
+  roundType?: RoundType;
 
   @ApiPropertyOptional({ description: 'Name of the investor' })
   @IsString()
@@ -29,9 +30,9 @@ export class AddOwnerShipStructureDetailsDto {
   numberOfShares?: number;
 
   @ApiPropertyOptional({ description: 'Types of shares held by the investor' })
-  @IsString()
+  @IsEnum(SharesType)
   @IsOptional()
-  typesOfShares?: string;
+  typesOfShares?: SharesType;
 
   @ApiPropertyOptional({ description: 'Capital invested by the investor' })
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 2 })

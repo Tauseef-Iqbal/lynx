@@ -1,12 +1,14 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { FILE_LIMITS } from 'src/shared/constants';
+import { TransformToBoolean } from 'src/shared/utils/transformers';
 
 export class CompanyProfileLegalStructureOrgFacilityDto {
   @ApiPropertyOptional({ description: 'The ID of the organizational facility.' })
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({ description: 'The full address of the office.' })
@@ -40,6 +42,7 @@ export class CreateCompanyProfileLegalStructureDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => (value ? value.split(',').map((item: string) => item.trim()) : []))
   legalStructure: string[];
 
   @ApiPropertyOptional({ description: 'Doing Business As name' })
@@ -63,6 +66,7 @@ export class CreateCompanyProfileLegalStructureDto {
   @ApiPropertyOptional({ description: "Indicates if the company's legal structure changed in the last two years" })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => TransformToBoolean(value))
   legalStructureChanged?: boolean;
 
   @ApiPropertyOptional({ description: 'Description of the legal structure change' })
@@ -73,6 +77,7 @@ export class CreateCompanyProfileLegalStructureDto {
   @ApiPropertyOptional({ description: 'Indicates if the company owns or operates in foreign countries' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => TransformToBoolean(value))
   corporationOwnOperateForeignCountries?: boolean;
 
   @ApiPropertyOptional({ description: "Description of the corporation's foreign operations" })
@@ -83,6 +88,7 @@ export class CreateCompanyProfileLegalStructureDto {
   @ApiPropertyOptional({ description: 'Indicates if the company has multiple organizational facilities' })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => TransformToBoolean(value))
   hasMultipleOrgFacilities?: boolean;
 
   @ApiPropertyOptional({ description: 'List of organizational facilities' })

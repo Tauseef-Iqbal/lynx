@@ -40,7 +40,7 @@ export class CompanyProfileLegalStructureEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (company) => company.cpLegalStructure, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

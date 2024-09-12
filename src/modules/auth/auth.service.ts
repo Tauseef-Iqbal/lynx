@@ -1,5 +1,5 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
 import ApiError from 'src/shared/utils/api.error';
@@ -81,6 +81,8 @@ export class AuthService implements IAuthService {
     const { sub } = this.jwtService.decode(AccessToken) as { sub: string };
 
     const user = await this.userService.findUserByEmail(loginDto.email);
+
+    if (!user) throw new NotFoundException('User not found');
 
     const token = await this.getAuthToken(user, sub, AccessToken);
     return { token, user };

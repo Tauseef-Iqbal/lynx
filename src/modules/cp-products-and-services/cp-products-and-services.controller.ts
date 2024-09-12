@@ -1,17 +1,15 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { BaseController } from 'src/shared/services';
-import { CpProductsAndServicesEntity } from 'src/typeorm/models';
-import { CreateCpProductsAndServicesDto, CreateCpProductsAndServicesDtoApiBodyDto, GetAllQueryParamsDto, UpdateCpProductsAndServicesDto } from './dtos';
-import { CpProductsAndServicesService } from './cp-products-and-services.service';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { User } from 'src/shared/decorators';
-import { validateOrReject } from 'class-validator';
-import { ResponseDto } from 'src/shared/dtos';
-import { plainToInstance } from 'class-transformer';
-import { JwtAuthGuard } from 'src/shared/guards';
-import { CpProductsAndServicesFiles } from './interfaces';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FILE_LIMITS } from 'src/shared/constants';
+import { User } from 'src/shared/decorators';
+import { ResponseDto } from 'src/shared/dtos';
+import { JwtAuthGuard } from 'src/shared/guards';
+import { BaseController } from 'src/shared/services';
+import { CpProductsAndServicesEntity, UserEntity } from 'src/typeorm/models';
+import { CpProductsAndServicesService } from './cp-products-and-services.service';
+import { CreateCpProductsAndServicesDto, CreateCpProductsAndServicesDtoApiBodyDto, GetAllQueryParamsDto, UpdateCpProductsAndServicesDto } from './dtos';
+import { CpProductsAndServicesFiles } from './interfaces';
 
 @ApiTags('Company Profile Products and Services')
 @UseGuards(JwtAuthGuard)
@@ -31,10 +29,10 @@ export class CpProductsAndServicesController extends BaseController<CpProductsAn
       { name: 'supportingMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
     ]),
   )
-  async createCpProductsAndService(@User() user: any, @Body('data') data: string, @UploadedFiles() files: CpProductsAndServicesFiles) {
-    const createCpProductsAndServicesDto = plainToInstance(CreateCpProductsAndServicesDto, JSON.parse(data));
-    await validateOrReject(createCpProductsAndServicesDto);
-    const response = await this.cpProductsAndServicesService.createCpProductsAndServices(user, createCpProductsAndServicesDto, files);
+  async createCpProductsAndService(@User() user: UserEntity, @Body() data: CreateCpProductsAndServicesDto, @UploadedFiles() files: CpProductsAndServicesFiles) {
+    // const createCpProductsAndServicesDto = plainToInstance(CreateCpProductsAndServicesDto, JSON.parse(data));
+    // await validateOrReject(createCpProductsAndServicesDto);
+    const response = await this.cpProductsAndServicesService.createCpProductsAndServices(user, data, files);
     return new ResponseDto(HttpStatus.CREATED, 'Company profile products or services created successfully!', response);
   }
 
@@ -47,9 +45,9 @@ export class CpProductsAndServicesController extends BaseController<CpProductsAn
 
   @ApiOperation({ summary: 'Get Company profile products and services' })
   @Get()
-  async getCpProductsAndServices(@Query() queryParams: GetAllQueryParamsDto): Promise<any> {
+  async getCpProductsAndServices(@User() user: UserEntity, @Query() queryParams: GetAllQueryParamsDto): Promise<any> {
     const { page = 1, limit = 10 } = queryParams;
-    const response = await this.findAll({ limit, page }, { relations: ['productsAndServicesMeta'] });
+    const response = await this.findAll({ limit, page, cp_id: user.companyProfile.id }, { relations: ['productsAndServicesMeta'] });
     return new ResponseDto(HttpStatus.OK, 'Company profile products and services fetched successfully!', response);
   }
 
@@ -63,10 +61,10 @@ export class CpProductsAndServicesController extends BaseController<CpProductsAn
       { name: 'supportingMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
     ]),
   )
-  async updateCompanyProfileLegalStructureById(@User() user: any, @Param('id') id: number, @Body('data') data: string, @UploadedFiles() files: CpProductsAndServicesFiles): Promise<any> {
-    const updateCpProductsAndServicesDto = plainToInstance(UpdateCpProductsAndServicesDto, JSON.parse(data));
-    await validateOrReject(updateCpProductsAndServicesDto);
-    const response = await this.cpProductsAndServicesService.updateCpProductsAndService(id, user, updateCpProductsAndServicesDto, files);
+  async updateCompanyProfileLegalStructureById(@User() user: any, @Param('id') id: number, @Body() data: UpdateCpProductsAndServicesDto, @UploadedFiles() files: CpProductsAndServicesFiles): Promise<any> {
+    // const updateCpProductsAndServicesDto = plainToInstance(UpdateCpProductsAndServicesDto, JSON.parse(data));
+    // await validateOrReject(updateCpProductsAndServicesDto);
+    const response = await this.cpProductsAndServicesService.updateCpProductsAndService(id, user, data, files);
     return new ResponseDto(HttpStatus.OK, 'Compnay Profile Product or Service updated successfully!', response);
   }
 

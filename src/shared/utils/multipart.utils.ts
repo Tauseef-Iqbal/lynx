@@ -115,7 +115,6 @@ export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles =
     }
 
     if (isS3Url(assetUrl)) {
-      console.log({ assetUrl, existingAssets });
       // const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl && (!assetType || existing.type === assetType)));
       const existingAsset = Array.from(existingAssets).find((existing) => (typeof existing === 'string' ? existing === assetUrl : existing.url === assetUrl));
       // if (!existingAsset) {

@@ -61,7 +61,7 @@ export class CPResearchAndDevelopmentEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.revenue, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

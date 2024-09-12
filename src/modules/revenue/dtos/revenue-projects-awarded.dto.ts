@@ -5,6 +5,7 @@ import { IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
 export class AddRevenueProjectsAwardedDto {
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({ description: 'Project Name', example: 'Project X' })

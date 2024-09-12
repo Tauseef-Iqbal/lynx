@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, Max, Min } from 'class-validator';
+import { IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 export class GetByIdDto {
   @ApiPropertyOptional({ required: false })
@@ -22,4 +22,10 @@ export class GetAllDto {
   @Min(1)
   @IsNumber()
   page: number = 1;
+
+  @ApiPropertyOptional({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  cp_id?: number;
 }

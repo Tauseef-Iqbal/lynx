@@ -24,6 +24,7 @@ import { DataComplianceDocumentationEntity } from './cp-data-compliance-document
 import { ControlsAndProtocolEntity } from './cp-controls-and-protocols.entity';
 import { CPDataManagementAndStorageEntity } from './cp-data-management-and-storage.entity';
 import { CPFCIAndCUIEntity } from './cp-fci-and-cui.entity';
+import { CompanyOverviewEntity } from './company-overview.entity';
 
 @Entity({ name: 'company_profile' })
 export class CompanyProfileEntity extends CustomBaseEntity {
@@ -154,6 +155,9 @@ export class CompanyProfileEntity extends CustomBaseEntity {
 
   @OneToOne(() => CPFCIAndCUIEntity, (FCIAndCUI) => FCIAndCUI.companyProfile)
   FCIAndCUI: CPFCIAndCUIEntity;
+
+  @OneToOne(() => CompanyOverviewEntity, (co) => co.companyProfile)
+  companyOverview: CompanyOverviewEntity;
 
   @BeforeInsert()
   @BeforeUpdate()

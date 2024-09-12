@@ -11,4 +11,5 @@ export interface IGetById {
 export interface IGetAll {
   page?: number;
   limit?: number;
+  cp_id?: number;
 }

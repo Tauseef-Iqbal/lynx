@@ -9,7 +9,7 @@ export class CPOwnershipStructureEntity extends CustomBaseEntity {
   @Column({ name: 'ownership_agreements', type: 'boolean', nullable: true })
   ownershipAgreements?: boolean;
 
-  @Column({ name: 'ownership_agreements_details', type: 'text', nullable: true })
+  @Column({ name: 'ownership_agreements_details', type: 'jsonb', nullable: true })
   ownershipAgreementsDetails?: string;
 
   @Column({ name: 'foreign_agreements_contracts', type: 'boolean', nullable: true })
@@ -21,13 +21,13 @@ export class CPOwnershipStructureEntity extends CustomBaseEntity {
   @Column({ name: 'foreign_interest_10_percent', type: 'boolean', nullable: true })
   foreignInterest10Percent?: boolean;
 
-  @Column({ name: 'foreign_interest_10_percent_details', type: 'text', nullable: true })
+  @Column({ name: 'foreign_interest_10_percent_details', type: 'jsonb', nullable: true })
   foreignInterest10PercentDetails?: string;
 
   @Column({ name: 'business_foreign_ownership', type: 'boolean', nullable: true })
   businessForeignOwnership?: boolean;
 
-  @Column({ name: 'business_foreign_ownership_details', type: 'text', nullable: true })
+  @Column({ name: 'business_foreign_ownership_details', type: 'jsonb', nullable: true })
   businessForeignOwnershipDetails?: string;
 
   @Column({ name: 'voting_nominee_10_percent', type: 'boolean', nullable: true })
@@ -39,7 +39,7 @@ export class CPOwnershipStructureEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.ownershipStructure, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

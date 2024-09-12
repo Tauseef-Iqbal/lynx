@@ -114,7 +114,7 @@ export class CPSupplyChainEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.toolsAndApplications, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

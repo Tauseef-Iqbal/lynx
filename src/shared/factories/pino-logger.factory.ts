@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { v4 as uuidv4 } from 'uuid';
 
 export function createLoggerOptions(configService: ConfigService) {
   return {
@@ -12,7 +13,8 @@ export function createLoggerOptions(configService: ConfigService) {
       },
       serializers: {
         req: (req) => ({
-          id: req.id,
+          // id: req.id,
+          id: uuidv4(),
           method: req.method,
           url: req.url,
           body: req.raw.body,

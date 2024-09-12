@@ -1,10 +1,12 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class CreateCpCertificationDto {
   @ApiPropertyOptional({ description: 'The ID of the certificate.' })
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({ description: 'Category of the certification' })

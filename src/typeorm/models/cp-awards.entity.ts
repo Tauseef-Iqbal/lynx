@@ -45,7 +45,7 @@ export class CpAwardEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CompanyProfileEntity, (company) => company.cpAwards, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

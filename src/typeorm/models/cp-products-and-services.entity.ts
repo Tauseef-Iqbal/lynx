@@ -40,7 +40,7 @@ export class CpProductsAndServicesEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.cpRequiredSystem, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

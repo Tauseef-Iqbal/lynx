@@ -78,6 +78,7 @@ export class CpPastPerformanceEntity extends CustomBaseEntity {
     name: 'subcontractors_partners',
     nullable: true,
     type: 'varchar',
+    array: true,
   })
   subcontractorsPartners?: string[];
 
@@ -102,7 +103,7 @@ export class CpPastPerformanceEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.pastPerformance, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

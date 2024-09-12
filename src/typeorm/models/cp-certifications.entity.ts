@@ -32,7 +32,7 @@ export class CpCertificationsEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CompanyProfileEntity, (company) => company.cpCertifications, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

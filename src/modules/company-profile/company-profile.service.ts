@@ -69,7 +69,6 @@ export class CompanyProfileService extends BaseTypeOrmCrudService<CompanyProfile
   async getMyCompanyProfile(user: UserEntity): Promise<CompanyProfileEntity> {
     // if (!user.companyProfile.id) throw new Error(`You're not registered. Please create your company profile.`);
     if (!user.companyProfile.id) return null;
-
     const companyProfile = await this.findByFilter({ userProfile: { id: user.id } });
 
     return companyProfile;

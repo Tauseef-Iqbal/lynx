@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { ErrorResponse } from '../interfaces';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AxiosError } from 'axios';
 import { ValidationError } from 'class-validator';
 
@@ -9,6 +9,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+
+    const request = ctx.getRequest<Request>();
+    console.log(request.id);
+
     const status = exception.getStatus ? exception.getStatus() : 400;
     let errorMessage = exception?.message || 'Bad Request';
     let details = undefined;

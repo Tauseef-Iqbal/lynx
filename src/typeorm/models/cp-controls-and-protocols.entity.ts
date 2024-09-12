@@ -74,7 +74,7 @@ export class ControlsAndProtocolEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.controlsAndProtocol, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

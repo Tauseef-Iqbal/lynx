@@ -4,6 +4,15 @@ import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
+export const JSONTransformer = {
+  from(value: string | undefined | null) {
+    return value ? JSON.parse(value) : value;
+  },
+  to(value: string | undefined | null) {
+    return value ? JSON.stringify(value) : value;
+  },
+};
+
 @Entity({ name: 'cp_personnel' })
 export class CPPersonnelEntity extends CustomBaseEntity {
   @Column({ name: 'total_employees', type: 'enum', enum: TotalEmployees, nullable: true })
@@ -15,7 +24,13 @@ export class CPPersonnelEntity extends CustomBaseEntity {
   @Column({ name: 'active_security_clearances_employees', type: 'varchar', enum: ActiveSecurityClearancesEmployees, nullable: true })
   activeSecurityClearancesEmployees?: string;
 
-  @Column({ name: 'security_clearances_held_by_employees', type: 'jsonb', array: true, nullable: true })
+  @Column({
+    name: 'security_clearances_held_by_employees',
+    type: 'text',
+    // array: true,
+    nullable: true,
+    transformer: JSONTransformer,
+  })
   securityClearancesHeldByEmployees?: string[];
 
   @Column({ name: 'employees_involved_in_govt_contracts', type: 'varchar', enum: EmployeesInvolvedInGovtContracts, nullable: true })
@@ -45,7 +60,13 @@ export class CPPersonnelEntity extends CustomBaseEntity {
   @Column({ name: 'foci_designation_details', type: 'text', nullable: true })
   FOCIDesignationDetails?: string;
 
-  @Column({ name: 'foci_designation_files', type: 'jsonb', array: true, nullable: true })
+  @Column({
+    name: 'foci_designation_files',
+    type: 'text',
+    // array: true,
+    nullable: true,
+    transformer: JSONTransformer,
+  })
   FOCIDesignationFiles?: string[];
 
   @Column({ name: 'non_us_employees', type: 'boolean', nullable: true })
@@ -87,7 +108,7 @@ export class CPPersonnelEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.personnel, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

@@ -14,14 +14,21 @@ export class BaseTypeOrmCrudService<T> {
   }
 
   async findAll(inputParams: IGetAll, options?: any): Promise<{ data: T[]; count: number; totalCount: number; totalPages: number }> {
-    const { page, limit } = inputParams;
-    const [data, count] = await this.repository.findAndCount({
+    const { page, limit, cp_id } = inputParams;
+
+    const queryOptions: any = {
       skip: (page - 1) * limit,
       take: limit,
       relations: options?.relations,
-    });
+    };
 
-    const totalCount = await this.repository.count();
+    if (cp_id) {
+      queryOptions.where = { companyProfile: { id: cp_id } };
+    }
+
+    const [data, count] = await this.repository.findAndCount(queryOptions);
+
+    const totalCount = await this.repository.count({ where: queryOptions.where });
     const totalPages = Math.ceil(totalCount / limit);
 
     return { data, count, totalCount, totalPages };

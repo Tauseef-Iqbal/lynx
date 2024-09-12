@@ -1,7 +1,9 @@
-import { ICybersecurityAuditsDetails, ICybersecurityStandardsCompliantDetails, ICybersecurityTrainingDetails, IEncryptDataDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPenetrationTestingDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { ICybersecurityAuditsDetails, ICybersecurityTrainingDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPenetrationTestingDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
+import { CPCybersecurityStandardsComplianceDetailsEntity } from './cp-cybersecurity-standards-compliance-details.entity';
+import { CPCybersecurityEncryptionDetailsEntity } from './cp-cybersecurity-encryption-details.entity';
 
 @Entity({ name: 'cp_cybersecurity' })
 export class CPCybersecurityEntity extends CustomBaseEntity {
@@ -26,12 +28,6 @@ export class CPCybersecurityEntity extends CustomBaseEntity {
   @Column({ name: ' cybersecurity_standards_compliant', type: 'boolean', nullable: true })
   cybersecurityStandardsCompliant?: boolean;
 
-  @Column({ name: 'cybersecurity_standards_compliant_details', type: 'jsonb', nullable: true })
-  cybersecurityStandardsCompliantDetails?: ICybersecurityStandardsCompliantDetails;
-
-  @Column({ name: 'cybersecurity_standards_compliant_files', type: 'text', array: true, nullable: true })
-  cybersecurityStandardsCompliantFiles?: string[];
-
   @Column({ name: ' incident_response_plan', type: 'boolean', nullable: true })
   incidentResponsePlan?: boolean;
 
@@ -46,12 +42,6 @@ export class CPCybersecurityEntity extends CustomBaseEntity {
 
   @Column({ name: 'encrypt_data', type: 'boolean', nullable: true })
   encryptData?: boolean;
-
-  @Column({ name: 'encrypt_data_details', type: 'jsonb', nullable: true })
-  encryptDataDetails?: IEncryptDataDetails;
-
-  @Column({ name: 'encrypt_data_files', type: 'text', array: true, nullable: true })
-  encryptDataFiles?: string[];
 
   @Column({ name: 'cybersecurity_audits', type: 'boolean', nullable: true })
   cybersecurityAudits?: boolean;
@@ -93,12 +83,22 @@ export class CPCybersecurityEntity extends CustomBaseEntity {
   primaryFollowUpContact?: IPrimaryFollowUpContact;
 
   @Index()
-  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.toolsAndApplications, {
+  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.cybersecurity, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn({ name: 'cp_id' })
   companyProfile: CompanyProfileEntity;
+
+  @OneToMany(() => CPCybersecurityStandardsComplianceDetailsEntity, (cybersecurityStandardsComplianceDetails) => cybersecurityStandardsComplianceDetails.cybersecurity, {
+    cascade: ['insert', 'update'],
+  })
+  cybersecurityStandardsComplianceDetails: CPCybersecurityStandardsComplianceDetailsEntity[];
+
+  @OneToMany(() => CPCybersecurityStandardsComplianceDetailsEntity, (cybersecurityEncryptionDetails) => cybersecurityEncryptionDetails.cybersecurity, {
+    cascade: ['insert', 'update'],
+  })
+  cybersecurityEncryptionDetails: CPCybersecurityEncryptionDetailsEntity[];
 }

@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { CompanyProfileGuard } from 'src/shared/middlewares';
 import { CreateRequiredSystemDto, UpdateRequiredSystemDto } from './dtos';
 import { BaseController } from 'src/shared/services';
-import { RequiredSystemEntity } from 'src/typeorm/models';
+import { RequiredSystemEntity, UserEntity } from 'src/typeorm/models';
 import { GetAllDto, ResponseDto } from 'src/shared/dtos';
 import { User } from 'src/shared/decorators';
 
@@ -21,7 +21,7 @@ export class RequiredSystemController extends BaseController<RequiredSystemEntit
   @Post()
   @ApiOperation({ summary: 'Create company profile required system' })
   @ApiBody({ type: CreateRequiredSystemDto })
-  async createRequiredSystem(@User() user: any, @Body() createRequiredSystemDto: CreateRequiredSystemDto) {
+  async createRequiredSystem(@User() user: UserEntity, @Body() createRequiredSystemDto: CreateRequiredSystemDto) {
     const result = await this.requiredSystemService.createRequiredSystem(user, createRequiredSystemDto);
     return new ResponseDto(HttpStatus.CREATED, 'Required System created successfully', result);
   }
@@ -35,9 +35,9 @@ export class RequiredSystemController extends BaseController<RequiredSystemEntit
 
   @ApiOperation({ summary: 'Get Company profile required system' })
   @Get()
-  async getRequiredSystems(@Query() queryParams: GetAllDto): Promise<any> {
+  async getRequiredSystems(@User() user: UserEntity, @Query() queryParams: GetAllDto): Promise<any> {
     const { page = 1, limit = 10 } = queryParams;
-    const response = await this.findAll({ limit, page }, { relations: { businessClassifications: true, certifications: true, systemTypes: true } });
+    const response = await this.findAll({ limit, page, cp_id: user.companyProfile.id }, { relations: { businessClassifications: true, certifications: true, systemTypes: true } });
     return new ResponseDto(HttpStatus.OK, 'Company profile required system fetched successfully!', response);
   }
 

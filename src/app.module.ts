@@ -40,6 +40,7 @@ import { CpControlsAndProtocolsModule } from './modules/cp-controls-and-protocol
 import { ResearchAndDevelopmentModule } from './modules/research-and-development';
 import { DataManagementAndStorageModule } from './modules/data-management-and-storage';
 import { FCIAndCUIModule } from './modules/fci-and-cui';
+import { CompanyOrverviewModule } from './modules/company-orverview/company-orverview.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { FCIAndCUIModule } from './modules/fci-and-cui';
     CpControlsAndProtocolsModule,
     DataManagementAndStorageModule,
     FCIAndCUIModule,
+    CompanyOrverviewModule,
   ],
   providers: [
     {

@@ -128,8 +128,13 @@ export const filesToUpdate = async (user: any, files: Express.Multer.File[], exi
 };
 
 export const filesToDelete = async (user: any, urls: string[], s3Service: S3Service, folderName: string) => {
-  for (const [url] of urls) {
-    await s3Service.deleteFile(url.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop());
+  for (const url of urls) {
+    if (url) {
+      const fileName = url.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop();
+      if (fileName) {
+        await s3Service.deleteFile(fileName);
+      }
+    }
   }
 };
 

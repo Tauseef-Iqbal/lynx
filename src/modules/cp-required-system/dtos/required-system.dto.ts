@@ -1,10 +1,11 @@
 import { IsString, IsOptional, ValidateNested, IsBoolean, IsDate, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class RequiredSystemBusinessClassificationDto {
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @IsString()
@@ -14,6 +15,7 @@ export class RequiredSystemBusinessClassificationDto {
 export class RequiredSystemCertificationDto {
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @IsString()
@@ -32,6 +34,7 @@ export class RequiredSystemCertificationDto {
 export class RequiredSystemTypesDto {
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @IsString()

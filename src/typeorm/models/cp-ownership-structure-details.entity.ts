@@ -1,11 +1,17 @@
 import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { CPOwnershipStructureEntity } from './cp-ownership-structure.entity';
 import { CustomBaseEntity } from './custom-base.entity';
+import { RoundType, SharesType } from 'src/modules/ownership-structure/enums';
 
 @Entity({ name: 'cp_ownership_structure_details' })
 export class CPOwnershipStructureDetailsEntity extends CustomBaseEntity {
-  @Column({ name: 'round_type', type: 'text', nullable: true })
-  roundType?: string;
+  @Column({
+    name: 'round_type',
+    type: 'enum',
+    enum: RoundType,
+    nullable: true,
+  })
+  roundType?: RoundType;
 
   @Column({ name: 'investor_name', type: 'text', nullable: true })
   investorName?: string;
@@ -16,8 +22,13 @@ export class CPOwnershipStructureDetailsEntity extends CustomBaseEntity {
   @Column({ name: 'number_of_shares', type: 'int', nullable: true })
   numberOfShares?: number;
 
-  @Column({ name: 'types_of_shares', type: 'jsonb', nullable: true })
-  typesOfShares?: string[] | string;
+  @Column({
+    name: 'types_of_shares',
+    type: 'enum',
+    enum: SharesType,
+    nullable: true,
+  })
+  typesOfShares?: SharesType;
 
   @Column({ name: 'capital_invested', type: 'decimal', nullable: true })
   capitalInvested?: number;

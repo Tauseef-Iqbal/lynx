@@ -1,11 +1,12 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsArray, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class PastPerformanceTestimonialsDto {
   @ApiPropertyOptional({ description: 'The ID of the testimonials.' })
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({
@@ -50,6 +51,7 @@ export class CreatePastPerformanceDto {
   })
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   contractNumber?: number;
 
   @ApiPropertyOptional({
@@ -95,6 +97,7 @@ export class CreatePastPerformanceDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => (value ? value.split(',').map((item: string) => item.trim()) : []))
   subcontractorsPartners?: string[];
 
   @ApiPropertyOptional({

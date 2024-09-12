@@ -1,9 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class AddForeignFundingForeignAffiliationDto {
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
   id?: number;
 
   @ApiPropertyOptional({ description: 'Name of Foreign Entity', example: 'Project X' })

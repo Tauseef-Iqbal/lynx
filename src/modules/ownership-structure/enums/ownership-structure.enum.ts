@@ -1,14 +1,29 @@
-export enum GeneratedRevenueRange {
-  LESS_THAN_100K = 'Less than $100,000',
-  BETWEEN_100K_AND_499K = '$100,000 - $499,999',
-  BETWEEN_500K_AND_999K = '$500,000 - $999,999',
-  BETWEEN_1M_AND_4_99M = '$1 million - $4.99 million',
-  BETWEEN_5M_AND_9_99M = '$5 million - $9.99 million',
-  BETWEEN_10M_AND_49_99M = '$10 million - $49.99 million',
-  MORE_THAN_50M = '$50 million or more',
+export enum RoundType {
+  FOUNDER_EQUITY = `Founder's Equity/Debt`,
+  DEBT = 'Debt',
+  SEED = 'SEED/Angel',
+  SERIES_A = 'Series A',
+  SERIES_B = 'Series B',
+  SERIES_C = 'Series C',
+  SERIES_D = 'Series D',
+  PE = 'PE',
 }
 
-export enum CompanyRevenueStream {
-  DEPENDENT = 'Dependent on a few key customers',
-  DIVERSIFIED = 'Diversified across multiple customers',
+export enum SharesType {
+  COMMON_STOCK = 'Common Stock',
+  PREFERRED = 'Preferred',
+  OPTIONS = 'Options',
+}
+
+export enum RelationshipType {
+  JOINT_VENTURES = 'Joint Venture',
+  ADVISORS = 'Advisors',
+  MENTOR_PROTEGE = 'Mentor Protégé',
+  INDEMNITY = 'Indemnity',
+  CONSULTING = 'Consulting',
+  DISTRIBUTORSHIP = 'Distributorship',
+  LISCENSING = 'Licensing',
+  TEAMING = 'Teaming',
+  TRUST = 'Trust',
+  FRANCHISE = 'Franchise',
 }

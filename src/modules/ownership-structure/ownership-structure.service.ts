@@ -65,7 +65,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
 
       for (const keyManagement of ownershipStructureKeyManagement) {
         if (keyManagement.id) {
-          const existedkeyManagement = await this.ownershipStructureKeyManagementRepository.findOne({ where: { id: keyManagement.id, isDeleted: false } });
+          const existedkeyManagement = await this.ownershipStructureKeyManagementRepository.findOne({ where: { id: keyManagement.id } });
           if (!existedkeyManagement) throw new NotFoundException(`Ownership Structure Key Management with id ${keyManagement.id} isn't associated with the Ownership Structure with id ${id}`);
           await this.ownershipStructureKeyManagementRepository.update(existedkeyManagement.id, keyManagement);
         } else {

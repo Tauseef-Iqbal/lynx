@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsArray, IsDateString } from 'class-validator';
 
 export class CreateCpAwardDto {
@@ -7,20 +7,21 @@ export class CreateCpAwardDto {
   })
   @IsString()
   @IsOptional()
-  nameOfAward: string;
+  nameOfAward?: string;
 
   @ApiProperty({
     description: 'The organization that granted the award',
   })
   @IsString()
   @IsOptional()
-  awardingOrganization: string;
+  awardingOrganization?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The date the award was granted',
   })
   @IsDateString()
-  dateOfAward: string;
+  @IsOptional()
+  dateOfAward?: string;
 
   @ApiProperty({
     description: 'A brief description of the award purpose',

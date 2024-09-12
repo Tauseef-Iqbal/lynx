@@ -97,7 +97,7 @@ export class CPFinancialHealthEntity extends CustomBaseEntity {
   @Index()
   @OneToOne(() => CompanyProfileEntity, (company) => company.financialHealth, {
     nullable: false,
-    cascade: true,
+    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

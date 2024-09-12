@@ -5,7 +5,7 @@ import { ICapacityInfoDetails } from 'src/modules/advanced-business-information/
 import { CertificateStatus, ClearanceStatus } from '../enums';
 
 export function stringToBoolean(value: string): boolean {
-  return value?.toString()?.toLowerCase() === 'true';
+  return typeof value == 'boolean' ? value : value?.toString()?.toLowerCase() === 'true';
 }
 
 export function TransformBoolean() {

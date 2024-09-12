@@ -42,3 +42,4 @@ export * from './cp-research-and-development-research-papers.entity';
 export * from './cp-research-and-development.entity';
 export * from './cp-data-management-and-storage.entity';
 export * from './cp-fci-and-cui.entity';
+export * from './company-overview.entity';

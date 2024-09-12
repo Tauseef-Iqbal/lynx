@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
 import { CompanyProfileGuard } from 'src/shared/middlewares';
 import { BaseController } from 'src/shared/services';
-import { CpCertificationsEntity } from 'src/typeorm/models';
+import { CpCertificationsEntity, UserEntity } from 'src/typeorm/models';
 import { CreateCpCertificationDto, UpdateCpCertificationDto } from './dtos';
 import { CertificationsService } from './certifications.service';
 import { User } from 'src/shared/decorators';
@@ -24,7 +24,7 @@ export class CertificationsController extends BaseController<CpCertificationsEnt
     type: [CreateCpCertificationDto],
   })
   @Post()
-  async addCertifications(@User() user: any, @Body() createCpCertificationDto: CreateCpCertificationDto[]) {
+  async addCertifications(@User() user: UserEntity, @Body() createCpCertificationDto: CreateCpCertificationDto[]) {
     const certifications = await this.certificationsService.addCertifications(user, createCpCertificationDto);
     return new ResponseDto(HttpStatus.CREATED, 'Certifications added successfully!', certifications).toJSON();
   }
@@ -38,9 +38,9 @@ export class CertificationsController extends BaseController<CpCertificationsEnt
 
   @ApiOperation({ summary: 'Get Company profile certifications' })
   @Get()
-  async getCpCertifications(@Query() queryParams: GetAllDto): Promise<any> {
+  async getCpCertifications(@User() user: UserEntity, @Query() queryParams: GetAllDto): Promise<any> {
     const { page = 1, limit = 10 } = queryParams;
-    const response = await this.findAll({ limit, page });
+    const response = await this.findAll({ limit, page, cp_id: user.companyProfile.id });
     return new ResponseDto(HttpStatus.OK, 'Company profile certifications fetched successfully!', response).toJSON();
   }
 

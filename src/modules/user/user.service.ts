@@ -1,22 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { validateOrReject } from 'class-validator';
+import ApiError from 'src/shared/utils/api.error';
 import { Repository } from 'typeorm';
 import { CompanyEntity, SocialMediaEntity, UserEntity, UserRepresentationEntity } from '../../typeorm/models';
-import ApiError from 'src/shared/utils/api.error';
 import { CreateUserDto } from './dto/user.dto';
-import { validateOrReject } from 'class-validator';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userEntityRepository: Repository<UserEntity>,
-    @InjectRepository(UserRepresentationEntity)
-    private readonly userRepresentationEntityRepository: Repository<UserRepresentationEntity>,
-    @InjectRepository(CompanyEntity)
-    private readonly companyEntityRepository: Repository<CompanyEntity>,
-    @InjectRepository(SocialMediaEntity)
-    private readonly companySocialMediaRepository: Repository<SocialMediaEntity>,
+    @InjectRepository(UserEntity) private readonly userEntityRepository: Repository<UserEntity>,
+    @InjectRepository(UserRepresentationEntity) private readonly userRepresentationEntityRepository: Repository<UserRepresentationEntity>,
+    @InjectRepository(CompanyEntity) private readonly companyEntityRepository: Repository<CompanyEntity>,
+    @InjectRepository(SocialMediaEntity) private readonly companySocialMediaRepository: Repository<SocialMediaEntity>,
   ) {}
 
   saveForgotPasswordUuid(email: string, uuid: string) {
@@ -32,6 +28,7 @@ export class UserService {
         companyProfile: true,
       },
     });
+
     return res;
   }
 
