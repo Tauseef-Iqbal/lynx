@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RequiredSystemEntity } from 'src/typeorm/models';
+import { RequiredSystemEntity, UserEntity } from 'src/typeorm/models';
 import { CreateRequiredSystemDto, UpdateRequiredSystemDto } from './dtos';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
 import { RequiredSystemBusinessClassificationService } from './re-business-classification.service';
@@ -20,30 +20,25 @@ export class RequiredSystemService extends BaseTypeOrmCrudService<RequiredSystem
     super(requiredSystemRepository);
   }
 
-  async createRequiredSystem(user: any, createRequiredSystemDto: CreateRequiredSystemDto): Promise<RequiredSystemEntity> {
+  async createRequiredSystem(user: UserEntity, createRequiredSystemDto: CreateRequiredSystemDto): Promise<RequiredSystemEntity> {
     const requiredSystem = await this.create({ ...createRequiredSystemDto, companyProfile: { id: user.companyProfile.id } } as unknown as RequiredSystemEntity);
 
     if (createRequiredSystemDto?.businessClassifications?.length > 0) {
-      await this.requiredSystemBusinessClassificationService.createRquiredSystemBusinessCertification(requiredSystem.id, createRequiredSystemDto.businessClassifications);
+      await this.requiredSystemBusinessClassificationService.upsertRquiredSystemBusinessCertification(requiredSystem.id, createRequiredSystemDto.businessClassifications);
     }
 
     if (createRequiredSystemDto?.certifications.length > 0) {
-      await this.requiredSystemCertificationService.createRquiredSystemCertification(requiredSystem.id, createRequiredSystemDto.certifications);
+      await this.requiredSystemCertificationService.upsertRquiredSystemCertification(requiredSystem.id, createRequiredSystemDto.certifications);
     }
 
     if (createRequiredSystemDto?.systemTypes?.length > 0) {
-      await this.requiredSystemTypeService.createRquiredSystemType(requiredSystem.id, createRequiredSystemDto.systemTypes);
+      await this.requiredSystemTypeService.upsertRquiredSystemType(requiredSystem.id, createRequiredSystemDto.systemTypes);
     }
 
     return requiredSystem;
   }
 
-  async updateRequiredSystem(id: number, updateRequiredSystemDto: UpdateRequiredSystemDto): Promise<RequiredSystemEntity> {
-    const requiredSystem = await this.findById(id, { relations: { companyProfile: true } });
-    if (!requiredSystem) {
-      throw new Error('Company required system not associated with this company profile');
-    }
-
+  async updateRequiredSystem(requiredSystem: RequiredSystemEntity, updateRequiredSystemDto: UpdateRequiredSystemDto): Promise<RequiredSystemEntity> {
     if (updateRequiredSystemDto?.businessClassifications?.length > 0) {
       await this.requiredSystemBusinessClassificationService.upsertRquiredSystemBusinessCertification(requiredSystem.id, updateRequiredSystemDto.businessClassifications);
 
@@ -62,6 +57,6 @@ export class RequiredSystemService extends BaseTypeOrmCrudService<RequiredSystem
       delete updateRequiredSystemDto.systemTypes;
     }
 
-    return this.update(id, updateRequiredSystemDto as unknown as RequiredSystemEntity);
+    return this.update(requiredSystem.id, updateRequiredSystemDto as unknown as RequiredSystemEntity);
   }
 }

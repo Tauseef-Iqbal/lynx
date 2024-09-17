@@ -141,7 +141,7 @@ export class CompanyProfileEntity extends CustomBaseEntity {
   @OneToOne(() => CPPersonnelEntity, (personnel) => personnel.companyProfile)
   personnel: CPPersonnelEntity;
 
-  @OneToOne(() => CPPointsOfContactEntity, (pointsOfContact) => pointsOfContact.companyProfile)
+  @OneToMany(() => CPPointsOfContactEntity, (pointsOfContact) => pointsOfContact.companyProfile)
   pointsOfContact: CPPointsOfContactEntity[];
 
   @OneToOne(() => DataComplianceDocumentationEntity, (dataComplianceDocumentationEntity) => dataComplianceDocumentationEntity.companyProfile)

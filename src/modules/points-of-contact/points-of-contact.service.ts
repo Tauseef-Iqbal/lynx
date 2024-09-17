@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
@@ -14,28 +14,54 @@ export class PointsOfContactService extends BaseTypeOrmCrudService<CPPointsOfCon
     super(pointsOfContactRepository);
   }
 
-  async addPointsOfContact(user: UserEntity, addPointsOfContactDto: AddPointsOfContactDto): Promise<CPPointsOfContactEntity> {
-    const existedPointsOfContact = await this.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
-    if (existedPointsOfContact) {
-      return this.updatePointsOfContact(existedPointsOfContact.id, user, addPointsOfContactDto);
+  async addPointsOfContact(user: UserEntity, addPointsOfContactDto: AddPointsOfContactDto[]): Promise<CPPointsOfContactEntity[]> {
+    const pointsOfContacts: CPPointsOfContactEntity[] = [];
+
+    for (const incomingPointsOfContact of addPointsOfContactDto) {
+      let existingPointOfContact: CPPointsOfContactEntity;
+
+      if (incomingPointsOfContact.id) {
+        existingPointOfContact = await this.findByFilter({ id: incomingPointsOfContact.id });
+        if (existingPointOfContact) {
+          await this.pointsOfContactRepository.update(existingPointOfContact.id, incomingPointsOfContact as unknown as CPPointsOfContactEntity);
+          const updatedContact = await this.findById(existingPointOfContact.id);
+          pointsOfContacts.push(updatedContact);
+        } else {
+          const newContact = await this.create({ ...incomingPointsOfContact, companyProfile: { id: user.companyProfile.id } } as unknown as CPPointsOfContactEntity);
+          pointsOfContacts.push(newContact);
+        }
+      } else {
+        const newContact = await this.create({ ...incomingPointsOfContact, companyProfile: { id: user.companyProfile.id } } as unknown as CPPointsOfContactEntity);
+        pointsOfContacts.push(newContact);
+      }
     }
 
-    return this.create({ ...addPointsOfContactDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPPointsOfContactEntity);
+    return pointsOfContacts;
   }
 
-  async updatePointsOfContact(id: number, user: UserEntity, updatePointsOfContactDto: UpdatePointsOfContactDto): Promise<CPPointsOfContactEntity> {
-    const pointsOfContact = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    // if (!pointsOfContact) {
-    //   throw new Error('Points Of Contact not associated with this company profile');
-    // }
+  async updatePointsOfContact(user: UserEntity, updatePointsOfContactDtos: UpdatePointsOfContactDto[]): Promise<CPPointsOfContactEntity[]> {
+    const updatedContacts: CPPointsOfContactEntity[] = [];
 
-    if (!pointsOfContact) return null;
+    for (const updatePointsOfContactDto of updatePointsOfContactDtos) {
+      if (updatePointsOfContactDto.id) {
+        const pointsOfContact = await this.findByFilter({ id: updatePointsOfContactDto.id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
+        if (pointsOfContact) {
+          await this.pointsOfContactRepository.update(pointsOfContact.id, updatePointsOfContactDto as unknown as CPPointsOfContactEntity);
+          const updatedContact = await this.findById(pointsOfContact.id);
+          updatedContacts.push(updatedContact);
+        } else {
+          throw new PreconditionFailedException(`Point of contact with ID ${updatePointsOfContactDto.id} not found or does not belong to this company profile.`);
+        }
+      } else {
+        throw new PreconditionFailedException('Please use a valid ID to update the Point of Contact.');
+      }
+    }
 
-    return this.update(id, updatePointsOfContactDto as unknown as CPPointsOfContactEntity);
+    return updatedContacts;
   }
 
-  async getMyPointsOfContact(companyProfileId: number): Promise<CPPointsOfContactEntity> {
-    const myPointsOfContact = await this.findByFilter({ companyProfile: { id: companyProfileId }, isDeleted: false });
+  async getMyPointsOfContact(companyProfileId: number): Promise<CPPointsOfContactEntity[]> {
+    const myPointsOfContact = await this.findManyByFilter({ companyProfile: { id: companyProfileId } });
     // if (!myPointsOfContact) {
     //   throw new NotFoundException('Points Of Contact not found against your company profile');
     // }
@@ -46,7 +72,7 @@ export class PointsOfContactService extends BaseTypeOrmCrudService<CPPointsOfCon
   }
 
   async deleteMyPointsOfContact(companyProfileId: number): Promise<CPPointsOfContactEntity> {
-    const myPointsOfContact = await this.getMyPointsOfContact(companyProfileId);
+    const myPointsOfContact = await this.findByFilter({ companyProfile: { id: companyProfileId } });
     return this.update(myPointsOfContact.id, { isDeleted: true } as unknown as CPPointsOfContactEntity);
   }
 }

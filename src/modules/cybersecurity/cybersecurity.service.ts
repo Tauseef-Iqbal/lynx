@@ -6,7 +6,7 @@ import { CPCybersecurityEntity, UserEntity } from 'src/typeorm/models';
 import { AddCybersecurityDto, UpdateCybersecurityDto } from './dtos';
 import { CybersecurityFiles } from './interfaces';
 import { CybersecurityFilesCategory } from './enums';
-import { processFilesToAdd } from 'src/shared/utils';
+import { processFilesToAdd, processFilesToUpdate } from 'src/shared/utils';
 import { S3Service } from '../global/providers';
 import { ConfigService } from '@nestjs/config';
 
@@ -27,89 +27,58 @@ export class CybersecurityService extends BaseTypeOrmCrudService<CPCybersecurity
       return this.updateCybersecurity(existedCybersecurity.id, user, addCybersecurityDto, files);
     }
 
-    // const { cybersecurityStandardsCompliant, cybersecurityStandardsComplianceDetails, encryptData, cybersecurityEncryptionDetails } = addCybersecurityDto;
-    // const { complianceFiles, encryptionFiles } = files;
+    if (addCybersecurityDto?.cybersecurityStandardsCompliant && (files?.cybersecurityStandardsCompliantFiles?.length || addCybersecurityDto?.cybersecurityStandardsCompliantFiles?.length)) {
+      addCybersecurityDto.cybersecurityStandardsCompliantFiles = await processFilesToAdd({
+        incomingFiles: files.cybersecurityStandardsCompliantFiles,
+        incomingS3AndBase64: addCybersecurityDto.cybersecurityStandardsCompliantFiles,
+        keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.CybersecurityStandardsCompliant}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
+    }
 
-    // if (cybersecurityStandardsCompliant) {
-    //   if (complianceFiles || cybersecurityStandardsComplianceDetails?.length) {
-    //     for (const cybersecurityStandardsComplianceDetail of cybersecurityStandardsComplianceDetails) {
-    //       cybersecurityStandardsComplianceDetail.complianceFiles = await processFilesToAdd({
-    //         incomingFiles: complianceFiles,
-    //         incomingS3AndBase64: cybersecurityStandardsComplianceDetail.complianceFiles,
-    //         keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.CybersecurityStandardsCompliant}`,
-    //         configService: this.configService,
-    //         s3Service: this.s3Service,
-    //       });
-    //     }
-    //   }
-    // }
-
-    // if (addCybersecurityDto?.encryptData && (files?.encryptionFiles?.length || addCybersecurityDto?.cybersecurityEncryptionDetails?.encryptionFiles?.length)) {
-    //   addCybersecurityDto.cybersecurityEncryptionDetails.encryptionFiles = await processFilesToAdd({
-    //     incomingFiles: files.encryptionFiles,
-    //     incomingS3AndBase64: addCybersecurityDto.cybersecurityEncryptionDetails.encryptionFiles,
-    //     keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.EncryptionData}`,
-    //     configService: this.configService,
-    //     s3Service: this.s3Service,
-    //   });
-    // }
+    if (addCybersecurityDto?.encryptData && (files?.encryptDataFiles?.length || addCybersecurityDto?.encryptDataFiles?.length)) {
+      addCybersecurityDto.encryptDataFiles = await processFilesToAdd({
+        incomingFiles: files.encryptDataFiles,
+        incomingS3AndBase64: addCybersecurityDto.encryptDataFiles,
+        keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.EncryptionData}`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      });
+    }
 
     return this.create({ ...addCybersecurityDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPCybersecurityEntity);
   }
 
   async updateCybersecurity(id: number, user: UserEntity, updateCybersecurityDto: UpdateCybersecurityDto, files: CybersecurityFiles): Promise<CPCybersecurityEntity> {
-    const cybercecurity = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
-    // if (!cybercecurity) {
+    const existingCybercecurity = await this.findByFilter({ id, companyProfile: { id: user.companyProfile.id } }, { relations: { companyProfile: true } });
+    // if (!existingCybercecurity) {
     //   throw new Error('Cybersecurity not associated with this company profile');
     // }
 
-    if (!cybercecurity) return null;
+    if (!existingCybercecurity) return null;
 
-    // if (updateCybersecurityDto?.cybersecurityStandardsCompliant && (files?.complianceFiles?.length || updateCybersecurityDto?.cybersecurityStandardsComplianceDetails?.complianceFiles?.length)) {
-    //   updateCybersecurityDto.cybersecurityStandardsComplianceDetails.complianceFiles = await processFilesToAdd({
-    //     incomingFiles: files.complianceFiles,
-    //     incomingS3AndBase64: updateCybersecurityDto.cybersecurityStandardsComplianceDetails.complianceFiles,
-    //     keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.CybersecurityStandardsCompliant}`,
-    //     configService: this.configService,
-    //     s3Service: this.s3Service,
-    //   });
-    // }
+    if (updateCybersecurityDto?.cybersecurityStandardsCompliant && (files?.cybersecurityStandardsCompliantFiles?.length || updateCybersecurityDto?.cybersecurityStandardsCompliantFiles?.length)) {
+      updateCybersecurityDto.cybersecurityStandardsCompliantFiles = await processFilesToUpdate({
+        existingFiles: existingCybercecurity.cybersecurityStandardsCompliantFiles,
+        incomingFiles: files.cybersecurityStandardsCompliantFiles,
+        incomingS3AndBase64: updateCybersecurityDto.cybersecurityStandardsCompliantFiles,
+        keyPrefix: `${existingCybercecurity.companyProfile.name}/${CybersecurityFilesCategory.CybersecurityStandardsCompliant}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
+    }
 
-    // if (updateCybersecurityDto?.encryptData && (files?.encryptionFiles?.length || updateCybersecurityDto?.cybersecurityEncryptionDetails?.encryptionFiles?.length)) {
-    //   updateCybersecurityDto.cybersecurityEncryptionDetails.encryptionFiles = await processFilesToAdd({
-    //     incomingFiles: files.encryptionFiles,
-    //     incomingS3AndBase64: updateCybersecurityDto.cybersecurityEncryptionDetails.encryptionFiles,
-    //     keyPrefix: `${user.companyProfile.name}/${CybersecurityFilesCategory.EncryptionData}`,
-    //     configService: this.configService,
-    //     s3Service: this.s3Service,
-    //   });
-    // }
-
-    // if (updateCybersecurityDto.cybersecurityStandardsComplianceDetails) {
-    //   const existingForeignAffiliationsIds: number[] = existedFundingSources.cybersecurityStandardsComplianceDetails.map((cybersecurityStandardsComplianceDetails) => Number(cybersecurityStandardsComplianceDetails.id));
-    //   const foreignAffiliationsIdsToKeep = updateCybersecurityDto.cybersecurityStandardsComplianceDetails.filter((cybersecurityStandardsComplianceDetails) => cybersecurityStandardsComplianceDetails.id).map((cybersecurityStandardsComplianceDetails) => cybersecurityStandardsComplianceDetails.id);
-    //   const foreignAffiliationsToDelete = existingForeignAffiliationsIds.filter((existingId) => !foreignAffiliationsIdsToKeep.includes(existingId));
-    //   if (foreignAffiliationsToDelete.length) {
-    //     await this.cybersecurityStandardsComplianceDetailsRepository.delete(foreignAffiliationsToDelete);
-    //   }
-
-    //   if (updateCybersecurityDto.cybersecurityStandardsComplianceDetails) {
-    //     for (const foreignAffiliation of updateCybersecurityDto.cybersecurityStandardsComplianceDetails) {
-    //       if (foreignAffiliation.id) {
-    //         await this.cybersecurityStandardsComplianceDetailsRepository.update(foreignAffiliation.id, foreignAffiliation);
-    //       } else {
-    //         const newForeignAffiliation = this.cybersecurityStandardsComplianceDetailsRepository.create({
-    //           ...foreignAffiliation,
-    //           fundingSources: existedFundingSources,
-    //         });
-    //         await this.cybersecurityStandardsComplianceDetailsRepository.save(newForeignAffiliation);
-    //       }
-    //     }
-    //   }
-    //   delete updateCybersecurityDto.cybersecurityStandardsComplianceDetails;
-    // } else {
-    //   await this.cybersecurityStandardsComplianceDetailsRepository.delete({ fundingSources: { id: existedFundingSources.id } });
-    // }
+    if (updateCybersecurityDto?.encryptData && (files?.encryptDataFiles?.length || updateCybersecurityDto?.encryptDataFiles?.length)) {
+      updateCybersecurityDto.encryptDataFiles = await processFilesToUpdate({
+        existingFiles: existingCybercecurity.encryptDataFiles,
+        incomingFiles: files.encryptDataFiles,
+        incomingS3AndBase64: updateCybersecurityDto.encryptDataFiles,
+        keyPrefix: `${existingCybercecurity.companyProfile.name}/${CybersecurityFilesCategory.EncryptionData}`,
+        s3Service: this.s3Service,
+        configService: this.configService,
+      });
+    }
 
     return this.update(id, updateCybersecurityDto as unknown as CPCybersecurityEntity);
   }
@@ -123,26 +92,6 @@ export class CybersecurityService extends BaseTypeOrmCrudService<CPCybersecurity
     if (!myCybersecurity) return null;
 
     return myCybersecurity;
-  }
-
-  async getCybersecurityByFilter(filter: any): Promise<CPCybersecurityEntity> {
-    return this.findByRelationFilters(filter, {
-      relations: {
-        companyProfile: 'companyProfile',
-        cybersecurityStandardsComplianceDetails: 'cybersecurityStandardsComplianceDetails',
-        cybersecurityEncryptionDetails: 'cybersecurityEncryptionDetails',
-      },
-      relationFilters: {
-        cybersecurityStandardsComplianceDetails: {
-          condition: 'cybersecurityStandardsComplianceDetails.isDeleted = :isDeleted',
-          params: { isDeleted: false },
-        },
-        cybersecurityEncryptionDetails: {
-          condition: 'cybersecurityEncryptionDetails.isDeleted = :isDeleted',
-          params: { isDeleted: false },
-        },
-      },
-    });
   }
 
   async deleteMyCybersecurity(companyProfileId: number): Promise<CPCybersecurityEntity> {

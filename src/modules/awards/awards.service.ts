@@ -1,47 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
-import { CpAwardEntity } from 'src/typeorm/models/cp-awards.entity';
 import { Repository } from 'typeorm';
-import { S3Service } from '../global/providers';
-import { ConfigService } from '@nestjs/config';
-import { CreateCpAwardDto, UpdateCpAwardDto } from './dtos';
-import { AwardFiles } from './interfaces';
-import { filesToUpdate, uploadFilesToS3 } from 'src/shared/utils';
-import { MAX_CP_AWARDS_FILE_SIZE_MB, MAX_CP_AWARDS_SIZE_BYTES } from 'src/shared/constants';
+import { SaveCpAwardDto, UpdateCpAwardDto } from './dtos';
+import { CpAwardEntity, UserEntity } from 'src/typeorm/models';
+import { AwardsOfficialDocsService } from './award-official-docs.service';
 
 @Injectable()
 export class AwardsService extends BaseTypeOrmCrudService<CpAwardEntity> {
   constructor(
     @InjectRepository(CpAwardEntity)
-    readonly cpAwardEntity: Repository<CpAwardEntity>,
-    private readonly s3Service: S3Service,
-    private readonly configService: ConfigService,
+    readonly cpAwardRepository: Repository<CpAwardEntity>,
+    private readonly awardsOfficialDocsService: AwardsOfficialDocsService,
   ) {
-    super(cpAwardEntity);
+    super(cpAwardRepository);
   }
 
-  async createAward(user: any, createCpAwardDto: CreateCpAwardDto, files: AwardFiles): Promise<CpAwardEntity> {
-    if (files.documentation) {
-      createCpAwardDto.documentation = await uploadFilesToS3(user, files.documentation, createCpAwardDto.nameOfAward, this.s3Service, this.configService, MAX_CP_AWARDS_SIZE_BYTES, MAX_CP_AWARDS_FILE_SIZE_MB);
+  async saveAwards(user: any, saveCpAwardDtoa: SaveCpAwardDto[]): Promise<CpAwardEntity[]> {
+    const existingAwards = await this.cpAwardRepository.find({
+      where: { companyProfile: { id: user?.companyProfile?.id } },
+    });
+
+    if (existingAwards.length > 0) {
+      await Promise.all(
+        existingAwards.map(async (award) => {
+          await this.awardsOfficialDocsService.deleteOfficialDocs(user, award);
+          await this.delete(award.id);
+        }),
+      );
     }
 
-    return this.create({
-      ...createCpAwardDto,
-      companyProfile: { id: user.companyProfile.id },
-    } as unknown as CpAwardEntity);
+    const newAwards = await Promise.all(
+      saveCpAwardDtoa.map(async (createCpAwardDto) => {
+        const { officialDocs, ...cpAwardData } = createCpAwardDto;
+
+        const award = await this.create({
+          ...cpAwardData,
+          companyProfile: { id: user?.companyProfile?.id },
+        } as unknown as CpAwardEntity);
+
+        if (officialDocs && officialDocs.length > 0) {
+          await this.awardsOfficialDocsService.createOfficialDocs(user, officialDocs, award);
+        }
+
+        return award;
+      }),
+    );
+
+    return newAwards;
   }
 
-  async updateAward(user: any, id: number, updateCpAwardDto: UpdateCpAwardDto, files: AwardFiles): Promise<CpAwardEntity> {
+  async updateAward(user: UserEntity, id: number, updateCpAwardDto: UpdateCpAwardDto): Promise<CpAwardEntity> {
     const cpAward = await this.findById(id, { relations: { companyProfile: true } });
     if (!cpAward) {
       throw new Error('Company award not associated with this company profile');
     }
 
-    if (files.documentation) {
-      updateCpAwardDto.documentation = await filesToUpdate(user, files.documentation, cpAward.documentation, cpAward.nameOfAward, this.s3Service, this.configService, MAX_CP_AWARDS_SIZE_BYTES, MAX_CP_AWARDS_FILE_SIZE_MB);
+    const { officialDocs, ...cpAwardData } = updateCpAwardDto;
+
+    if (officialDocs && officialDocs.length > 0) {
+      await this.awardsOfficialDocsService.updateOfficialDocs(user, officialDocs, cpAward);
     }
 
-    return this.update(id, updateCpAwardDto as unknown as CpAwardEntity);
+    return this.update(id, cpAwardData as unknown as CpAwardEntity);
+  }
+
+  async getMyAwards(companyProfileId: number): Promise<CpAwardEntity[]> {
+    const awards = await this.cpAwardRepository.find({
+      where: { companyProfile: { id: companyProfileId }, isDeleted: false },
+      relations: ['officialDocs'],
+    });
+
+    if (!awards || awards.length === 0) {
+      throw new NotFoundException('No awards found for your company profile.');
+    }
+
+    return awards;
   }
 }

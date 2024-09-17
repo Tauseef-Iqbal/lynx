@@ -1,23 +1,15 @@
-import { IsString, IsOptional, ValidateNested, IsBoolean, IsDate, IsNumber } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsString, IsOptional, ValidateNested, IsBoolean, IsDate, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { StatusEnum } from 'src/shared/enums';
 
 export class RequiredSystemBusinessClassificationDto {
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
-  id?: number;
-
   @IsString()
   classificationName: string;
 }
 
 export class RequiredSystemCertificationDto {
   @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
-  id?: number;
-
   @IsString()
   certificationName: string;
 
@@ -29,16 +21,16 @@ export class RequiredSystemCertificationDto {
   @IsOptional()
   @IsString()
   number?: string;
+
+  @IsOptional()
+  @IsEnum(StatusEnum)
+  certificationStatus?: StatusEnum;
 }
 
 export class RequiredSystemTypesDto {
   @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
-  id?: number;
-
   @IsString()
-  systemName: string;
+  systemName?: string;
 
   @IsOptional()
   @IsString()
@@ -55,6 +47,10 @@ export class RequiredSystemTypesDto {
   @IsOptional()
   @IsString()
   complianceDetails?: string;
+
+  @IsOptional()
+  @IsEnum(StatusEnum)
+  systemStatus?: StatusEnum;
 }
 
 export class CreateRequiredSystemDto {

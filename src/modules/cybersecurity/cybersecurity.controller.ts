@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, ParseArrayPipe, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CybersecurityService } from './cybersecurity.service';
 import { ResponseDto } from 'src/shared/dtos';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -6,9 +6,8 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddCybersecurityDto, UpdateCybersecurityDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
-import { AnyFilesInterceptor, FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CybersecurityFiles } from './interfaces';
-import { CybersecurityStandardsComplianceDetailsDto } from './dtos/cybersecurity-standards-compliance-details.dto';
 
 @ApiTags('Cybersecurity')
 @ApiBearerAuth()
@@ -17,24 +16,13 @@ import { CybersecurityStandardsComplianceDetailsDto } from './dtos/cybersecurity
 export class CybersecurityController {
   constructor(private readonly cybersecurityService: CybersecurityService) {}
 
-  @Post('upload-compliance-details')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(AnyFilesInterceptor())
-  uploadComplianceDetails(
-    @UploadedFiles() files: any,
-    @Body()
-    details: CybersecurityStandardsComplianceDetailsDto[],
-  ) {
-    console.log('details>>>>>>>>>', details, files);
-  }
-
   @ApiOperation({ summary: 'Add Cybersecurity' })
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'complianceFiles', maxCount: 10 },
-        { name: 'encryptionFiles', maxCount: 10 },
+        { name: 'cybersecurityStandardsCompliantFiles', maxCount: 10 },
+        { name: 'encryptDataFiles', maxCount: 10 },
       ],
       {
         limits: {

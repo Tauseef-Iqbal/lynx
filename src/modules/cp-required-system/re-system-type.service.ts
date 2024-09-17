@@ -14,29 +14,15 @@ export class RequiredSystemTypeService extends BaseTypeOrmCrudService<RequiredSy
     super(systemTypeRepository);
   }
 
-  async createRquiredSystemType(requiredSystemId: number, requiredSystemTypesDto?: RequiredSystemTypesDto[]): Promise<void> {
-    await Promise.all(
-      requiredSystemTypesDto.map((typeDto) =>
-        this.create({
-          ...typeDto,
-          requiredSystem: { id: requiredSystemId },
-        } as unknown as RequiredSystemTypesEntity),
-      ),
-    );
-  }
-
   async upsertRquiredSystemType(requiredSystemId: number, requiredSystemTypesDto?: RequiredSystemTypesDto[]): Promise<void> {
+    await this.systemTypeRepository.delete({ requiredSystem: { id: requiredSystemId } });
+
     await Promise.all(
       requiredSystemTypesDto.map((typeDto) => {
-        const { id, ...createOrUpdateDto } = typeDto;
-        if (id) {
-          return this.update(id, createOrUpdateDto as unknown as RequiredSystemTypesEntity);
-        } else {
-          return this.create({
-            ...createOrUpdateDto,
-            requiredSystem: { id: requiredSystemId },
-          } as unknown as RequiredSystemTypesEntity);
-        }
+        return this.create({
+          ...typeDto,
+          requiredSystem: { id: requiredSystemId },
+        } as unknown as RequiredSystemTypesEntity);
       }),
     );
   }

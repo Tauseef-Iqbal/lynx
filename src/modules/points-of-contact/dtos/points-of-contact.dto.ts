@@ -1,8 +1,14 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString, Length } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, Length } from 'class-validator';
 import { POCType } from 'src/modules/points-of-contact/enums';
 
 export class AddPointsOfContactDto {
+  @IsNumber()
+  @IsOptional()
+  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
+  id?: number;
+
   @ApiProperty({ description: 'Name of the point of contact', maxLength: 255 })
   @IsNotEmpty()
   @IsString()

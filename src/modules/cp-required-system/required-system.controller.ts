@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Body, HttpStatus, ParseIntPipe, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, HttpStatus, UseGuards } from '@nestjs/common';
 import { RequiredSystemService } from './required-system.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guards';
@@ -6,7 +6,7 @@ import { CompanyProfileGuard } from 'src/shared/middlewares';
 import { CreateRequiredSystemDto, UpdateRequiredSystemDto } from './dtos';
 import { BaseController } from 'src/shared/services';
 import { RequiredSystemEntity, UserEntity } from 'src/typeorm/models';
-import { GetAllDto, ResponseDto } from 'src/shared/dtos';
+import { ResponseDto } from 'src/shared/dtos';
 import { User } from 'src/shared/decorators';
 
 @ApiTags('Required Systems')
@@ -22,30 +22,38 @@ export class RequiredSystemController extends BaseController<RequiredSystemEntit
   @ApiOperation({ summary: 'Create company profile required system' })
   @ApiBody({ type: CreateRequiredSystemDto })
   async createRequiredSystem(@User() user: UserEntity, @Body() createRequiredSystemDto: CreateRequiredSystemDto) {
-    const result = await this.requiredSystemService.createRequiredSystem(user, createRequiredSystemDto);
-    return new ResponseDto(HttpStatus.CREATED, 'Required System created successfully', result);
-  }
+    const requiredSystem = await this.requiredSystemService.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
 
-  @ApiOperation({ summary: 'Get Company profile required system' })
-  @Get(':id')
-  async getRequiredSystemById(@Param('id') id: number): Promise<any> {
-    const response = await this.findById(id, { relations: { companyProfile: true, businessClassifications: true, certifications: true, systemTypes: true } });
-    return new ResponseDto(HttpStatus.OK, 'Company profile required system fetched successfully!', response);
+    let result: RequiredSystemEntity;
+    if (requiredSystem) {
+      result = await this.requiredSystemService.updateRequiredSystem(requiredSystem, createRequiredSystemDto);
+    } else {
+      result = await this.requiredSystemService.createRequiredSystem(user, createRequiredSystemDto);
+    }
+
+    const resp = await this.findById(result.id, { relations: { systemTypes: true, certifications: true, businessClassifications: true } });
+
+    return new ResponseDto(HttpStatus.OK, 'Required System created or updated successfully', resp);
   }
 
   @ApiOperation({ summary: 'Get Company profile required system' })
   @Get()
-  async getRequiredSystems(@User() user: UserEntity, @Query() queryParams: GetAllDto): Promise<any> {
-    const { page = 1, limit = 10 } = queryParams;
-    const response = await this.findAll({ limit, page, cp_id: user.companyProfile.id }, { relations: { businessClassifications: true, certifications: true, systemTypes: true } });
+  async getRequiredSystems(@User() user: UserEntity): Promise<any> {
+    const response = await this.requiredSystemService.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false }, { relations: { systemTypes: true, certifications: true, businessClassifications: true } });
     return new ResponseDto(HttpStatus.OK, 'Company profile required system fetched successfully!', response);
   }
 
-  @Put(':id')
+  @Put()
   @ApiOperation({ summary: 'Update company required system' })
   @ApiBody({ type: UpdateRequiredSystemDto })
-  async updateRequiredSystem(@Param('id', ParseIntPipe) id: number, @Body() updateRequiredSystemDto: UpdateRequiredSystemDto) {
-    const updatedSystem = await this.requiredSystemService.updateRequiredSystem(id, updateRequiredSystemDto);
+  async updateRequiredSystem(@User() user: UserEntity, @Body() updateRequiredSystemDto: UpdateRequiredSystemDto) {
+    const requiredSystem = await this.requiredSystemService.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
+
+    if (!requiredSystem) {
+      throw new Error('required system not found against this company profile');
+    }
+
+    const updatedSystem = await this.requiredSystemService.updateRequiredSystem(requiredSystem, updateRequiredSystemDto);
     return new ResponseDto(HttpStatus.OK, 'Required System updated successfully', updatedSystem);
   }
 }

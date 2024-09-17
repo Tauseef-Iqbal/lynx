@@ -61,7 +61,7 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
 
     await this.update(id, updateFundingSourcesDto as unknown as CPFundingSourcesEntity);
 
-    return this.getMyFundingSources(user.companyProfile.id);
+    return this.getFundingSourcesByFilter({ companyProfile: { id: user.companyProfile.id } });
   }
 
   async getMyFundingSources(companyProfileId: number): Promise<CPFundingSourcesEntity> {

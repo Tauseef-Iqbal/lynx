@@ -76,6 +76,12 @@ export class CreateCpProductsAndServicesDto {
   @MaxLength(FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT, { each: true })
   uploadedMaterials?: string[];
 
+  @ApiPropertyOptional({ description: 'Product or service image' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1)
+  productOrServiceImage?: string;
+
   @ApiPropertyOptional({ description: 'List of organizational facilities' })
   @IsOptional()
   @IsArray()

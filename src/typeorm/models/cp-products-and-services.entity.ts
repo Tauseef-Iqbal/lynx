@@ -12,6 +12,9 @@ export class CpProductsAndServicesEntity extends CustomBaseEntity {
   @Column({ name: 'type', nullable: true, type: 'varchar', length: 60 })
   type?: string;
 
+  @Column({ name: 'product_or_service_image', nullable: true, type: 'text' })
+  productOrServiceImage?: string;
+
   @Column({ name: 'description', type: 'text', nullable: true })
   description?: string;
 

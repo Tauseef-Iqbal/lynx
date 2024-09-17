@@ -1,6 +1,7 @@
-import { Column, DeleteDateColumn, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
+import { CpAwardsOfficalDocsEntity } from './cp-awards-official-docs.entity';
 
 @Entity({ name: 'cp_awards' })
 export class CpAwardEntity extends CustomBaseEntity {
@@ -27,13 +28,8 @@ export class CpAwardEntity extends CustomBaseEntity {
   @Column({ name: 'award_description', type: 'text', nullable: true })
   awardDescription: string;
 
-  @Column({
-    name: 'documentation',
-    type: 'text',
-    array: true,
-    nullable: true,
-  })
-  documentation?: string[];
+  @OneToMany(() => CpAwardsOfficalDocsEntity, (docs) => docs.cpAward)
+  officialDocs?: CpAwardsOfficalDocsEntity[];
 
   @DeleteDateColumn({
     name: 'deleted_at',
@@ -45,7 +41,7 @@ export class CpAwardEntity extends CustomBaseEntity {
   @Index()
   @ManyToOne(() => CompanyProfileEntity, (company) => company.cpAwards, {
     nullable: false,
-    // cascade: true,
+    cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

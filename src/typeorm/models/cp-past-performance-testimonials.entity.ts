@@ -16,8 +16,7 @@ export class CpPastPerformanceTestimonialsEntity extends CustomBaseEntity {
   @Column({
     name: 'testimonial_input',
     nullable: true,
-    type: 'varchar',
-    length: 255,
+    type: 'text',
   })
   testimonialInput?: string;
 

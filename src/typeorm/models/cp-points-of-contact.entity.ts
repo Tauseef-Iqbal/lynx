@@ -1,5 +1,5 @@
 import { POCType } from 'src/modules/points-of-contact/enums';
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { CompanyProfileEntity } from '.';
 import { CustomBaseEntity } from './custom-base.entity';
 
@@ -24,7 +24,7 @@ export class CPPointsOfContactEntity extends CustomBaseEntity {
   type: string;
 
   @Index()
-  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.pointsOfContact, {
+  @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.pointsOfContact, {
     nullable: false,
     // cascade: true,
     onDelete: 'NO ACTION',

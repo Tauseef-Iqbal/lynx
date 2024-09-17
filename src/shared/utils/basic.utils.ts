@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { S3Service } from 'src/modules/global/providers';
 import { ISocialMedia } from 'src/modules/company-profile/interfaces';
 import { ConfigService } from '@nestjs/config';
+import { UserEntity } from 'src/typeorm/models';
 
 export const convertKeysToCamelCase = (obj) => _.mapKeys(obj, (value, key) => _.camelCase(key));
 
@@ -75,6 +76,54 @@ export const uploadFilesToS3 = async (user: any, files: Express.Multer.File[], f
   );
 };
 
+export const uploadSingleFileToS3 = async (user: any, file: Express.Multer.File, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string> => {
+  const allowedMimeTypes = ['image/png', 'image/jpeg'];
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    throw new Error('Invalid file type. Only PNG and JPEG are allowed.');
+  }
+
+  if (file.size > maxFileSizeBytes) {
+    throw new Error(`File ${file.originalname} exceeds the maximum size of ${maxFileSizeMb} MB.`);
+  }
+
+  const sanitizedFilename = file.originalname.replace(/\s+/g, '_');
+  const key = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
+  await s3Service.uploadBuffer(file.buffer, key);
+
+  return `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${key}`;
+};
+
+export const singleFileToUpdate = async (user: any, file: Express.Multer.File, existingFile: string | null | undefined, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string> => {
+  existingFile = existingFile || '';
+
+  const allowedMimeTypes = ['image/png', 'image/jpeg'];
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    throw new Error('Invalid file type. Only PNG and JPEG are allowed.');
+  }
+
+  const sanitizedFilename = file.originalname.replace(/\s+/g, '_');
+  const blobPath = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
+  const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${blobPath}`;
+
+  if (maxFileSizeBytes && file.size > maxFileSizeBytes) {
+    throw new Error(`File ${file.originalname} exceeds the maximum size of ${maxFileSizeMb} MB.`);
+  }
+
+  const existingBlobName = existingFile ? existingFile.split(`${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/`).pop() : null;
+  const fileAlreadyExists = existingBlobName === sanitizedFilename;
+
+  // Handle existing file
+  if (fileAlreadyExists) {
+    await s3Service.deleteFile(blobPath); // Delete the old file
+  } else {
+    existingFile = fileUrl;
+  }
+
+  await s3Service.uploadBuffer(file.buffer, blobPath);
+
+  return fileUrl;
+};
+
 export const filesToUpdate = async (user: any, files: Express.Multer.File[], existingFiles: string[] | null | undefined, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string[]> => {
   const incomingFiles: string[] = [];
 
@@ -142,3 +191,25 @@ export function isS3Url(str: string): boolean {
   const s3UrlPattern = /^https:\/\/[a-zA-Z0-9.-]+\.s3\.amazonaws\.com\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%\s-]*$/;
   return s3UrlPattern.test(str);
 }
+
+export const uploadSingleBase64ToS3 = async (user: UserEntity, base64File: string, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string> => {
+  const [metadata, base64Data] = base64File.split(',');
+  const buffer = Buffer.from(base64Data, 'base64');
+
+  if (buffer.length > maxFileSizeBytes) {
+    throw new Error(`File exceeds the maximum size of ${maxFileSizeMb} MB.`);
+  }
+
+  const mimeType = metadata.match(/:(.*?);/)?.[1] || 'application/octet-stream';
+  const extension = mimeType.split('/')[1];
+
+  const timestamp = Date.now();
+  const sanitizedFilename = `file_${timestamp}.${extension}`;
+  const key = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
+
+  // Upload to S3
+  await s3Service.uploadBuffer(buffer, key);
+  const fileUrl = `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${key}`;
+
+  return fileUrl;
+};

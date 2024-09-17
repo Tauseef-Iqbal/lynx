@@ -1,7 +1,24 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional, IsArray, IsDateString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsArray, IsDateString, ValidateNested } from 'class-validator';
 
-export class CreateCpAwardDto {
+export class CpAwardsOfficalDocsDto {
+  @ApiPropertyOptional({ description: 'Name of the document', example: 'Certificate of Achievement' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiProperty({
+    description: 'Base64 encoded image string',
+    example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  b64Images?: string[];
+}
+
+export class SaveCpAwardDto {
   @ApiProperty({
     description: 'The name of the award',
   })
@@ -30,13 +47,14 @@ export class CreateCpAwardDto {
   @IsString()
   awardDescription?: string;
 
-  @ApiProperty({
-    description: 'Official documentation related to the award',
+  @ApiPropertyOptional({
+    description: 'Official documents related to the award',
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  documentation?: string[];
+  @ValidateNested({ each: true })
+  @Type(() => CpAwardsOfficalDocsDto)
+  officialDocs?: CpAwardsOfficalDocsDto[];
 }
 
-export class UpdateCpAwardDto extends PartialType(CreateCpAwardDto) {}
+export class UpdateCpAwardDto extends PartialType(SaveCpAwardDto) {}

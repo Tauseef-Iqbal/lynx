@@ -27,11 +27,10 @@ export class CpProductsAndServicesController extends BaseController<CpProductsAn
     FileFieldsInterceptor([
       { name: 'uploadedMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
       { name: 'supportingMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
+      { name: 'productOrServiceImage', maxCount: 1 },
     ]),
   )
   async createCpProductsAndService(@User() user: UserEntity, @Body() data: CreateCpProductsAndServicesDto, @UploadedFiles() files: CpProductsAndServicesFiles) {
-    // const createCpProductsAndServicesDto = plainToInstance(CreateCpProductsAndServicesDto, JSON.parse(data));
-    // await validateOrReject(createCpProductsAndServicesDto);
     const response = await this.cpProductsAndServicesService.createCpProductsAndServices(user, data, files);
     return new ResponseDto(HttpStatus.CREATED, 'Company profile products or services created successfully!', response);
   }
@@ -59,11 +58,10 @@ export class CpProductsAndServicesController extends BaseController<CpProductsAn
     FileFieldsInterceptor([
       { name: 'uploadedMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
       { name: 'supportingMaterials', maxCount: FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT },
+      { name: 'productOrServiceImage', maxCount: 1 },
     ]),
   )
   async updateCompanyProfileLegalStructureById(@User() user: any, @Param('id') id: number, @Body() data: UpdateCpProductsAndServicesDto, @UploadedFiles() files: CpProductsAndServicesFiles): Promise<any> {
-    // const updateCpProductsAndServicesDto = plainToInstance(UpdateCpProductsAndServicesDto, JSON.parse(data));
-    // await validateOrReject(updateCpProductsAndServicesDto);
     const response = await this.cpProductsAndServicesService.updateCpProductsAndService(id, user, data, files);
     return new ResponseDto(HttpStatus.OK, 'Compnay Profile Product or Service updated successfully!', response);
   }

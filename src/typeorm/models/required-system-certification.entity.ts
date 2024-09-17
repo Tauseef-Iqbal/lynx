@@ -5,7 +5,7 @@ import { CustomBaseEntity } from './custom-base.entity';
 @Entity('required_system_certification')
 export class RequiredSystemCertificationEntity extends CustomBaseEntity {
   // certificationName is required
-  @Column({ type: 'varchar', length: 255, name: 'certification_name' })
+  @Column({ type: 'varchar', nullable: true, length: 255, name: 'certification_name' })
   certificationName: string;
 
   // All other fields are optional
@@ -14,6 +14,13 @@ export class RequiredSystemCertificationEntity extends CustomBaseEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'number' })
   number?: string;
+
+  @Column({
+    type: 'varchar',
+    default: 'N/A',
+    name: 'certification_status',
+  })
+  certificationStatus?: string;
 
   @ManyToOne(() => RequiredSystemEntity, (requiredSystem) => requiredSystem.certifications, {
     cascade: true,

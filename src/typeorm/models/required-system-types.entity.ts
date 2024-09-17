@@ -5,7 +5,7 @@ import { CustomBaseEntity } from './custom-base.entity';
 @Entity('required_system_types')
 export class RequiredSystemTypesEntity extends CustomBaseEntity {
   // systemName is required
-  @Column({ type: 'varchar', length: 255, name: 'system_name' })
+  @Column({ type: 'varchar', nullable: true, length: 255, name: 'system_name' })
   systemName: string;
 
   // All other fields are optional
@@ -20,6 +20,13 @@ export class RequiredSystemTypesEntity extends CustomBaseEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'compliance_details' })
   complianceDetails?: string;
+
+  @Column({
+    type: 'varchar',
+    default: 'N/A',
+    name: 'system_status',
+  })
+  systemStatus?: string;
 
   @ManyToOne(() => RequiredSystemEntity, (requiredSystem) => requiredSystem.systemTypes, {
     cascade: true,

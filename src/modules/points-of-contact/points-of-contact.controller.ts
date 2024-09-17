@@ -14,25 +14,22 @@ import { UserEntity } from 'src/typeorm/models';
 export class PointsOfContactController {
   constructor(private readonly pointsOfContactService: PointsOfContactService) {}
 
-  @ApiOperation({ summary: 'Add PointsOfContact' })
+  @ApiOperation({ summary: 'Add Points Of Contact' })
   @Post()
-  async addPointsOfContact(@User() user: UserEntity, @Body() addPointsOfContactDto: AddPointsOfContactDto) {
-    const pointsOfContact = await this.pointsOfContactService.addPointsOfContact(user, addPointsOfContactDto);
-    return new ResponseDto(HttpStatus.CREATED, 'Points Of Contact added successfully!', pointsOfContact).toJSON();
+  async addPointsOfContact(@User() user: UserEntity, @Body() addPointsOfContactDto: AddPointsOfContactDto[]) {
+    return this.pointsOfContactService.addPointsOfContact(user, addPointsOfContactDto);
   }
 
-  @ApiOperation({ summary: 'Update PointsOfContact' })
-  @Put('/:id')
-  async updatePointsOfContact(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity, @Body() updatePointsOfContactDto: UpdatePointsOfContactDto) {
-    const pointsOfContact = await this.pointsOfContactService.updatePointsOfContact(id, user, updatePointsOfContactDto);
-    return new ResponseDto(HttpStatus.CREATED, 'Points Of Contact added successfully!', pointsOfContact).toJSON();
+  @ApiOperation({ summary: 'Update Points Of Contact' })
+  @Put()
+  async updatePointsOfContact(@User() user: UserEntity, @Body() updatePointsOfContactDto: UpdatePointsOfContactDto[]) {
+    return this.pointsOfContactService.updatePointsOfContact(user, updatePointsOfContactDto);
   }
 
-  @ApiOperation({ summary: 'Get My PointsOfContact' })
+  @ApiOperation({ summary: 'Get My Points Of Contact' })
   @Get('section/me')
   async getMyPointsOfContact(@User() user: UserEntity) {
-    const response = await this.pointsOfContactService.getMyPointsOfContact(user?.companyProfile?.id);
-    return new ResponseDto(HttpStatus.OK, 'My PointsOfContact Section fetched successfully!', response).toJSON();
+    return this.pointsOfContactService.getMyPointsOfContact(user?.companyProfile?.id);
   }
 
   @ApiOperation({ summary: 'Get PointsOfContact By ID' })

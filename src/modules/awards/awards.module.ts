@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { AwardsController } from './awards.controller';
 import { AwardsService } from './awards.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CpAwardEntity } from 'src/typeorm/models/cp-awards.entity';
+import { CpAwardEntity, CpAwardsOfficalDocsEntity } from 'src/typeorm/models';
+import { AwardsOfficialDocsService } from './award-official-docs.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CpAwardEntity])],
+  imports: [TypeOrmModule.forFeature([CpAwardEntity, CpAwardsOfficalDocsEntity])],
   controllers: [AwardsController],
-  providers: [AwardsService],
+  providers: [AwardsService, AwardsOfficialDocsService],
 })
 export class AwardsModule {}

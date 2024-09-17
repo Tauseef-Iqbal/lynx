@@ -44,6 +44,10 @@ export class BaseTypeOrmCrudService<T> {
     return this.repository.findOne({ where: { ...filter } as any, relations: options?.relations });
   }
 
+  async findManyByFilter(filter: any = {}, options: any = {}): Promise<T[]> {
+    return this.repository.find({ where: { ...filter } as any, relations: options?.relations });
+  }
+
   async findByRelationFilters(
     filter: Record<string, any> = {},
     options: {
