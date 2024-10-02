@@ -1,73 +1,174 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { S3Service } from '../global/providers';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
-import { CpProductsAndServicesEntity } from 'src/typeorm/models';
-import { CreateCpProductsAndServicesDto, UpdateCpProductsAndServicesDto } from './dtos';
-import { CpProductsAndServicesFiles } from './interfaces';
-import { CpProductsAndServicesMetaDataService } from './cp-products-and-services-metadata.service';
-import { filesToUpdate, singleFileToUpdate, uploadFilesToS3, uploadSingleFileToS3 } from 'src/shared/utils';
-import { MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB, MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_BYTES, MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_MB } from 'src/shared/constants';
+import { CPProductsAndServicesEntity, CPProductsAndServicesMetadataEntity, UserEntity } from 'src/typeorm/models';
+import { CreateProductsAndServicesDto, UpdateProductsAndServicesDto } from './dtos';
+import { processFilesToAdd, processFilesToUpdate } from 'src/shared/utils';
 
 @Injectable()
-export class CpProductsAndServicesService extends BaseTypeOrmCrudService<CpProductsAndServicesEntity> {
+export class ProductsAndServicesService extends BaseTypeOrmCrudService<CPProductsAndServicesEntity> {
   constructor(
-    @InjectRepository(CpProductsAndServicesEntity)
-    readonly cpProductsAndServicesRepository: Repository<CpProductsAndServicesEntity>,
+    @InjectRepository(CPProductsAndServicesEntity)
+    readonly productsAndServicesRepository: Repository<CPProductsAndServicesEntity>,
+    @InjectRepository(CPProductsAndServicesMetadataEntity)
+    readonly productsAndServicesMetadataRepository: Repository<CPProductsAndServicesMetadataEntity>,
     private readonly s3Service: S3Service,
     private readonly configService: ConfigService,
-    private readonly cpProductsAndServicesMetaDataService: CpProductsAndServicesMetaDataService,
   ) {
-    super(cpProductsAndServicesRepository);
+    super(productsAndServicesRepository);
   }
 
-  async createCpProductsAndServices(user: any, createCpProductsAndServicesDto: CreateCpProductsAndServicesDto, files: CpProductsAndServicesFiles): Promise<CpProductsAndServicesEntity> {
-    if (files.uploadedMaterials) {
-      createCpProductsAndServicesDto.uploadedMaterials = await uploadFilesToS3(user, files.uploadedMaterials, createCpProductsAndServicesDto.name, this.s3Service, this.configService, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
+  async createProductsAndServices(user: UserEntity, createProductsAndServicesDto: CreateProductsAndServicesDto, files: Express.Multer.File[]): Promise<CPProductsAndServicesEntity> {
+    const image: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith('image'));
+    if (image) {
+      createProductsAndServicesDto.image = (
+        await processFilesToAdd({
+          incomingFiles: image,
+          incomingS3AndBase64: createProductsAndServicesDto.assets,
+          keyPrefix: `${user.companyProfile.name}/Products And Services/${createProductsAndServicesDto.name}/Image`,
+          configService: this.configService,
+          s3Service: this.s3Service,
+        })
+      )[0];
     }
 
-    if (files.productOrServiceImage) {
-      createCpProductsAndServicesDto.productOrServiceImage = await uploadSingleFileToS3(user, files.productOrServiceImage[0], createCpProductsAndServicesDto.name, this.s3Service, this.configService, MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_BYTES, MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_MB);
+    const assets: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith('assets'));
+    if (assets) {
+      createProductsAndServicesDto.assets = await processFilesToAdd({
+        incomingFiles: assets,
+        incomingS3AndBase64: createProductsAndServicesDto.assets,
+        keyPrefix: `${user.companyProfile.name}/Products And Services/${createProductsAndServicesDto.name}/Assets`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+        assetsMetadata: createProductsAndServicesDto.assetsMetadata,
+      });
     }
 
-    const cpProductsAndServices = await this.create({ ...createCpProductsAndServicesDto, companyProfile: { id: user.companyProfile.id } } as unknown as CpProductsAndServicesEntity);
-
-    await this.cpProductsAndServicesMetaDataService.upsertCpProductsAndServicesMetaData(user, cpProductsAndServices.id, createCpProductsAndServicesDto.metaData, files.supportingMaterials);
-
-    return this.findById(cpProductsAndServices.id, { relations: { productsAndServicesMeta: true } });
-  }
-
-  async updateCpProductsAndService(id: number, user: any, updateProductsAndServicesDto: UpdateCpProductsAndServicesDto, files: CpProductsAndServicesFiles): Promise<CpProductsAndServicesEntity> {
-    const cpProductOrService = await this.findById(id, { relations: { companyProfile: true, productsAndServicesMeta: true } });
-    if (!cpProductOrService) {
-      throw new Error('Company product or service not associated with this company profile');
-    }
-
-    if (files.productOrServiceImage) {
-      updateProductsAndServicesDto.productOrServiceImage = await singleFileToUpdate(
-        user,
-        files.productOrServiceImage[0],
-        cpProductOrService.productOrServiceImage,
-        updateProductsAndServicesDto.name,
-        this.s3Service,
-        this.configService,
-        MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_BYTES,
-        MAX_CP_PRODUCT_OR_SERVICES_IMAGE_SIZE_MB,
+    if (createProductsAndServicesDto.productsAndServicesMetadata && createProductsAndServicesDto.productsAndServicesMetadata.length) {
+      await Promise.all(
+        createProductsAndServicesDto.productsAndServicesMetadata.map(async (metadata, index) => {
+          const assets: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith(`productsAndServicesMetadata[${index}][assets]`));
+          metadata.assets = await processFilesToAdd({
+            incomingFiles: assets,
+            incomingS3AndBase64: metadata.assets,
+            keyPrefix: `${user.companyProfile.name}/Products And Services/${createProductsAndServicesDto.name}/Additional Information/Assets`,
+            configService: this.configService,
+            s3Service: this.s3Service,
+            assetsMetadata: metadata.assetsMetadata,
+          });
+        }),
       );
     }
 
-    if (files.uploadedMaterials) {
-      updateProductsAndServicesDto.uploadedMaterials = await filesToUpdate(user, files.uploadedMaterials, cpProductOrService.uploadedMaterials, cpProductOrService.name, this.s3Service, this.configService, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_BYTES, MAX_CP_PRODUCT_AND_SERVICES_FILE_SIZE_MB);
+    return this.create({ ...createProductsAndServicesDto, companyProfile: { id: user.companyProfile.id } } as unknown as CPProductsAndServicesEntity);
+  }
+
+  async updateProductsAndServices(id: number, user: UserEntity, updateProductsAndServicesDto: UpdateProductsAndServicesDto, files: Express.Multer.File[]): Promise<CPProductsAndServicesEntity[]> {
+    const existedProductsAndServices = (await this.getProductsAndServicesByFilter({ id, companyProfile: { id: user.companyProfile.id } }))[0];
+    // if (!existedProductsAndServices) {
+    //   throw new Error('Supply Chain not associated with this company profile');
+    // }
+
+    if (!existedProductsAndServices) return null;
+
+    const image: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith('image'));
+    updateProductsAndServicesDto.image = (
+      await processFilesToUpdate({
+        existingFiles: existedProductsAndServices.image ? [existedProductsAndServices.image] : [],
+        incomingFiles: image || [],
+        incomingS3AndBase64: updateProductsAndServicesDto.image ? [updateProductsAndServicesDto.image] : [],
+        keyPrefix: `${user.companyProfile.name}/Products And Services/${updateProductsAndServicesDto.name}/Image`,
+        configService: this.configService,
+        s3Service: this.s3Service,
+      })
+    )[0];
+
+    const assets: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith('assets'));
+    updateProductsAndServicesDto.assets = await processFilesToUpdate({
+      existingFiles: existedProductsAndServices.assets,
+      incomingFiles: assets || [],
+      incomingS3AndBase64: updateProductsAndServicesDto.assets,
+      keyPrefix: `${user.companyProfile.name}/Products And Services/${updateProductsAndServicesDto.name}/Additional Information/Assets`,
+      configService: this.configService,
+      s3Service: this.s3Service,
+      assetsMetadata: updateProductsAndServicesDto.assetsMetadata,
+    });
+
+    if (updateProductsAndServicesDto.productsAndServicesMetadata && updateProductsAndServicesDto.productsAndServicesMetadata.length) {
+      await Promise.all(
+        updateProductsAndServicesDto.productsAndServicesMetadata.map(async (metadata, index) => {
+          const assets: Express.Multer.File[] = files.filter((file) => file.fieldname.startsWith(`productsAndServicesMetadata[${index}][assets]`));
+          if (metadata.id) {
+            const existingProductsAndServicesMetadata = await this.productsAndServicesMetadataRepository.findOne({ where: { id: metadata.id, productsAndServices: { id: existedProductsAndServices.id } } });
+            if (!existingProductsAndServicesMetadata) throw new NotFoundException(`Products And Services Metadata with id ${metadata.id} isn't associated with the Products And Services with id ${id}`);
+
+            metadata.assets = await processFilesToUpdate({
+              existingFiles: existingProductsAndServicesMetadata.assets,
+              incomingFiles: assets,
+              incomingS3AndBase64: metadata.assets,
+              keyPrefix: `${user.companyProfile.name}/Products And Services/${updateProductsAndServicesDto.name}/Additional Information/Assets`,
+              configService: this.configService,
+              s3Service: this.s3Service,
+              assetsMetadata: metadata.assetsMetadata,
+            });
+
+            await this.productsAndServicesMetadataRepository.update(existingProductsAndServicesMetadata.id, metadata);
+          } else {
+            metadata.assets = await processFilesToAdd({
+              incomingFiles: assets,
+              incomingS3AndBase64: metadata.assets,
+              keyPrefix: `${user.companyProfile.name}/Products And Services/${updateProductsAndServicesDto.name}/Additional Information/Assets`,
+              configService: this.configService,
+              s3Service: this.s3Service,
+              assetsMetadata: metadata.assetsMetadata,
+            });
+            const newProductsAndServicesMetadata = this.productsAndServicesMetadataRepository.create({
+              ...metadata,
+              productsAndServices: existedProductsAndServices,
+            });
+            await this.productsAndServicesMetadataRepository.save(newProductsAndServicesMetadata);
+          }
+        }),
+      );
+      delete updateProductsAndServicesDto.productsAndServicesMetadata;
+    } else {
+      await this.productsAndServicesMetadataRepository.delete({ productsAndServices: { id: existedProductsAndServices.id } });
     }
 
-    if (updateProductsAndServicesDto.metaData && updateProductsAndServicesDto.metaData.length > 0) {
-      await this.cpProductsAndServicesMetaDataService.upsertCpProductsAndServicesMetaData(user, id, updateProductsAndServicesDto.metaData, files.supportingMaterials);
+    await this.update(id, updateProductsAndServicesDto as unknown as CPProductsAndServicesEntity);
 
-      delete updateProductsAndServicesDto.metaData;
-    }
+    return this.getMyProductsAndServices(user.companyProfile.id);
+  }
 
-    return this.update(id, updateProductsAndServicesDto as unknown as CpProductsAndServicesEntity);
+  async getMyProductsAndServices(companyProfileId: number): Promise<CPProductsAndServicesEntity[]> {
+    const myProductsAndServices = await this.getProductsAndServicesByFilter({ companyProfile: { id: companyProfileId } });
+    // if (!myProductsAndServices) {
+    //   throw new NotFoundException('ProductsAndServices not found against your company profile');
+    // }
+
+    if (!myProductsAndServices) return null;
+
+    return myProductsAndServices;
+  }
+
+  async getProductsAndServicesByFilter(filter: any): Promise<CPProductsAndServicesEntity[]> {
+    const result = await this.findByRelationFilters(filter, {
+      relations: {
+        companyProfile: 'companyProfile',
+        productsAndServicesMetadata: 'productsAndServicesMetadata',
+      },
+      relationFilters: {
+        productsAndServicesMetadata: {
+          condition: 'productsAndServicesMetadata.isDeleted = :isDeleted',
+          params: { isDeleted: false },
+        },
+      },
+      bulkFetch: true,
+    });
+
+    return Array.isArray(result) ? result : [];
   }
 }

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CompanyProfileService } from './company-profile.service';
-import { CompanyProfileController } from './company-profile.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyProfileEntity } from 'src/typeorm/models';
+import { CompanyProfileController } from './company-profile.controller';
+import { CompanyProfileService } from './company-profile.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CompanyProfileEntity])],

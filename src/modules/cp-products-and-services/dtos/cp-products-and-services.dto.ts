@@ -1,128 +1,74 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MaxLength, Min, ValidateNested } from 'class-validator';
-import { FILE_LIMITS } from 'src/shared/constants';
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { AssetsDto, AssetsMetadataDto } from 'src/modules/company-profile/dtos';
+import { MRLSpecification, TRLSpecification } from '../enums';
+import { ProductsAndServicesMetadataDto } from './cp-products-and-services-metadata.dto';
 
-export class CpProductsAndServicesMetaDataDto {
-  @ApiPropertyOptional({ description: 'The ID of the company products and services meta data' })
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => (![undefined, null, ''].includes(value) ? Number(value) : value))
-  id?: number;
-
-  @ApiPropertyOptional({ description: 'Type of the product or service' })
-  @IsString()
-  @IsOptional()
-  type?: string;
-
-  @ApiPropertyOptional({ description: 'Additional information about the product or service' })
-  @IsString()
-  @IsOptional()
-  additionalInfo?: string;
-
-  @ApiPropertyOptional({
-    description: 'Indices for the files for Supporting materials to the corresponding additional informations',
-    type: [Number],
-  })
-  @IsArray()
-  @IsNumber({}, { each: true })
-  @IsOptional()
-  @Type(() => Number)
-  fileIndices?: number[];
-}
-
-export class CreateCpProductsAndServicesDto {
-  @ApiProperty({ description: 'Name of the company products and services' })
-  @IsString()
+export class CreateProductsAndServicesDto {
+  @ApiProperty({ description: 'The name of the product or service' })
   @IsNotEmpty()
+  @IsString()
   name: string;
 
-  @ApiPropertyOptional({ description: 'Type of the company products and services' })
-  @IsString()
+  @ApiPropertyOptional({ description: 'Type of offering provided by the product or service' })
   @IsOptional()
-  type?: string;
+  @IsString()
+  offeringType?: string;
 
-  @ApiPropertyOptional({ description: 'Detailed description of the company products and services' })
-  @IsString()
+  @ApiPropertyOptional({ description: 'Image URL of the product or service' })
   @IsOptional()
+  @IsString()
+  image?: string;
+
+  @ApiPropertyOptional({ description: 'Description of the product or service' })
+  @IsOptional()
+  @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'TRL  specifications related to the products and services' })
+  @ApiPropertyOptional({ description: 'TRL specification level', enum: TRLSpecification })
   @IsOptional()
-  @IsString()
-  trlSpecification?: string[];
+  @IsEnum(TRLSpecification)
+  trlSpecification?: TRLSpecification;
 
-  @ApiPropertyOptional({ description: 'MRL specifications related to the products and services' })
+  @ApiPropertyOptional({ description: 'MRL specification level', enum: MRLSpecification })
   @IsOptional()
-  @IsString()
-  mrlSpecification?: string[];
+  @IsEnum(MRLSpecification)
+  mrlSpecification?: MRLSpecification;
 
-  @ApiPropertyOptional({ description: 'Company differentiators that set it apart from competitors' })
+  @ApiPropertyOptional({ description: 'Company differentiators', isArray: true })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (value ? value.split(',').map((item: string) => item.trim()) : []))
   compnayDifferentiators?: string[];
 
-  @ApiPropertyOptional({ description: 'Challenges addressed by the company products and services' })
-  @IsString()
+  @ApiPropertyOptional({ description: 'Challenges addressed by the product or service' })
   @IsOptional()
+  @IsString()
   challengesAddressed?: string;
 
-  @ApiPropertyOptional({ description: 'Files associated with the products and services' })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @MaxLength(FILE_LIMITS.CP_PRODUCTS_AND_SERVICES_FILE_LIMIT, { each: true })
-  uploadedMaterials?: string[];
-
-  @ApiPropertyOptional({ description: 'Product or service image' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(1)
-  productOrServiceImage?: string;
-
-  @ApiPropertyOptional({ description: 'List of organizational facilities' })
+  @ApiPropertyOptional({ description: ' Assets' })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CpProductsAndServicesMetaDataDto)
-  metaData?: CpProductsAndServicesMetaDataDto[];
-}
+  @IsObject({ each: true })
+  @Type(() => AssetsDto)
+  assets?: AssetsDto[];
 
-export class UpdateCpProductsAndServicesDto extends PartialType(CreateCpProductsAndServicesDto) {}
-
-class FilesApiBodyDto {
-  @ApiProperty({ type: 'string', format: 'binary' })
-  data: any;
-}
-
-export class CreateCpProductsAndServicesDtoApiBodyDto {
-  @ApiProperty({ type: 'string' })
-  @IsString()
-  data: string;
-
-  @ApiProperty({ type: [FilesApiBodyDto], isArray: true })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => FilesApiBodyDto)
-  uploadedMaterials: FilesApiBodyDto[];
-
-  @ApiProperty({ type: [FilesApiBodyDto], isArray: true })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => FilesApiBodyDto)
-  supportingMaterials: FilesApiBodyDto[];
-}
-
-export class GetAllQueryParamsDto {
+  @ApiPropertyOptional({ description: 'Names of the assets' })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  page?: number;
+  @ValidateNested({ each: true })
+  @IsObject({ each: true })
+  @Type(() => AssetsMetadataDto)
+  @IsArray()
+  assetsMetadata: AssetsMetadataDto[];
 
+  @ApiPropertyOptional({ description: 'Generated Revenue Range', type: [ProductsAndServicesMetadataDto] })
+  @Type(() => ProductsAndServicesMetadataDto)
+  @ValidateNested({ each: true })
+  @IsArray()
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  limit?: number;
+  productsAndServicesMetadata?: ProductsAndServicesMetadataDto[];
 }
+
+export class UpdateProductsAndServicesDto extends PartialType(CreateProductsAndServicesDto) {}

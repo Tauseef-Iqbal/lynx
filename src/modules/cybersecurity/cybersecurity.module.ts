@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { CybersecurityService } from './cybersecurity.service';
 import { CybersecurityController } from './cybersecurity.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CPCybersecurityEntity } from 'src/typeorm/models';
+import { CPCybersecurityEncryptionDetailsEntity, CPCybersecurityEntity, CPCybersecurityStandardsComplianceDetailsEntity } from 'src/typeorm/models';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CPCybersecurityEntity])],
+  imports: [TypeOrmModule.forFeature([CPCybersecurityEntity, CPCybersecurityStandardsComplianceDetailsEntity, CPCybersecurityEncryptionDetailsEntity])],
   providers: [CybersecurityService],
   controllers: [CybersecurityController],
 })

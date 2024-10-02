@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
-@Entity({ name: 'cp_fci-and-cui' })
+@Entity({ name: 'cp_fci_and_cui' })
 export class CPFCIAndCUIEntity extends CustomBaseEntity {
   @Column({ name: 'protection_contracts', type: 'boolean', nullable: true })
   protectionContracts?: boolean;

@@ -115,7 +115,7 @@ export class SupplyChainService extends BaseTypeOrmCrudService<CPSupplyChainEnti
   }
 
   async getSupplyChainByFilter(filter: any): Promise<CPSupplyChainEntity> {
-    return this.findByRelationFilters(filter, {
+    const result = await this.findByRelationFilters(filter, {
       relations: {
         companyProfile: 'companyProfile',
         supplyChainSupplier: 'supplyChainSupplier',
@@ -127,6 +127,8 @@ export class SupplyChainService extends BaseTypeOrmCrudService<CPSupplyChainEnti
         },
       },
     });
+
+    return result as CPSupplyChainEntity;
   }
 
   async deleteMySupplyChain(companyProfileId: number): Promise<CPSupplyChainEntity> {

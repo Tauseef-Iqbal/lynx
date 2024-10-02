@@ -192,7 +192,7 @@ export function isS3Url(str: string): boolean {
   return s3UrlPattern.test(str);
 }
 
-export const uploadSingleBase64ToS3 = async (user: UserEntity, base64File: string, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number): Promise<string> => {
+export const uploadSingleBase64ToS3 = async (user: UserEntity, base64File: string, folderName: string, s3Service: S3Service, configService: ConfigService, maxFileSizeBytes?: number, maxFileSizeMb?: number, fileName?: string): Promise<string> => {
   const [metadata, base64Data] = base64File.split(',');
   const buffer = Buffer.from(base64Data, 'base64');
 
@@ -204,7 +204,7 @@ export const uploadSingleBase64ToS3 = async (user: UserEntity, base64File: strin
   const extension = mimeType.split('/')[1];
 
   const timestamp = Date.now();
-  const sanitizedFilename = `file_${timestamp}.${extension}`;
+  const sanitizedFilename = `file_${fileName ?? timestamp}.${extension}`;
   const key = `${user.companyProfile.name.replace(/\s+/g, '_')}/${folderName.replace(/\s+/g, '_')}/${sanitizedFilename}`;
 
   // Upload to S3

@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddFCIAndCUIDto, UpdateFCIAndCUIDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('FCI And CUI')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('fci-and-cui')
 export class FCIAndCUIController {
   constructor(private readonly fciAndcuiService: FCIAndCUIService) {}

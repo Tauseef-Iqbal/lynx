@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddBusinessGoalsDto, UpdateBusinessGoalsDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('BusinessGoals')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('business-goals')
 export class BusinessGoalsController {
   constructor(private readonly businessGoalsService: BusinessGoalsService) {}

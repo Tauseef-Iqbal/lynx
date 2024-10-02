@@ -1,47 +1,46 @@
-import { Column, DeleteDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CustomBaseEntity } from './custom-base.entity';
 import { CompanyProfileEntity } from './company-profile.entity';
-import { CpProductsAndServicesMetaDataEntity } from './cp-products-and-services-metadata.entity';
+import { CPProductsAndServicesMetadataEntity } from './cp-products-and-services-metadata.entity';
+import { IAssets } from 'src/modules/company-profile/interfaces';
 
 @Entity({ name: 'cp_products_and_services' })
-export class CpProductsAndServicesEntity extends CustomBaseEntity {
+export class CPProductsAndServicesEntity extends CustomBaseEntity {
   @Index()
-  @Column({ name: 'name', nullable: true, type: 'varchar', length: 255 })
-  name?: string;
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
 
-  @Column({ name: 'type', nullable: true, type: 'varchar', length: 60 })
-  type?: string;
+  @Column({ name: 'offering_type', type: 'varchar', length: 255, nullable: true })
+  offeringType?: string;
 
-  @Column({ name: 'product_or_service_image', nullable: true, type: 'text' })
-  productOrServiceImage?: string;
+  @Column({ type: 'text', nullable: true })
+  image?: string;
 
-  @Column({ name: 'description', type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ name: 'trl_specification', nullable: true, type: 'varchar', length: 255 })
+  @Column({ name: 'trl_specification', type: 'varchar', length: 255, nullable: true })
   trlSpecification?: string;
 
-  @Column({ name: 'mrl_specification', nullable: true, type: 'varchar', length: 255 })
+  @Column({ name: 'mrl_specification', type: 'varchar', length: 255, nullable: true })
   mrlSpecification?: string;
 
-  @Column({ name: 'compnay_differentiators', nullable: true, type: 'varchar', array: true, length: 255 })
+  @Column({ name: 'compnay_differentiators', type: 'varchar', array: true, length: 255, nullable: true })
   compnayDifferentiators?: string[];
 
-  @Column({ name: 'challenges_addressed', nullable: true, type: 'text' })
+  @Column({ name: 'challenges_addressed', type: 'text', nullable: true })
   challengesAddressed?: string;
 
-  @Column({ name: 'uploaded_materials', nullable: true, type: 'text', array: true })
-  uploadedMaterials?: string[];
+  @Column({ type: 'jsonb', nullable: true })
+  assets: IAssets[];
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
-  deletedAt?: Date;
-
-  // relation
-  @OneToMany(() => CpProductsAndServicesMetaDataEntity, (meta) => meta.cpProductsAndServicesId)
-  productsAndServicesMeta: CpProductsAndServicesMetaDataEntity[];
+  @OneToMany(() => CPProductsAndServicesMetadataEntity, (productsAndServicesMetadata) => productsAndServicesMetadata.productsAndServices, {
+    cascade: ['insert', 'update'],
+  })
+  productsAndServicesMetadata: CPProductsAndServicesMetadataEntity[];
 
   @Index()
-  @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.cpRequiredSystem, {
+  @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.productsAndServices, {
     nullable: false,
     // cascade: true,
     onDelete: 'NO ACTION',

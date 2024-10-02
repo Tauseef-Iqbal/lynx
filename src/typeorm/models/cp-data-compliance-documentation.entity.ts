@@ -1,62 +1,48 @@
-import { Entity, Column, DeleteDateColumn, Index, OneToOne, JoinColumn } from 'typeorm';
-import { CustomBaseEntity } from './custom-base.entity';
+import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { CompanyProfileEntity } from '.';
+import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity('cp_data_compliance_documentation')
-export class DataComplianceDocumentationEntity extends CustomBaseEntity {
-  // Documented Data Governance Policy
-  @Column({ type: 'boolean' })
-  hasDataGovernancePolicy: boolean;
+export class CPDataComplianceDocumentationEntity extends CustomBaseEntity {
+  @Column({ name: 'data_governance_policy', type: 'boolean', nullable: true })
+  dataGovernancePolicy?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'data_governance_policy_details', type: 'text', nullable: true })
   dataGovernancePolicyDetails?: string;
 
-  // Data Loss Prevention (DLP) Strategy
-  @Column({ type: 'boolean' })
-  hasDlpStrategy: boolean;
+  @Column({ name: 'dlp_strategy', type: 'boolean', nullable: true })
+  dlpStrategy?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'dlp_strategy_details', type: 'text', nullable: true })
   dlpStrategyDetails?: string;
 
-  // Access Log Maintenance
-  @Column({ type: 'boolean' })
-  hasAccessLog: boolean;
+  @Column({ name: 'access_log', type: 'boolean', nullable: true })
+  accessLog?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'access_log_details', type: 'text', nullable: true })
   accessLogDetails?: string;
 
-  // Incident Response Plan
-  @Column({ type: 'boolean' })
-  hasIncidentResponsePlan: boolean;
+  @Column({ name: 'incident_response_plan', type: 'boolean', nullable: true })
+  incidentResponse?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'incident_response_plan_details', type: 'text', nullable: true })
   incidentResponseDetails?: string;
 
-  // Privacy Act of 1974 Policy
-  @Column({ type: 'boolean' })
-  hasPrivacyActPolicy: boolean;
+  @Column({ name: 'privacy_act_policy', type: 'boolean', nullable: true })
+  privacyActPolicy?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'privacy_act_policy_details', type: 'text', nullable: true })
   privacyActPolicyDetails?: string;
 
-  // Data Disposal Procedure
-  @Column({ type: 'boolean' })
-  hasDataDisposalProcedure: boolean;
+  @Column({ name: 'data_disposal_procedure', type: 'boolean', nullable: true })
+  dataDisposalProcedure?: boolean;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'data_disposal_procedure_details', type: 'text', nullable: true })
   dataDisposalProcedureDetails?: string;
 
-  @DeleteDateColumn({
-    name: 'deleted_at',
-    type: 'timestamp with time zone',
-    nullable: true,
-  })
-  deletedAt?: Date;
-
   @Index()
-  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.toolsAndApplications, {
+  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.dataComplianceDocumentation, {
     nullable: false,
-    // cascade: true,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

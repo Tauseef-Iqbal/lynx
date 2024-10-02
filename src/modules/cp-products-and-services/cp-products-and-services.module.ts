@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CpProductsAndServicesController } from './cp-products-and-services.controller';
-import { CpProductsAndServicesService } from './cp-products-and-services.service';
+import { ProductsAndServicesService } from './cp-products-and-services.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CpProductsAndServicesEntity, CpProductsAndServicesMetaDataEntity } from 'src/typeorm/models';
-import { CpProductsAndServicesMetaDataService } from './cp-products-and-services-metadata.service';
+import { CPProductsAndServicesEntity, CPProductsAndServicesMetadataEntity } from 'src/typeorm/models';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CpProductsAndServicesEntity, CpProductsAndServicesMetaDataEntity])],
+  imports: [TypeOrmModule.forFeature([CPProductsAndServicesEntity, CPProductsAndServicesMetadataEntity])],
   controllers: [CpProductsAndServicesController],
-  providers: [CpProductsAndServicesService, CpProductsAndServicesMetaDataService],
+  providers: [ProductsAndServicesService],
 })
 export class CpProductsAndServicesModule {}

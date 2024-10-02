@@ -8,10 +8,11 @@ import { SupplyChainService } from './supply-chain.service';
 import { AddSupplyChainDto, UpdateSupplyChainDto } from './dtos';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { SupplyChainFiles } from './interfaces';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Supply Chain')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('supply-chain')
 export class SupplyChainController {
   constructor(private readonly supplyChainService: SupplyChainService) {}

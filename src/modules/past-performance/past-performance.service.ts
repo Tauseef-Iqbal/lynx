@@ -37,9 +37,11 @@ export class PastPerformanceService extends BaseTypeOrmCrudService<CpPastPerform
 
   async updatePastPerformance(user: any, id: number, updatePastPerformanceDto: CreatePastPerformanceDto, files: CpPastPerformanceFiles): Promise<CpPastPerformanceEntity> {
     const pastPerformance = await this.findById(id, { relations: { companyProfile: true, pastPerformanceTestimonials: true } });
-    if (!pastPerformance) {
-      throw new Error('Company product or service not associated with this company profile');
-    }
+    // if (!pastPerformance) {
+    //   throw new Error('Company product or service not associated with this company profile');
+    // }
+
+    if (!pastPerformance) return null;
 
     if (files.supportingDocs) {
       updatePastPerformanceDto.supportingDocs = await filesToUpdate(user, files.supportingDocs, pastPerformance.supportingDocs, pastPerformance.contractName, this.s3Service, this.configService, MAX_PAST_PROFORMANCE_FILE_SIZE_BYTES, MAX_PAST_PROFORMANCE_FILE_SIZE_MB);

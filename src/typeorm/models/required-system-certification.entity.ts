@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { RequiredSystemEntity } from './required-system.entity';
+import { CPRequiredSystemEntity } from './required-system.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity('required_system_certification')
@@ -22,7 +22,7 @@ export class RequiredSystemCertificationEntity extends CustomBaseEntity {
   })
   certificationStatus?: string;
 
-  @ManyToOne(() => RequiredSystemEntity, (requiredSystem) => requiredSystem.certifications, {
+  @ManyToOne(() => CPRequiredSystemEntity, (requiredSystem) => requiredSystem.certifications, {
     cascade: true,
     nullable: false,
     onDelete: 'NO ACTION',
@@ -30,5 +30,5 @@ export class RequiredSystemCertificationEntity extends CustomBaseEntity {
   })
   @JoinColumn({ name: 'required_system_id' })
   @Index()
-  requiredSystem: RequiredSystemEntity;
+  requiredSystem: CPRequiredSystemEntity;
 }

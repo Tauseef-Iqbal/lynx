@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { CompanyProfileGuard } from 'src/shared/middlewares';
 import { CreateRequiredSystemDto, UpdateRequiredSystemDto } from './dtos';
 import { BaseController } from 'src/shared/services';
-import { RequiredSystemEntity, UserEntity } from 'src/typeorm/models';
+import { CPRequiredSystemEntity, UserEntity } from 'src/typeorm/models';
 import { ResponseDto } from 'src/shared/dtos';
 import { User } from 'src/shared/decorators';
 
@@ -13,7 +13,7 @@ import { User } from 'src/shared/decorators';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('required-systems')
-export class RequiredSystemController extends BaseController<RequiredSystemEntity, CreateRequiredSystemDto | UpdateRequiredSystemDto> {
+export class RequiredSystemController extends BaseController<CPRequiredSystemEntity, CreateRequiredSystemDto | UpdateRequiredSystemDto> {
   constructor(private readonly requiredSystemService: RequiredSystemService) {
     super(requiredSystemService);
   }
@@ -24,7 +24,7 @@ export class RequiredSystemController extends BaseController<RequiredSystemEntit
   async createRequiredSystem(@User() user: UserEntity, @Body() createRequiredSystemDto: CreateRequiredSystemDto) {
     const requiredSystem = await this.requiredSystemService.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
 
-    let result: RequiredSystemEntity;
+    let result: CPRequiredSystemEntity;
     if (requiredSystem) {
       result = await this.requiredSystemService.updateRequiredSystem(requiredSystem, createRequiredSystemDto);
     } else {

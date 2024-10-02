@@ -59,7 +59,7 @@ export class CPResearchAndDevelopmentEntity extends CustomBaseEntity {
   intellectualPropertyProtectionDetails?: string;
 
   @Index()
-  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.revenue, {
+  @OneToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.researchAndDevelopment, {
     nullable: false,
     // cascade: true,
     onDelete: 'NO ACTION',

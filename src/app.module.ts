@@ -7,7 +7,7 @@ import { GlobalJwtModule } from './jwt/jwt.module';
 import { AuthModule } from './modules/auth';
 import { CognitoModule } from './modules/cognito/cognito.module';
 import { CompanyModule } from './modules/company';
-import { CompanyProfileLegalStructureModule } from './modules/company-profile-legal-structure';
+import { CompanyProfileLegalStructureModule } from './modules/legal-structure';
 import { ContactUsModule } from './modules/contact-us';
 import { MailerModule } from './modules/mailer/mailer.module';
 import { createLoggerOptions } from './shared/factories';
@@ -36,11 +36,11 @@ import { SupplyChainModule } from './modules/supply-chain';
 import { PersonnelModule } from './modules/personnel';
 import { PointsOfContactModule } from './modules/points-of-contact';
 import { DataComplianceDocumentationModule } from './modules/data-compliance-documentation/data-compliance-documentation.module';
-import { CpControlsAndProtocolsModule } from './modules/cp-controls-and-protocols/cp-controls-and-protocols.module';
 import { ResearchAndDevelopmentModule } from './modules/research-and-development';
 import { DataManagementAndStorageModule } from './modules/data-management-and-storage';
 import { FCIAndCUIModule } from './modules/fci-and-cui';
 import { CompanyOrverviewModule } from './modules/company-orverview/company-orverview.module';
+import { ControlsAndProtocolsModule } from './modules/controls-and-protocols/controls-and-protocols.module';
 
 @Module({
   imports: [
@@ -82,7 +82,7 @@ import { CompanyOrverviewModule } from './modules/company-orverview/company-orve
     PointsOfContactModule,
     ResearchAndDevelopmentModule,
     DataComplianceDocumentationModule,
-    CpControlsAndProtocolsModule,
+    ControlsAndProtocolsModule,
     DataManagementAndStorageModule,
     FCIAndCUIModule,
     CompanyOrverviewModule,

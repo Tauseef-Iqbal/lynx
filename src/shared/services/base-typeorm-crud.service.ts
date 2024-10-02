@@ -53,14 +53,17 @@ export class BaseTypeOrmCrudService<T> {
     options: {
       relations?: Record<string, string>;
       relationFilters?: Record<string, { condition: string; params: Record<string, any> }>;
+      bulkFetch?: boolean;
     } = {},
-  ): Promise<T | null> {
+  ): Promise<T[] | T | null> {
     const queryBuilder = this.repository.createQueryBuilder('entity');
 
     Object.keys(filter).forEach((key) => {
       if (typeof filter[key] === 'object' && filter[key] !== null) {
         Object.keys(filter[key]).forEach((nestedKey) => {
-          queryBuilder.andWhere(`entity.${key}.${nestedKey} = :${key}_${nestedKey}`, { [`${key}_${nestedKey}`]: filter[key][nestedKey] });
+          queryBuilder.andWhere(`entity.${key}.${nestedKey} = :${key}_${nestedKey}`, {
+            [`${key}_${nestedKey}`]: filter[key][nestedKey],
+          });
         });
       } else {
         queryBuilder.andWhere(`entity.${key} = :${key}`, { [key]: filter[key] });
@@ -78,7 +81,7 @@ export class BaseTypeOrmCrudService<T> {
       });
     }
 
-    return queryBuilder.getOne();
+    return options.bulkFetch ? queryBuilder.getMany() : queryBuilder.getOne();
   }
 
   async update(id: number, params: T): Promise<T> {

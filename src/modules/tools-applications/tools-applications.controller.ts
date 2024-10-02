@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddToolsAndApplicationsDto, UpdateToolsAndApplicationsDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Tools And Applications')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('tools-and-applications')
 export class ToolsAndApplicationsController {
   constructor(private readonly toolsAndApplicationsService: ToolsAndApplicationsService) {}

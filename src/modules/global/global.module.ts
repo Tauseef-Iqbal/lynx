@@ -21,11 +21,11 @@ export const RedisOptions: CacheModuleAsyncOptions = {
 
       return {
         store: store as unknown as CacheStore,
-        ttl: 24 * 60 * 60,
+        ttl: 24 * 60 * 60 * 60,
       };
     } else
       return {
-        ttl: 24 * 60 * 60,
+        ttl: 24 * 60 * 60 * 60,
       };
   },
   inject: [ConfigService],

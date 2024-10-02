@@ -15,7 +15,7 @@ export class HealthController {
   @Get()
   @HealthCheck()
   async check() {
-    const health = await this.health.check([async () => this.db.pingCheck('database')]);
+    const health = await this.health.check([async () => this.db.pingCheck('database', { timeout: 60000 })]);
     return new ResponseDto(HttpStatus.OK, 'Checking application health...', health);
   }
 }

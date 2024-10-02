@@ -17,7 +17,7 @@ export function createLoggerOptions(configService: ConfigService) {
           id: uuidv4(),
           method: req.method,
           url: req.url,
-          body: req.raw.body,
+          // body: req.raw.body,
           ip: req.raw.ip,
           headers: {
             'user-agent': req.raw.headers['user-agent'],

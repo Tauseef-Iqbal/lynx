@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddPointsOfContactDto, UpdatePointsOfContactDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Points Of Contact')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('points-of-contact')
 export class PointsOfContactController {
   constructor(private readonly pointsOfContactService: PointsOfContactService) {}

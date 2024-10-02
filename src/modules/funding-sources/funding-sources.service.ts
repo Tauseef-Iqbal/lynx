@@ -77,7 +77,7 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
   }
 
   async getFundingSourcesByFilter(filter: any): Promise<CPFundingSourcesEntity> {
-    return this.findByRelationFilters(filter, {
+    const result = await this.findByRelationFilters(filter, {
       relations: {
         companyProfile: 'companyProfile',
         fundingSourcesForeignAffiliation: 'fundingSourcesForeignAffiliation',
@@ -89,6 +89,8 @@ export class FundingSourcesService extends BaseTypeOrmCrudService<CPFundingSourc
         },
       },
     });
+
+    return result as CPFundingSourcesEntity;
   }
 
   async deleteMyFundingSources(companyProfileId: number): Promise<CPFundingSourcesEntity> {

@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddFundingSourcesDto, UpdateFundingSourcesDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Funding Sources')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('funding-sources')
 export class FundingSourcesController {
   constructor(private readonly fundingSourcesService: FundingSourcesService) {}

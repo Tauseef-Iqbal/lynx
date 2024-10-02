@@ -21,9 +21,6 @@ export class FinancialHealthService extends BaseTypeOrmCrudService<CPFinancialHe
   }
 
   async createFinancialHealthSection(user: UserEntity, createFinancialHealthSectionDto: CreateFinancialHealthSectionDto, files: FinancialHealthFiles): Promise<CPFinancialHealthEntity> {
-    console.log('createFinancialHealthSectionDto', createFinancialHealthSectionDto);
-    console.log('files', files);
-
     const existedFinancialHealth = await this.findByFilter({ companyProfile: { id: user.companyProfile.id }, isDeleted: false });
     if (existedFinancialHealth) {
       return this.updateFinancialHealthSection(existedFinancialHealth.id, user, createFinancialHealthSectionDto, files);

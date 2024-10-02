@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseTypeOrmCrudService } from 'src/shared/services';
 import { Repository } from 'typeorm';
@@ -52,9 +52,11 @@ export class AwardsService extends BaseTypeOrmCrudService<CpAwardEntity> {
 
   async updateAward(user: UserEntity, id: number, updateCpAwardDto: UpdateCpAwardDto): Promise<CpAwardEntity> {
     const cpAward = await this.findById(id, { relations: { companyProfile: true } });
-    if (!cpAward) {
-      throw new Error('Company award not associated with this company profile');
-    }
+    // if (!cpAward) {
+    //   throw new Error('Company award not associated with this company profile');
+    // }
+
+    if (!cpAward) return null;
 
     const { officialDocs, ...cpAwardData } = updateCpAwardDto;
 
@@ -72,7 +74,8 @@ export class AwardsService extends BaseTypeOrmCrudService<CpAwardEntity> {
     });
 
     if (!awards || awards.length === 0) {
-      throw new NotFoundException('No awards found for your company profile.');
+      // throw new NotFoundException('No awards found for your company profile.');
+      return [];
     }
 
     return awards;

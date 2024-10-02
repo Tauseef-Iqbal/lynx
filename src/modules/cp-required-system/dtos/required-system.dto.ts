@@ -54,6 +54,11 @@ export class RequiredSystemTypesDto {
 }
 
 export class CreateRequiredSystemDto {
+  @ApiProperty({ type: 'boolean' })
+  @IsOptional()
+  @IsBoolean()
+  hasSAM?: boolean;
+
   @ApiProperty({ type: 'string' })
   @IsOptional()
   @IsString()

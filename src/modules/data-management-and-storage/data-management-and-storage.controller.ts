@@ -6,10 +6,11 @@ import { JwtAuthGuard } from 'src/shared/guards';
 import { User } from 'src/shared/decorators';
 import { AddDataManagementAndStorageDto, UpdateDataManagementAndStorageDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Data Management And Storage')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('data-management-and-storage')
 export class DataManagementAndStorageController {
   constructor(private readonly dataManagementAndStorageService: DataManagementAndStorageService) {}

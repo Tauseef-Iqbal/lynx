@@ -1,7 +1,9 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Expose, Transform, Type } from 'class-transformer';
-import { IBaseCyberSecurityDetails, ICybersecurityStandardsCompliantDetails, IEncryptDataDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
+import { IBaseCyberSecurityDetails, IForeignEntityInvolvedDetails, IManageAccessControlDetails, IPrimaryFollowUpContact } from 'src/modules/cybersecurity/interfaces';
+import { CybersecurityStandardsComplianceDetailsDto } from './cybersecurity-standards-compliance-details.dto';
+import { CybersecurityEncryptionDetailsDto } from './cybersecurity-encryption-details.dto';
 
 class BaseCyberSecurityDetailsDto implements IBaseCyberSecurityDetails {
   @ApiPropertyOptional({ description: 'The frequency of the cybersecurity activity (e.g., monthly, quarterly).' })
@@ -18,30 +20,6 @@ class BaseCyberSecurityDetailsDto implements IBaseCyberSecurityDetails {
 export class PenetrationTestingDetailsDto extends BaseCyberSecurityDetailsDto {}
 export class CybersecurityTrainingDetailsDto extends BaseCyberSecurityDetailsDto {}
 export class CybersecurityAuditsDetailsDto extends BaseCyberSecurityDetailsDto {}
-
-export class CybersecurityStandardsCompliantDetailsDto implements ICybersecurityStandardsCompliantDetails {
-  @ApiPropertyOptional({ description: 'The framework or standard that the organization complies with.' })
-  @IsOptional()
-  @IsString()
-  framework?: string;
-
-  @ApiPropertyOptional({ description: 'The certification status related to cybersecurity standards compliance.' })
-  @IsOptional()
-  @IsString()
-  certificationStatus?: string;
-}
-
-export class EncryptDataDetailsDto implements IEncryptDataDetails {
-  @ApiPropertyOptional({ description: 'The encryption standard used for data protection.' })
-  @IsOptional()
-  @IsString()
-  standard?: string;
-
-  @ApiPropertyOptional({ description: 'The provider of the encryption services.' })
-  @IsOptional()
-  @IsString()
-  provider?: string;
-}
 
 export class ForeignEntityInvolvedDetailsDto implements IForeignEntityInvolvedDetails {
   @ApiPropertyOptional({ description: 'The name of the foreign entity involved in cybersecurity activities.' })
@@ -137,27 +115,14 @@ export class AddCybersecurityDto {
   @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   cybersecurityStandardsCompliant?: boolean;
 
-  @ApiPropertyOptional({ description: 'Details about the organization’s compliance with cybersecurity standards.', type: CybersecurityStandardsCompliantDetailsDto })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CybersecurityStandardsCompliantDetailsDto)
-  @Expose()
-  @Transform(({ obj, value }) => (obj.cybersecurityStandardsCompliant === false || obj.cybersecurityStandardsCompliant === 'false' ? null : value), { toClassOnly: true })
-  cybersecurityStandardsCompliantDetails?: CybersecurityStandardsCompliantDetailsDto;
-
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @ApiPropertyOptional({ description: 'Details about the organization’s compliance with cybersecurity standards.', type: CybersecurityStandardsComplianceDetailsDto })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
+  @ValidateNested()
+  @Type(() => CybersecurityStandardsComplianceDetailsDto)
   @Expose()
   @Transform(({ obj, value }) => (obj.cybersecurityStandardsCompliant === false || obj.cybersecurityStandardsCompliant === 'false' ? null : value), { toClassOnly: true })
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (typeof value === 'string') return [value];
-
-    return value;
-  })
-  cybersecurityStandardsCompliantFiles?: string[];
+  cybersecurityStandardsComplianceDetails?: CybersecurityStandardsComplianceDetailsDto[];
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization has an incident response plan.' })
   @IsOptional()
@@ -192,27 +157,14 @@ export class AddCybersecurityDto {
   @Transform(({ value }) => value === true || value === 'true', { toClassOnly: true })
   encryptData?: boolean;
 
-  @ApiPropertyOptional({ description: 'Details about the organization’s data encryption activities.', type: EncryptDataDetailsDto })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => EncryptDataDetailsDto)
-  @Expose()
-  @Transform(({ obj, value }) => (obj.encryptData === false || obj.encryptData === 'false' ? null : value), { toClassOnly: true })
-  encryptDataDetails?: EncryptDataDetailsDto;
-
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @ApiPropertyOptional({ description: 'Details about the organization’s data encryption activities.', type: CybersecurityEncryptionDetailsDto })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
+  @ValidateNested()
+  @Type(() => CybersecurityEncryptionDetailsDto)
   @Expose()
   @Transform(({ obj, value }) => (obj.encryptData === false || obj.encryptData === 'false' ? null : value), { toClassOnly: true })
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (typeof value === 'string') return [value];
-
-    return value;
-  })
-  encryptDataFiles?: string[];
+  cybersecurityEncryptionDetails?: CybersecurityEncryptionDetailsDto[];
 
   @ApiPropertyOptional({ description: 'Indicates whether the organization conducts cybersecurity audits.' })
   @IsOptional()

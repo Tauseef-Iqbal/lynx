@@ -40,22 +40,6 @@ export const processFilesToAdd = async ({ incomingFiles = [], incomingS3AndBase6
   return uploadedFiles;
 };
 
-export const processCpLegalStructureFilesToAdd = async (user: any, files: Express.Multer.File[], legalStructure: string, s3Service: S3Service, configService: ConfigService): Promise<string[]> => {
-  files.forEach((file) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      throw new Error(`File ${file.originalname} exceeds the maximum size of ${MAX_FILE_SIZE_MB} MB.`);
-    }
-  });
-
-  return Promise.all(
-    files.map(async (file) => {
-      const key = `${user.companyProfile.name}/${legalStructure}/${file.originalname}`;
-      await s3Service.uploadBuffer(file.buffer, key);
-      return `${configService.get<string>('AWS_S3_PUBLIC_LINK')}${key}`;
-    }),
-  );
-};
-
 export const processFilesToUpdate = async ({ existingFiles = [], incomingFiles = [], incomingS3AndBase64 = [], keyPrefix, configService, s3Service, assetsMetadata = [] }: ParamsToHandleUpdateFiles): Promise<any> => {
   const existingAssets = new Set<any>(existingFiles);
   const incomingAssets = new Set<any>();

@@ -31,7 +31,7 @@ export class RevenueController {
 
   @ApiOperation({ summary: 'Get My Revenue' })
   @Get('section/me')
-  async getMyCybersecurity(@User() user: UserEntity) {
+  async getMyRevenue(@User() user: UserEntity) {
     const response = await this.revenueService.getMyRevenue(user?.companyProfile?.id);
     return new ResponseDto(HttpStatus.OK, 'My Revenue fetched successfully!', response).toJSON();
   }

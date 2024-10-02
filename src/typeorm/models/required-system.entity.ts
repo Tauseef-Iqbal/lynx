@@ -6,7 +6,10 @@ import { CompanyProfileEntity } from './company-profile.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity('required_systems')
-export class RequiredSystemEntity extends CustomBaseEntity {
+export class CPRequiredSystemEntity extends CustomBaseEntity {
+  @Column({ name: 'has_sam', type: 'boolean', default: false })
+  hasSAM?: boolean;
+
   @OneToMany(() => RequiredSystemBusinessClassificationEntity, (classification) => classification.requiredSystem)
   businessClassifications: RequiredSystemBusinessClassificationEntity[];
 
@@ -26,7 +29,7 @@ export class RequiredSystemEntity extends CustomBaseEntity {
   governmentIntegrationDetails: string;
 
   @Index()
-  @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.cpRequiredSystem, {
+  @ManyToOne(() => CompanyProfileEntity, (companyProfile) => companyProfile.cpRequiredSystems, {
     nullable: false,
     // cascade: true,
     onDelete: 'NO ACTION',

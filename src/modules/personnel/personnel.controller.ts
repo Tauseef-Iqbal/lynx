@@ -8,10 +8,11 @@ import { AddPersonnelDto, UpdatePersonnelDto } from './dtos';
 import { UserEntity } from 'src/typeorm/models';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { IFOCIDesignationFiles } from './interfaces';
+import { CompanyProfileGuard } from 'src/shared/middlewares';
 
 @ApiTags('Personnel')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompanyProfileGuard)
 @Controller('personnel')
 export class PersonnelController {
   constructor(private readonly personnelService: PersonnelService) {}
@@ -28,7 +29,6 @@ export class PersonnelController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: AddPersonnelDto })
   async addPersonnel(@User() user: UserEntity, @Body() addPersonnelDto: AddPersonnelDto, @UploadedFiles() files: IFOCIDesignationFiles) {
-    console.log({ addPersonnelDto, files });
     const personnel = await this.personnelService.addPersonnel(user, addPersonnelDto, files);
     return new ResponseDto(HttpStatus.CREATED, 'Personnel added successfully!', personnel).toJSON();
   }

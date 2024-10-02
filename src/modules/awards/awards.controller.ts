@@ -41,7 +41,7 @@ export class AwardsController extends BaseController<CpAwardEntity, SaveCpAwardD
   @Get()
   async getMyAwards(@User() user: UserEntity) {
     const response = await this.awardService.getMyAwards(user?.companyProfile?.id);
-    return new ResponseDto(HttpStatus.OK, 'My Awards fetched successfully!', response).toJSON();
+    return new ResponseDto(HttpStatus.OK, 'My Awards fetched successfully!', { awards: response }).toJSON();
   }
 
   @ApiOperation({ summary: 'Update Company Award' })

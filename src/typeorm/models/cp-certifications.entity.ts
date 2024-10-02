@@ -38,4 +38,29 @@ export class CpCertificationsEntity extends CustomBaseEntity {
   })
   @JoinColumn({ name: 'cp_id' })
   companyProfile: CompanyProfileEntity;
+
+  @Column({
+    name: 'meta_data',
+    type: 'text',
+    default: null,
+    transformer: {
+      to(value) {
+        if (value)
+          try {
+            return JSON.stringify(value);
+          } catch (error) {
+            return value;
+          }
+      },
+      from(value) {
+        if (value)
+          try {
+            return JSON.parse(value);
+          } catch (error) {
+            return value;
+          }
+      },
+    },
+  })
+  metadata: JSON | string;
 }

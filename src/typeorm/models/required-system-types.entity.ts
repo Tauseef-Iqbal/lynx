@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { RequiredSystemEntity } from './required-system.entity';
+import { CPRequiredSystemEntity } from './required-system.entity';
 import { CustomBaseEntity } from './custom-base.entity';
 
 @Entity('required_system_types')
@@ -28,7 +28,7 @@ export class RequiredSystemTypesEntity extends CustomBaseEntity {
   })
   systemStatus?: string;
 
-  @ManyToOne(() => RequiredSystemEntity, (requiredSystem) => requiredSystem.systemTypes, {
+  @ManyToOne(() => CPRequiredSystemEntity, (requiredSystem) => requiredSystem.systemTypes, {
     cascade: true,
     nullable: false,
     onDelete: 'NO ACTION',
@@ -36,5 +36,5 @@ export class RequiredSystemTypesEntity extends CustomBaseEntity {
   })
   @JoinColumn({ name: 'required_system_id' })
   @Index()
-  requiredSystem: RequiredSystemEntity;
+  requiredSystem: CPRequiredSystemEntity;
 }

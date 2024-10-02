@@ -78,7 +78,7 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
   }
 
   async getRevenueByFilter(filter: any): Promise<CPRevenueEntity> {
-    return this.findByRelationFilters(filter, {
+    const result = await this.findByRelationFilters(filter, {
       relations: {
         companyProfile: 'companyProfile',
         projectsAwarded: 'projectsAwarded',
@@ -90,6 +90,8 @@ export class RevenueService extends BaseTypeOrmCrudService<CPRevenueEntity> {
         },
       },
     });
+
+    return result as CPRevenueEntity;
   }
 
   async deleteMyRevenue(companyProfileId: number): Promise<CPRevenueEntity> {

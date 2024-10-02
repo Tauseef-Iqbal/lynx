@@ -151,6 +151,7 @@ export class CreateCompanyProfileDto {
   @IsArray()
   @ValidateNested({ each: true })
   @IsObject({ each: true })
+  @Type(() => AssetsDto)
   assets?: AssetsDto[];
 
   @ApiPropertyOptional({ description: 'Names of the assets' })

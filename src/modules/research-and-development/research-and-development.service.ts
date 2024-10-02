@@ -196,7 +196,7 @@ export class ResearchAndDevelopmentService extends BaseTypeOrmCrudService<CPRese
   }
 
   async getMyResearchAndDevelopment(companyProfileId: number): Promise<CPResearchAndDevelopmentEntity> {
-    const myResearchAndDevelopment = await this.findByRelationFilters({ companyProfile: { id: companyProfileId } });
+    const myResearchAndDevelopment = await this.getResearchAndDevelopmentByFilter({ companyProfile: { id: companyProfileId } });
     // if (!myResearchAndDevelopment) {
     //   throw new NotFoundException('ResearchAndDevelopment not found against your company profile');
     // }
@@ -207,7 +207,7 @@ export class ResearchAndDevelopmentService extends BaseTypeOrmCrudService<CPRese
   }
 
   async getResearchAndDevelopmentByFilter(filter: any): Promise<CPResearchAndDevelopmentEntity> {
-    return this.findByRelationFilters(filter, {
+    const result = await this.findByRelationFilters(filter, {
       relations: {
         companyProfile: 'companyProfile',
         researchAndDevelopmentInnovations: 'researchAndDevelopmentInnovations',
@@ -239,6 +239,8 @@ export class ResearchAndDevelopmentService extends BaseTypeOrmCrudService<CPRese
         },
       },
     });
+
+    return result as CPResearchAndDevelopmentEntity;
   }
 
   async deleteMyResearchAndDevelopment(companyProfileId: number): Promise<CPResearchAndDevelopmentEntity> {

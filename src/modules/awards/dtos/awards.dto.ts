@@ -16,6 +16,11 @@ export class CpAwardsOfficalDocsDto {
   @IsArray()
   @IsString({ each: true })
   b64Images?: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  fileName?: string;
 }
 
 export class SaveCpAwardDto {

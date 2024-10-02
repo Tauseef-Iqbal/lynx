@@ -97,7 +97,15 @@ export class CreatePastPerformanceDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (value ? value.split(',').map((item: string) => item.trim()) : []))
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').map((item: string) => item.trim());
+    } else if (Array.isArray(value)) {
+      return value.map((item: string) => (typeof item === 'string' ? item.trim() : item));
+    } else {
+      return [];
+    }
+  })
   subcontractorsPartners?: string[];
 
   @ApiPropertyOptional({

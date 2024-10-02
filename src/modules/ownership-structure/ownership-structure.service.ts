@@ -98,7 +98,7 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
   }
 
   async getOwnershipStructureByFilter(filter: any): Promise<CPOwnershipStructureEntity> {
-    return this.findByRelationFilters(filter, {
+    const result = await this.findByRelationFilters(filter, {
       relations: {
         companyProfile: 'companyProfile',
         ownershipStructureDetails: 'ownershipStructureDetails',
@@ -115,6 +115,8 @@ export class OwnershipStructureService extends BaseTypeOrmCrudService<CPOwnershi
         },
       },
     });
+
+    return result as CPOwnershipStructureEntity;
   }
 
   async deleteMyOwnershipStructure(companyProfileId: number): Promise<CPOwnershipStructureEntity> {

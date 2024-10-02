@@ -7,14 +7,16 @@ export interface IPenetrationTestingDetails extends IBaseCyberSecurityDetails {}
 export interface ICybersecurityTrainingDetails extends IBaseCyberSecurityDetails {}
 export interface ICybersecurityAuditsDetails extends IBaseCyberSecurityDetails {}
 
-export interface ICybersecurityStandardsCompliantDetails {
+export interface ICybersecurityStandardsComplianceDetails {
   framework?: string;
   certificationStatus?: string;
+  complianceFiles?: Express.Multer.File[];
 }
 
-export interface IEncryptDataDetails {
+export interface ICybersecurityEncryptionDetails {
   standard?: string;
   provider?: string;
+  encryptionFiles?: string[];
 }
 
 export interface IForeignEntityInvolvedDetails {
@@ -32,9 +34,4 @@ export interface IPrimaryFollowUpContact {
   title?: string;
   email?: string;
   phone?: string;
-}
-
-export interface CybersecurityFiles {
-  cybersecurityStandardsCompliantFiles?: Express.Multer.File[];
-  encryptDataFiles?: Express.Multer.File[];
 }

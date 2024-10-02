@@ -1,15 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
-import { OneOf } from '../validator/company.validator';
 
 export class SearchCompanyDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  @OneOf(['title'], {
-    message: 'Either sam_or_cage or title must be provided.',
-  })
+  // @OneOf(['title'], {
+  //   message: 'Either sam_or_cage or title must be provided.',
+  // })
   sam_or_cage?: string;
 
   @ApiProperty()

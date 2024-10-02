@@ -9,7 +9,13 @@ import { Logger as PinoLogger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: true,
+    cors: {
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      allowedHeaders: '*',
+    },
+    logger: false,
+    bufferLogs: true,
   });
   const config = app.get(ConfigService);
   const PORT = config.get<number>('PORT') || 3000;
@@ -47,6 +53,9 @@ async function bootstrap() {
   await app.listen(PORT);
   const logger = new Logger('Main');
   logger.log(`Application listening on port ${PORT}`);
+
+  process.on('uncaughtException', (err) => logger.error(err, 'Uncaught Exception'));
+  process.on('unhandledRejection', (reason, promise) => logger.error({ reason, promise }, 'Unhandled Rejection'));
 }
 
 bootstrap();
